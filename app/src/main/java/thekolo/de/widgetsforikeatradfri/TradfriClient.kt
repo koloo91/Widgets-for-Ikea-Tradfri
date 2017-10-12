@@ -16,14 +16,20 @@ class TradfriClient(private val ip: String, private val securityId: String) {
     private val gson = Gson()
     private val baseUrl = "coap://$ip:5684"
 
-    private fun client(url: String): CoapClient {
-        val client = CoapClient(url)
 
+    private fun getCoapEndpoint(): CoapEndpoint {
+        println("GetCoapEndpoint")
         val builder = DtlsConnectorConfig.Builder(InetSocketAddress(0))
         builder.setPskStore(StaticPskStore("Client_identity", securityId.toByteArray()))
         val dtlsConnector = DTLSConnector(builder.build())
-        client.endpoint = CoapEndpoint(dtlsConnector, NetworkConfig.getStandard())
+        return CoapEndpoint(dtlsConnector, NetworkConfig.getStandard())
+    }
 
+    private val coapEndpoint: CoapEndpoint = getCoapEndpoint()
+
+    private fun client(url: String): CoapClient {
+        val client = CoapClient(url)
+        client.endpoint = coapEndpoint
         return client
     }
 
