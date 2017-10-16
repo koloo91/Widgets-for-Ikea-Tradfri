@@ -3,6 +3,7 @@ package thekolo.de.widgetsforikeatradfri
 import com.google.gson.Gson
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.selects.selectUnbiased
 import org.eclipse.californium.core.CoapClient
 import org.eclipse.californium.core.CoapResponse
 import org.eclipse.californium.core.coap.MediaTypeRegistry
@@ -53,6 +54,26 @@ class TradfriClient(private val ip: String, private val securityId: String) {
             val deviceIds = getDeviceIds().await() ?: emptyList()
             deviceIds.map {
                 getDevice("$it").await()
+            }
+        }
+    }
+
+    fun toogleDevice(deviceId: String) {
+        async {
+            val device = getDevice(deviceId).await()
+            if (device != null) {
+                if (device.states != null && device.states.isNotEmpty()) {
+                    val state = device.states.first().on ?: 0
+                    when (state) {
+                        0 -> turnDeviceOn(deviceId)
+                        1 -> turnDeviceOff(deviceId)
+                        else -> {
+                            turnDeviceOn(deviceId)
+                        }
+                    }
+                } else {
+                    turnDeviceOn(deviceId)
+                }
             }
         }
     }

@@ -10,6 +10,7 @@ class ListViewItemClickedBroadcastReceiver : BroadcastReceiver() {
         if(intent == null) return
         val id = intent.getIntExtra(TradfriAppWidgetProvider.DEVICE_ID, -1)
         println("OnReceive id: $id")
+        Client.getInstance().toogleDevice("$id")
     }
 
     companion object {
