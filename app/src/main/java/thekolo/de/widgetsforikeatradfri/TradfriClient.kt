@@ -1,6 +1,8 @@
 package thekolo.de.widgetsforikeatradfri
 
 import com.google.gson.Gson
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
 import org.eclipse.californium.core.CoapClient
 import org.eclipse.californium.core.CoapResponse
 import org.eclipse.californium.core.coap.MediaTypeRegistry
@@ -9,7 +11,6 @@ import org.eclipse.californium.core.network.config.NetworkConfig
 import org.eclipse.californium.scandium.DTLSConnector
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.pskstore.StaticPskStore
-import java.lang.reflect.Type
 import java.net.InetSocketAddress
 
 class TradfriClient(private val ip: String, private val securityId: String) {
@@ -33,21 +34,27 @@ class TradfriClient(private val ip: String, private val securityId: String) {
         return client
     }
 
-    fun getDeviceIds(): List<Int>? {
-        val response = client("$baseUrl/15001").get()
-        return parseResponse(response, List::class.java) as List<Int>?
+    fun getDeviceIds(): Deferred<List<Int>?> {
+        return async {
+            val response = client("$baseUrl/15001").get()
+            parseResponse(response, List::class.java) as List<Int>?
+        }
     }
 
-    fun getDevice(deviceId: String): Device? {
-        val response = client("$baseUrl/15001/$deviceId").get()
-        return parseResponse(response, Device::class.java)
+    fun getDevice(deviceId: String): Deferred<Device?> {
+        return async {
+            val response = client("$baseUrl/15001/$deviceId").get()
+            parseResponse(response, Device::class.java)
+        }
     }
 
-    fun getDevices(): List<Device> {
-        val deviceIds = getDeviceIds() ?: emptyList()
-        return deviceIds.map {
-            getDevice("$it")
-        }.filter { it != null }.map { it!! }
+    fun getDevices(): Deferred<List<Device?>> {
+        return async {
+            val deviceIds = getDeviceIds().await() ?: emptyList()
+            deviceIds.map {
+                getDevice("$it").await()
+            }
+        }
     }
 
     fun getGroups(): CoapResponse {

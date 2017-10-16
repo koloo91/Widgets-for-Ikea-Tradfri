@@ -24,8 +24,15 @@ class TradfriAppWidgetProvider : AppWidgetProvider() {
             intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
             val widget = RemoteViews(context.packageName, R.layout.example_appwidget)
-
             widget.setRemoteAdapter(R.id.devices_list_view, intent)
+
+            val clickIntent = Intent(context, ListViewItemClickedBroadcastReceiver::class.java)
+            clickIntent.action = ListViewItemClickedBroadcastReceiver.INTENT_NAME
+            clickIntent.setClassName(ListViewItemClickedBroadcastReceiver::class.java.`package`.name, ListViewItemClickedBroadcastReceiver::class.java.canonicalName)
+            val clickPI = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            widget.setPendingIntentTemplate(R.id.devices_list_view, clickPI)
+
 
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, widget)
@@ -33,7 +40,7 @@ class TradfriAppWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        const val EXTRA_WORD = "com.commonsware.android.appwidget.lorem.WORD"
+        const val DEVICE_ID = "com.commonsware.android.appwidget.lorem.WORD"
     }
 }
 
