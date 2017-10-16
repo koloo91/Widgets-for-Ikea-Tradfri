@@ -16,7 +16,8 @@ class MainActivity : AppCompatActivity() {
 
         val client = TradfriClient(ip, securityId)
         val device = client.getDevice(stehlampe)
-        val turnOffResponse = client.turnDeviceOn(stehlampe)
+        println(device)
+        //val turnOffResponse = client.turnDeviceOn(stehlampe)
         val response = client.getDevices()
         println(response)
 
