@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 26
@@ -35,10 +36,16 @@ dependencies {
     })
     implementation 'org.eclipse.californium:californium-core:1.0.6'
     implementation 'org.eclipse.californium:scandium:1.0.6'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.google.code.gson:gson:2.8.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.1'
+
 }
 repositories {
     mavenCentral()
 }
-
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}

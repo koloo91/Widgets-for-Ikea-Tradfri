@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Widgets for Ikea Tradfri</string>
+    <string name="device_name">Name</string>
 </resources>
