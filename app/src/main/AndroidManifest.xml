@@ -25,7 +25,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/example_appwidget_info" />
+                android:resource="@xml/tradfri_appwidget_info" />
         </receiver>
 
         <receiver android:name=".ListViewItemClickedBroadcastReceiver" />

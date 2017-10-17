@@ -23,7 +23,7 @@ class TradfriAppWidgetProvider : AppWidgetProvider() {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i])
             intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
-            val widget = RemoteViews(context.packageName, R.layout.example_appwidget)
+            val widget = RemoteViews(context.packageName, R.layout.tradfri_appwidget)
             widget.setRemoteAdapter(R.id.devices_list_view, intent)
 
             val clickIntent = Intent(context, ListViewItemClickedBroadcastReceiver::class.java)
