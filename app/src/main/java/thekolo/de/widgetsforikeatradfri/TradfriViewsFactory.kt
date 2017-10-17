@@ -34,12 +34,7 @@ class TradfriViewsFactory(private val context: Context, private val devices: Lis
         val device = devices[position]
 
         val row = RemoteViews(context.packageName, R.layout.device_list_view_item)
-        row.setTextViewText(R.id.device_id_text_view, "${device.id}")
         row.setTextViewText(R.id.device_name_text_view, device.name)
-        device.states?.let {
-            if (it.isNotEmpty())
-                row.setTextViewText(R.id.device_state_text_view, onText(it.first().on))
-        }
 
         val rowIntent = Intent()
         val extras = Bundle()

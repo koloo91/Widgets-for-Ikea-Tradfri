@@ -4,25 +4,12 @@
     android:id="@+id/device_row_item"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="0dp">
-
-    <TextView
-        android:id="@+id/device_id_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Id"/>
+    android:background="@android:color/white"
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/device_name_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Name"
-        android:layout_below="@+id/device_id_text_view"/>
-
-    <TextView
-        android:id="@+id/device_state_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="State"
-        android:layout_below="@+id/device_name_text_view"/>
+        android:text="@string/device_name"/>
 </RelativeLayout>

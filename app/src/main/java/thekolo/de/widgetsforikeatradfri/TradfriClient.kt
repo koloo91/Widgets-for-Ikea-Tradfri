@@ -52,9 +52,8 @@ class TradfriClient(private val ip: String, private val securityId: String) {
     fun getDevices(): Deferred<List<Device?>> {
         return async {
             val deviceIds = getDeviceIds().await() ?: emptyList()
-            deviceIds.map {
-                getDevice("$it").await()
-            }
+            val devices = deviceIds.map { getDevice("$it").await() }
+            devices.filterNotNull().filter { !it.type.name.contains("remote control") }
         }
     }
 
@@ -97,12 +96,12 @@ class TradfriClient(private val ip: String, private val securityId: String) {
     }
 
     private fun <T> parseResponse(response: CoapResponse, type: Class<T>): T? {
-        try {
+        return try {
             val payload = String(response.payload)
-            return gson.fromJson<T>(payload, type)
+            gson.fromJson<T>(payload, type)
         } catch (e: Exception) {
             println(e.message)
-            return null
+            null
         }
     }
 }
