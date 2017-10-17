@@ -34,6 +34,8 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'org.eclipse.californium:californium-core:1.0.6'
     implementation 'org.eclipse.californium:scandium:1.0.6'
     implementation 'com.google.code.gson:gson:2.8.2'
