@@ -19,11 +19,4 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true" />
-
-    <SeekBar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxHeight="6dp"
-        android:minHeight="6dp"
-        android:layout_below="@+id/device_name_text_view"/>
 </RelativeLayout>
