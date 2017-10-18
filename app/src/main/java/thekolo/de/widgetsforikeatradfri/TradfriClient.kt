@@ -49,7 +49,7 @@ class TradfriClient(private val ip: String, private val securityId: String) {
         }
     }
 
-    fun getDevices(): Deferred<List<Device?>> {
+    fun getDevices(): Deferred<List<Device>> {
         return async {
             val deviceIds = getDeviceIds().await() ?: emptyList()
             val devices = deviceIds.map { getDevice("$it").await() }

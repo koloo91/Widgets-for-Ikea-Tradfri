@@ -2,8 +2,8 @@
     android:minWidth="40dp"
     android:minHeight="40dp"
     android:updatePeriodMillis="1800000"
-    android:previewImage="@mipmap/ic_launcher_round"
-    android:initialLayout="@layout/example_appwidget"
+    android:previewImage="@mipmap/ic_launcher"
+    android:initialLayout="@layout/tradfri_appwidget"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
 </appwidget-provider>
