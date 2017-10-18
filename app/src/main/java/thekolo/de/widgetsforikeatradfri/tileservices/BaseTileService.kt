@@ -5,6 +5,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.support.annotation.RequiresApi
+import kotlinx.coroutines.experimental.runBlocking
 import thekolo.de.widgetsforikeatradfri.Client
 import thekolo.de.widgetsforikeatradfri.Device
 import thekolo.de.widgetsforikeatradfri.StorageService.SHARED_PREFS_NAME
@@ -15,15 +16,38 @@ import thekolo.de.widgetsforikeatradfri.utils.DeviceUtil
 abstract class BaseTileService : TileService() {
     abstract val PREFERENCES_ID: String
 
-    protected val client: TradfriClient
+    private val client: TradfriClient
         get() = Client.getInstance()
 
-    protected fun idFromPreferences(): String? {
+    override fun onStartListening() {
+        println("onStartListeningTile")
+
+        val id = idFromPreferences() ?: return
+        val device = runBlocking {
+            client.getDevice(id).await()
+        }
+
+        updateTile(device)
+    }
+
+    override fun onClick() {
+        println("OnClickTile")
+
+        val id = idFromPreferences() ?: return
+        val device = runBlocking {
+            client.toogleDevice(id).await()
+            client.getDevice(id).await()
+        }
+
+        updateTile(device)
+    }
+
+    private fun idFromPreferences(): String? {
         val preferences = applicationContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
         return preferences.getString(PREFERENCES_ID, null)
     }
 
-    protected fun updateTile(device: Device?) {
+    private fun updateTile(device: Device?) {
         val tile = qsTile
 
         if (device == null) {

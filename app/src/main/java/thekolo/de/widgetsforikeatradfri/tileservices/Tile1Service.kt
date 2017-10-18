@@ -2,34 +2,34 @@ package thekolo.de.widgetsforikeatradfri.tileservices
 
 import android.os.Build
 import android.support.annotation.RequiresApi
-import kotlinx.coroutines.experimental.runBlocking
 import thekolo.de.widgetsforikeatradfri.StorageService
 
 @RequiresApi(Build.VERSION_CODES.N)
 class Tile1Service : BaseTileService() {
     override val PREFERENCES_ID: String
         get() = StorageService.SHARED_PREF_TILE_1
+}
 
-    override fun onStartListening() {
-        println("onStartListeningTile1")
+@RequiresApi(Build.VERSION_CODES.N)
+class Tile2Service : BaseTileService() {
+    override val PREFERENCES_ID: String
+        get() = StorageService.SHARED_PREF_TILE_2
+}
 
-        val id = idFromPreferences() ?: return
-        val device = runBlocking {
-            client.getDevice(id).await()
-        }
+@RequiresApi(Build.VERSION_CODES.N)
+class Tile3Service : BaseTileService() {
+    override val PREFERENCES_ID: String
+        get() = StorageService.SHARED_PREF_TILE_3
+}
 
-        updateTile(device)
-    }
+@RequiresApi(Build.VERSION_CODES.N)
+class Tile4Service : BaseTileService() {
+    override val PREFERENCES_ID: String
+        get() = StorageService.SHARED_PREF_TILE_4
+}
 
-    override fun onClick() {
-        println("OnClickTile1")
-
-        val id = idFromPreferences() ?: return
-        val device = runBlocking {
-            client.toogleDevice(id).await()
-            client.getDevice(id).await()
-        }
-
-        updateTile(device)
-    }
+@RequiresApi(Build.VERSION_CODES.N)
+class Tile5Service : BaseTileService() {
+    override val PREFERENCES_ID: String
+        get() = StorageService.SHARED_PREF_TILE_5
 }
