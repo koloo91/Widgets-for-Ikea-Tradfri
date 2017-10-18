@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="TradfriAppWidgetProvider">
+        <receiver android:name=".widgets.TradfriAppWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -31,8 +31,19 @@
         <receiver android:name=".ListViewItemClickedBroadcastReceiver" />
 
         <service
-            android:name=".TradfriWidgetService"
+            android:name=".widgets.TradfriWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".tileservices.Tile1Service"
+            android:label="Tile 1"
+            android:icon="@drawable/ic_launcher_background"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

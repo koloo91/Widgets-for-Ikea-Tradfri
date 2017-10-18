@@ -1,10 +1,12 @@
-package thekolo.de.widgetsforikeatradfri
+package thekolo.de.widgetsforikeatradfri.widgets
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import thekolo.de.widgetsforikeatradfri.Device
+import thekolo.de.widgetsforikeatradfri.R
 
 
 class TradfriViewsFactory(private val context: Context, private val devices: List<Device>) : RemoteViewsService.RemoteViewsFactory {
