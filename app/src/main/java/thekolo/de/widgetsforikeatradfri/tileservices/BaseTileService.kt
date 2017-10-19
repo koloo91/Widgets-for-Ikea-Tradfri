@@ -1,6 +1,7 @@
 package thekolo.de.widgetsforikeatradfri.tileservices
 
 import android.content.Context
+import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
@@ -8,6 +9,7 @@ import android.support.annotation.RequiresApi
 import kotlinx.coroutines.experimental.runBlocking
 import thekolo.de.widgetsforikeatradfri.Client
 import thekolo.de.widgetsforikeatradfri.Device
+import thekolo.de.widgetsforikeatradfri.R
 import thekolo.de.widgetsforikeatradfri.StorageService.SHARED_PREFS_NAME
 import thekolo.de.widgetsforikeatradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.utils.DeviceUtil
@@ -58,8 +60,10 @@ abstract class BaseTileService : TileService() {
 
         if (DeviceUtil.isDeviceOn(device)) {
             tile.state = Tile.STATE_ACTIVE
+            tile.icon = Icon.createWithResource(applicationContext, R.drawable.lightbulb_on_outline)
         } else {
             tile.state = Tile.STATE_INACTIVE
+            tile.icon = Icon.createWithResource(applicationContext, R.drawable.lightbulb_outline)
         }
 
         tile.label = device.name
