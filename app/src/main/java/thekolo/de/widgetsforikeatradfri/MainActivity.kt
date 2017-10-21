@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.launch
@@ -42,16 +43,17 @@ class MainActivity : AppCompatActivity() {
         loadDevices()
     }
 
+    private fun isOtherDeviceOnTile(device: Device, position: Int): Boolean {
+        val deviceOnTile = deviceDataDao.findByTile(TileUtil.nameForIndex(position))
+        return deviceOnTile != null && device.id != deviceOnTile.id
+    }
+
     private val deviceAdapterListener = object : DevicesAdapter.DevicesAdapterActions {
         override fun onSpinnerItemSelected(device: Device, position: Int) {
             launch {
                 if (position == TileUtil.NONE.index) return@launch
-                val deviceOnTile = deviceDataDao.findByTile(TileUtil.nameForIndex(position))
-
-                if (deviceOnTile != null && device.id != deviceOnTile.id) {
-                    Snackbar.make(devices_recycler_view, "Only one device per tile is allowed", Snackbar.LENGTH_LONG).setAction("Ok", { _ ->
-
-                    }).show()
+                if (isOtherDeviceOnTile(device, position)) {
+                    displayErrorMessage("Only one device per tile is allowed")
 
                     runOnUiThread {
                         adapter.notifyDataSetChanged()
@@ -60,30 +62,39 @@ class MainActivity : AppCompatActivity() {
                     return@launch
                 }
 
-                val id = deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position)))
-                println("Inserted new entry with id: $id and position: $position for device: ${device.name}")
-                //Snackbar.make(devices_recycler_view, "Saved", Snackbar.LENGTH_LONG).show()
+                deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position)))
             }
         }
 
         override fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean) {
-            val response = when (isChecked) {
-                true -> client.turnDeviceOn(device.id)
-                false -> client.turnDeviceOff(device.id)
+            runBlocking {
+                val response = when (isChecked) {
+                    true -> client.turnDeviceOn(device.id)
+                    false -> client.turnDeviceOff(device.id)
+                }.await()
+
+                loadDevices()
+
+                if (!response?.isSuccess!!)
+                    displayErrorMessage("An unexpected error occured")
             }
-
-            loadDevices()
-
-            if (!response?.isSuccess!!)
-                Snackbar.make(devices_recycler_view, "An unexpected error occured", Snackbar.LENGTH_LONG).show()
         }
     }
 
     private fun loadDevices() {
-        runBlocking {
-            adapter.devices = client.getDevices().await()
-            adapter.notifyDataSetChanged()
-            devices_recycler_view.adapter = adapter
+        progress_bar.visibility = View.VISIBLE
+        devices_recycler_view.adapter = adapter
+
+        launch {
+            adapter.devices = client.getDevices().await() ?: emptyList()
+            runOnUiThread {
+                progress_bar.visibility = View.GONE
+                adapter.notifyDataSetChanged()
+            }
         }
+    }
+
+    private fun displayErrorMessage(message: String) {
+        Snackbar.make(devices_recycler_view, message, Snackbar.LENGTH_LONG).setAction("Ok", { _ -> }).show()
     }
 }
