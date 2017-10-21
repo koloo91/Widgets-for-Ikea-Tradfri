@@ -48,7 +48,7 @@ class TradfriClient(ip: String, private val securityId: String) {
     private fun getDeviceIds(): Deferred<List<Int>?> {
         return tryAsync {
             val response = client("$baseUrl/15001").get()
-            parseResponse(response, List::class.java) as List<Int>?
+            parseResponse(response, List::class.java) as List<Int>
         }
     }
 
