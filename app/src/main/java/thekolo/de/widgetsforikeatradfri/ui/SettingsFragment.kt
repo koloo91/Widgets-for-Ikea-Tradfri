@@ -1,13 +1,12 @@
-package thekolo.de.widgetsforikeatradfri
+package thekolo.de.widgetsforikeatradfri.ui
 
 import android.content.SharedPreferences
-import android.preference.PreferenceFragment
 import android.os.Bundle
 import android.preference.EditTextPreference
-import android.R.attr.key
-
-
-
+import android.preference.PreferenceFragment
+import thekolo.de.widgetsforikeatradfri.R
+import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
+import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil.DEFAULT_SHARED_PREFERENCES_FILE
 
 
 class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -24,20 +23,17 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if(sharedPreferences == null || key == null) return
+        if (sharedPreferences == null || key == null) return
 
         updateSummaries()
     }
 
     private fun updateSummaries() {
-        val gatewayPref = preferenceManager.findPreference("gateway_ip") as EditTextPreference
+        val gatewayPref = preferenceManager.findPreference(SettingsUtil.GATEWAY_IP_KEY) as EditTextPreference
         gatewayPref.summary = gatewayPref.text
 
-        val securityIdPref = preferenceManager.findPreference("security_id") as EditTextPreference
+        val securityIdPref = preferenceManager.findPreference(SettingsUtil.SECURITY_ID_KEY) as EditTextPreference
         securityIdPref.summary = securityIdPref.text
     }
 
-    companion object {
-        const val DEFAULT_SHARED_PREFERENCES_FILE = "thekolo.de.widgetsforikeatradfri.settings"
-    }
 }

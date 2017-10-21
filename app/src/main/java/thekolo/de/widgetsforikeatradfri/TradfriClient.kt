@@ -1,5 +1,6 @@
 package thekolo.de.widgetsforikeatradfri
 
+import android.content.Context
 import com.google.gson.Gson
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
@@ -11,12 +12,13 @@ import org.eclipse.californium.core.network.config.NetworkConfig
 import org.eclipse.californium.scandium.DTLSConnector
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.pskstore.StaticPskStore
+import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 import java.net.InetSocketAddress
 
 class TradfriClient(ip: String, private val securityId: String) {
     private val gson = Gson()
     private val baseUrl = "coap://$ip:5684"
-
+    private val coapEndpoint: CoapEndpoint = getCoapEndpoint()
 
     private fun getCoapEndpoint(): CoapEndpoint {
         println("GetCoapEndpoint")
@@ -24,19 +26,6 @@ class TradfriClient(ip: String, private val securityId: String) {
         builder.setPskStore(StaticPskStore("Client_identity", securityId.toByteArray()))
         val dtlsConnector = DTLSConnector(builder.build())
         return CoapEndpoint(dtlsConnector, NetworkConfig.getStandard())
-    }
-
-    private val coapEndpoint: CoapEndpoint = getCoapEndpoint()
-
-    private fun <T> tryAsync(f: suspend () -> T): Deferred<T?> {
-        return async {
-            return@async try {
-                f()
-            } catch (e: Exception) {
-                println(e)
-                null
-            }
-        }
     }
 
     private fun client(url: String): CoapClient {
@@ -67,7 +56,7 @@ class TradfriClient(ip: String, private val securityId: String) {
         }
     }
 
-    fun toogleDevice(deviceId: Int): Deferred<Unit?> {
+    fun toggleDevice(deviceId: Int): Deferred<Unit?> {
         return tryAsync {
             val device = getDevice(deviceId).await() ?: return@tryAsync
 
@@ -113,6 +102,32 @@ class TradfriClient(ip: String, private val securityId: String) {
         } catch (e: Exception) {
             println(e.message)
             null
+        }
+    }
+
+    private fun <T> tryAsync(f: suspend () -> T): Deferred<T?> {
+        return async {
+            return@async try {
+                f()
+            } catch (e: Exception) {
+                println(e)
+                null
+            }
+        }
+    }
+
+
+    companion object {
+        private var client: TradfriClient? = null
+
+        fun getInstance(context: Context): TradfriClient {
+            if (client == null) {
+                val ip = SettingsUtil.getGatewayIp(context.applicationContext) ?: ""
+                val securityId = SettingsUtil.getSecurityId(context.applicationContext) ?: ""
+                client = TradfriClient(ip, securityId)
+            }
+
+            return client!!
         }
     }
 }

@@ -1,4 +1,4 @@
-package thekolo.de.widgetsforikeatradfri
+package thekolo.de.widgetsforikeatradfri.ui
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -8,7 +8,8 @@ import android.view.ViewGroup
 import android.widget.*
 import kotlinx.android.synthetic.main.device_recycler_view_item.view.*
 import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import thekolo.de.widgetsforikeatradfri.Device
+import thekolo.de.widgetsforikeatradfri.R
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 

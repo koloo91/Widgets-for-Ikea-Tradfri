@@ -1,5 +1,6 @@
-package thekolo.de.widgetsforikeatradfri
+package thekolo.de.widgetsforikeatradfri.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
@@ -12,19 +13,22 @@ import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
+import thekolo.de.widgetsforikeatradfri.Device
+import thekolo.de.widgetsforikeatradfri.R
+import thekolo.de.widgetsforikeatradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
-import android.R.menu
-import android.content.Intent
-import android.view.MenuInflater
 
 
 class MainActivity : AppCompatActivity() {
 
+    /*private val ip = "192.168.178.56"
+    private val securityId = "vBPnZjwbl07N8rex"*/
+
     private val client: TradfriClient
-        get() = Client.getInstance()
+        get() = TradfriClient.getInstance(applicationContext)
 
     private val deviceDataDao: DeviceDataDao
         get() = Database.get(applicationContext).deviceDataDao()
@@ -37,8 +41,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         devices_recycler_view.setHasFixedSize(true)
-
-        layoutManager = LinearLayoutManager(applicationContext)
+        layoutManager = LinearLayoutManager(applicationContext
+        )
         devices_recycler_view.layoutManager = layoutManager
 
         val spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.tiles, android.R.layout.simple_spinner_item)
@@ -106,14 +110,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadDevices() {
-        progress_bar.visibility = View.VISIBLE
-        devices_recycler_view.adapter = adapter
-
         launch {
-            adapter.devices = client.getDevices().await() ?: emptyList()
-            runOnUiThread {
-                progress_bar.visibility = View.GONE
-                adapter.notifyDataSetChanged()
+            progress_bar.visibility = View.VISIBLE
+            devices_recycler_view.adapter = adapter
+
+            launch {
+                adapter.devices = client.getDevices().await() ?: emptyList()
+                runOnUiThread {
+                    progress_bar.visibility = View.GONE
+                    adapter.notifyDataSetChanged()
+                }
             }
         }
     }

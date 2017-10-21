@@ -1,7 +1,8 @@
-package thekolo.de.widgetsforikeatradfri
+package thekolo.de.widgetsforikeatradfri.ui
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import thekolo.de.widgetsforikeatradfri.R
 
 class SettingsActivity : AppCompatActivity() {
 

@@ -60,16 +60,4 @@ class TradfriViewsFactory(private val context: Context, private val devices: Lis
     override fun onDestroy() {
 
     }
-
-    private fun onText(state: Int?): String {
-        if (state == null) return "Off"
-
-        return when (state) {
-            0 -> "Off"
-            1 -> "On"
-            else -> {
-                "Off"
-            }
-        }
-    }
 }
