@@ -10,10 +10,10 @@ interface DeviceDataDao {
     fun getAll(): List<DeviceData>
 
     @Query("SELECT * FROM device_data WHERE id = :arg0 LIMIT 1")
-    fun byId(id: Int): DeviceData
+    fun byId(id: Int): DeviceData?
 
-    @Query("SELECT * FROM device_data WHERE tile = :arg0")
-    fun findByTile(tile: String): List<DeviceData>
+    @Query("SELECT * FROM device_data WHERE tile = :arg0 LIMIT 1")
+    fun findByTile(tile: String): DeviceData?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(deviceData: DeviceData): Long

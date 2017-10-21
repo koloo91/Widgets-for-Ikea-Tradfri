@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.*
 import kotlinx.android.synthetic.main.device_recycler_view_item.view.*
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 
@@ -29,15 +30,16 @@ class DevicesAdapter(context: Context,
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         if (holder == null) return
         val device = devices[position]
-        async {
-            val deviceData = deviceDataDao.byId(device.id)
-            holder.tilesSpinner.setSelection(TileUtil.positionFromName(deviceData.tile))
-        }
 
         holder.nameTextView.text = device.name
         holder.stateSwitch.isChecked = isDeviceOn(device)
-        holder.stateSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        holder.stateSwitch.setOnCheckedChangeListener { _, isChecked ->
             listener.onStateSwitchCheckedChanged(device, isChecked)
+        }
+
+        async {
+            val deviceData = deviceDataDao.byId(device.id)
+            holder.tilesSpinner.setSelection(TileUtil.positionFromName(deviceData?.tile ?: TileUtil.NONE.name), false)
         }
 
         holder.tilesSpinner.adapter = spinnerAdapter

@@ -30,31 +30,27 @@ abstract class BaseTileService : TileService() {
     override fun onStartListening() {
         println("onStartListeningTile")
 
-        val deviceData = runBlocking { deviceDataFromDatabase().await() }
+        val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return
 
-        deviceData.forEach { data ->
-            val tile = qsTile
-            tile.label = data.name
-            tile.updateTile()
-        }
+        val tile = qsTile
+        tile.label = deviceData.name
+        tile.updateTile()
     }
 
     override fun onClick() {
         println("OnClickTile")
 
-        val deviceData = runBlocking { deviceDataFromDatabase().await() }
+        val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return
 
-        deviceData.forEach { data ->
-            val device = runBlocking {
-                client.toogleDevice(data.id).await()
-                client.getDevice(data.id).await()
-            }
-            updateTile(device)
+        val device = runBlocking {
+            client.toogleDevice(deviceData.id).await()
+            client.getDevice(deviceData.id).await()
         }
 
+        updateTile(device)
     }
 
-    private fun deviceDataFromDatabase(): Deferred<List<DeviceData>> {
+    private fun deviceDataFromDatabase(): Deferred<DeviceData?> {
         return async { deviceDataDao.findByTile(TILE_NAME) }
     }
 

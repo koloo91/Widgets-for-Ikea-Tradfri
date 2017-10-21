@@ -30,9 +30,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //65540 Stehlampe
-        val stehlampe = "65540"
-
         devices_recycler_view.setHasFixedSize(true)
 
         layoutManager = LinearLayoutManager(applicationContext)
@@ -48,6 +45,21 @@ class MainActivity : AppCompatActivity() {
     private val deviceAdapterListener = object : DevicesAdapter.DevicesAdapterActions {
         override fun onSpinnerItemSelected(device: Device, position: Int) {
             launch {
+                if (position == TileUtil.NONE.index) return@launch
+                val deviceOnTile = deviceDataDao.findByTile(TileUtil.nameForIndex(position))
+
+                if (deviceOnTile != null && device.id != deviceOnTile.id) {
+                    Snackbar.make(devices_recycler_view, "Only one device per tile is allowed", Snackbar.LENGTH_LONG).setAction("Ok", { _ ->
+
+                    }).show()
+
+                    runOnUiThread {
+                        adapter.notifyDataSetChanged()
+                    }
+
+                    return@launch
+                }
+
                 val id = deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position)))
                 println("Inserted new entry with id: $id and position: $position for device: ${device.name}")
                 //Snackbar.make(devices_recycler_view, "Saved", Snackbar.LENGTH_LONG).show()
