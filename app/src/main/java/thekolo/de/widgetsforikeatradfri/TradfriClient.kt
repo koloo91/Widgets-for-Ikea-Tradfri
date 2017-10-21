@@ -57,8 +57,8 @@ class TradfriClient(private val ip: String, private val securityId: String) {
         }
     }
 
-    fun toogleDevice(deviceId: String) {
-        async {
+    fun toogleDevice(deviceId: String): Deferred<Unit> {
+        return async {
             val device = getDevice(deviceId).await()
             if (device != null) {
                 if (device.states != null && device.states.isNotEmpty()) {

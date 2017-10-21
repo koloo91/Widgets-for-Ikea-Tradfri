@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="TradfriAppWidgetProvider">
+        <receiver android:name=".widgets.TradfriAppWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -31,8 +31,59 @@
         <receiver android:name=".ListViewItemClickedBroadcastReceiver" />
 
         <service
-            android:name=".TradfriWidgetService"
+            android:name=".widgets.TradfriWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".tileservices.Tile1Service"
+            android:label="Tile 1"
+            android:icon="@drawable/lightbulb_outline"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".tileservices.Tile2Service"
+            android:label="Tile 2"
+            android:icon="@drawable/lightbulb_outline"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".tileservices.Tile3Service"
+            android:label="Tile 3"
+            android:icon="@drawable/lightbulb_outline"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".tileservices.Tile4Service"
+            android:label="Tile 4"
+            android:icon="@drawable/lightbulb_outline"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".tileservices.Tile5Service"
+            android:label="Tile 5"
+            android:icon="@drawable/lightbulb_outline"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
