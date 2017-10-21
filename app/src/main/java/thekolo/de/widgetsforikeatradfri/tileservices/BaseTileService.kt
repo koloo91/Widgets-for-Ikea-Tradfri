@@ -8,7 +8,6 @@ import android.support.annotation.RequiresApi
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
-import thekolo.de.widgetsforikeatradfri.Client
 import thekolo.de.widgetsforikeatradfri.Device
 import thekolo.de.widgetsforikeatradfri.R
 import thekolo.de.widgetsforikeatradfri.TradfriClient
@@ -22,7 +21,7 @@ abstract class BaseTileService : TileService() {
     abstract val TILE_NAME: String
 
     private val client: TradfriClient
-        get() = Client.getInstance()
+        get() = TradfriClient.getInstance(applicationContext)
 
     private val deviceDataDao: DeviceDataDao
         get() = Database.get(applicationContext).deviceDataDao()
@@ -43,7 +42,7 @@ abstract class BaseTileService : TileService() {
         val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return
 
         val device = runBlocking {
-            client.toogleDevice(deviceData.id).await()
+            client.toggleDevice(deviceData.id).await()
             client.getDevice(deviceData.id).await()
         }
 
