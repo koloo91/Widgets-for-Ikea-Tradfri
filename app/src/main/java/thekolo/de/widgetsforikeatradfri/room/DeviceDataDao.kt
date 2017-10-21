@@ -1,9 +1,6 @@
 package thekolo.de.widgetsforikeatradfri.room
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Delete
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 
 
 @Dao
@@ -12,14 +9,14 @@ interface DeviceDataDao {
     @Query("SELECT * FROM device_data")
     fun getAll(): List<DeviceData>
 
-    @Query("SELECT * FROM device_data WHERE id = :id")
-    fun byId(id: Int): List<DeviceData>
+    @Query("SELECT * FROM device_data WHERE id = :arg0 LIMIT 1")
+    fun byId(id: Int): DeviceData
 
-    @Query("SELECT * FROM device_data WHERE tile = :tile")
-    fun loadAllByTile(tile: String): List<DeviceData>
+    @Query("SELECT * FROM device_data WHERE tile = :arg0")
+    fun findByTile(tile: String): List<DeviceData>
 
-    @Insert
-    fun insert(deviceData: DeviceData)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(deviceData: DeviceData): Long
 
     @Delete
     fun delete(deviceData: DeviceData)

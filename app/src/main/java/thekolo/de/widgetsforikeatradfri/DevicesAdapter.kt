@@ -7,9 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import kotlinx.android.synthetic.main.device_recycler_view_item.view.*
+import kotlinx.coroutines.experimental.async
+import thekolo.de.widgetsforikeatradfri.room.Database
+import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 
 
-class DevicesAdapter(var devices: List<Device>, val spinnerAdapter: ArrayAdapter<CharSequence>, private val listener: DevicesAdapterActions) : RecyclerView.Adapter<DevicesAdapter.ViewHolder>() {
+class DevicesAdapter(context: Context,
+                     var devices: List<Device>,
+                     private val spinnerAdapter: ArrayAdapter<CharSequence>,
+                     private val listener: DevicesAdapterActions) : RecyclerView.Adapter<DevicesAdapter.ViewHolder>() {
+
+    private val deviceDataDao = Database.get(context).deviceDataDao()
+
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         // create a new view
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.device_recycler_view_item, parent, false)
@@ -20,6 +29,11 @@ class DevicesAdapter(var devices: List<Device>, val spinnerAdapter: ArrayAdapter
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         if (holder == null) return
         val device = devices[position]
+        async {
+            val deviceData = deviceDataDao.byId(device.id)
+            holder.tilesSpinner.setSelection(TileUtil.positionFromName(deviceData.tile))
+        }
+
         holder.nameTextView.text = device.name
         holder.stateSwitch.isChecked = isDeviceOn(device)
         holder.stateSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -63,4 +77,5 @@ class DevicesAdapter(var devices: List<Device>, val spinnerAdapter: ArrayAdapter
         fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean)
         fun onSpinnerItemSelected(device: Device, position: Int)
     }
+
 }

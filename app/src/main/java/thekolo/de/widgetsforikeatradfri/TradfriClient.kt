@@ -42,7 +42,7 @@ class TradfriClient(private val ip: String, private val securityId: String) {
         }
     }
 
-    fun getDevice(deviceId: String): Deferred<Device?> {
+    fun getDevice(deviceId: Int): Deferred<Device?> {
         return async {
             val response = client("$baseUrl/15001/$deviceId").get()
             parseResponse(response, Device::class.java)
@@ -52,12 +52,12 @@ class TradfriClient(private val ip: String, private val securityId: String) {
     fun getDevices(): Deferred<List<Device>> {
         return async {
             val deviceIds = getDeviceIds().await() ?: emptyList()
-            val devices = deviceIds.map { getDevice("$it").await() }
+            val devices = deviceIds.map { getDevice(it).await() }
             devices.filterNotNull().filter { !it.type.name.contains("remote control") }
         }
     }
 
-    fun toogleDevice(deviceId: String): Deferred<Unit> {
+    fun toogleDevice(deviceId: Int): Deferred<Unit> {
         return async {
             val device = getDevice(deviceId).await()
             if (device != null) {
@@ -85,12 +85,12 @@ class TradfriClient(private val ip: String, private val securityId: String) {
         return client("$baseUrl/15004/$groupId").get()
     }
 
-    fun turnDeviceOn(deviceId: String): CoapResponse? {
+    fun turnDeviceOn(deviceId: Int): CoapResponse? {
         val updateData = DeviceUpdater(listOf(DeviceState(1)))
         return client("$baseUrl/15001/$deviceId").put(gson.toJson(updateData), MediaTypeRegistry.TEXT_PLAIN)
     }
 
-    fun turnDeviceOff(deviceId: String): CoapResponse? {
+    fun turnDeviceOff(deviceId: Int): CoapResponse? {
         val updateData = DeviceUpdater(listOf(DeviceState(0)))
         return client("$baseUrl/15001/$deviceId").put(gson.toJson(updateData), MediaTypeRegistry.TEXT_PLAIN)
     }

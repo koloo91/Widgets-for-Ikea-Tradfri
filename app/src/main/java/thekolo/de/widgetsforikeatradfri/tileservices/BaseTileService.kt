@@ -1,52 +1,61 @@
 package thekolo.de.widgetsforikeatradfri.tileservices
 
-import android.content.Context
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.support.annotation.RequiresApi
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import thekolo.de.widgetsforikeatradfri.Client
 import thekolo.de.widgetsforikeatradfri.Device
 import thekolo.de.widgetsforikeatradfri.R
-import thekolo.de.widgetsforikeatradfri.StorageService.SHARED_PREFS_NAME
 import thekolo.de.widgetsforikeatradfri.TradfriClient
+import thekolo.de.widgetsforikeatradfri.room.Database
+import thekolo.de.widgetsforikeatradfri.room.DeviceData
+import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
 import thekolo.de.widgetsforikeatradfri.utils.DeviceUtil
 
 @RequiresApi(Build.VERSION_CODES.N)
 abstract class BaseTileService : TileService() {
-    abstract val PREFERENCES_ID: String
+    abstract val TILE_NAME: String
 
     private val client: TradfriClient
         get() = Client.getInstance()
 
+    private val deviceDataDao: DeviceDataDao
+        get() = Database.get(applicationContext).deviceDataDao()
+
     override fun onStartListening() {
         println("onStartListeningTile")
 
-        val id = idFromPreferences() ?: return
-        val device = runBlocking {
-            client.getDevice(id).await()
-        }
+        val deviceData = runBlocking { deviceDataFromDatabase().await() }
 
-        updateTile(device)
+        deviceData.forEach { data ->
+            val tile = qsTile
+            tile.label = data.name
+            tile.updateTile()
+        }
     }
 
     override fun onClick() {
         println("OnClickTile")
 
-        val id = idFromPreferences() ?: return
-        val device = runBlocking {
-            client.toogleDevice(id).await()
-            client.getDevice(id).await()
+        val deviceData = runBlocking { deviceDataFromDatabase().await() }
+
+        deviceData.forEach { data ->
+            val device = runBlocking {
+                client.toogleDevice(data.id).await()
+                client.getDevice(data.id).await()
+            }
+            updateTile(device)
         }
 
-        updateTile(device)
     }
 
-    private fun idFromPreferences(): String? {
-        val preferences = applicationContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
-        return preferences.getString(PREFERENCES_ID, null)
+    private fun deviceDataFromDatabase(): Deferred<List<DeviceData>> {
+        return async { deviceDataDao.findByTile(TILE_NAME) }
     }
 
     private fun updateTile(device: Device?) {
