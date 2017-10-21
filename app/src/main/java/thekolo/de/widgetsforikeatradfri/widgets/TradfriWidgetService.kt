@@ -8,7 +8,7 @@ import thekolo.de.widgetsforikeatradfri.Client
 class TradfriWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent?): RemoteViewsFactory {
         val devices = runBlocking {
-            Client.getInstance().getDevices().await().filter { it != null }.map { it!! }
+            (Client.getInstance().getDevices().await() ?: emptyList())
         }
 
         return TradfriViewsFactory(applicationContext, devices)

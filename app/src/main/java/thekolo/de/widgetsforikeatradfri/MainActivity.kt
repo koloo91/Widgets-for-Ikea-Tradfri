@@ -1,17 +1,19 @@
 package thekolo.de.widgetsforikeatradfri
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.device_recycler_view_item.*
+import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
-import thekolo.de.widgetsforikeatradfri.tileservices.BaseTileService
+import thekolo.de.widgetsforikeatradfri.room.Database
+import thekolo.de.widgetsforikeatradfri.room.DeviceData
+import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
+import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,8 +21,8 @@ class MainActivity : AppCompatActivity() {
     private val client: TradfriClient
         get() = Client.getInstance()
 
-    private val sharedPreferences: SharedPreferences
-        get() = getSharedPreferences(StorageService.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+    private val deviceDataDao: DeviceDataDao
+        get() = Database.get(applicationContext).deviceDataDao()
 
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: DevicesAdapter
@@ -29,47 +31,70 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //65540 Stehlampe
-        val stehlampe = "65540"
-
         devices_recycler_view.setHasFixedSize(true)
 
-        layoutManager = LinearLayoutManager(this)
+        layoutManager = LinearLayoutManager(applicationContext)
         devices_recycler_view.layoutManager = layoutManager
 
         val spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.tiles, android.R.layout.simple_spinner_item)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        adapter = DevicesAdapter(emptyList(), spinnerAdapter, deviceAdapterListener)
+        adapter = DevicesAdapter(applicationContext, emptyList(), spinnerAdapter, deviceAdapterListener)
         loadDevices()
+    }
+
+    private fun isOtherDeviceOnTile(device: Device, position: Int): Boolean {
+        val deviceOnTile = deviceDataDao.findByTile(TileUtil.nameForIndex(position))
+        return deviceOnTile != null && device.id != deviceOnTile.id
     }
 
     private val deviceAdapterListener = object : DevicesAdapter.DevicesAdapterActions {
         override fun onSpinnerItemSelected(device: Device, position: Int) {
-            val prefName = StorageService.sharedPrefNameForIndex(position)
-            val edit = sharedPreferences.edit()
-            edit.putString(prefName, "${device.id}")
-            edit.apply()
+            launch {
+                if (position == TileUtil.NONE.index) return@launch
+                if (isOtherDeviceOnTile(device, position)) {
+                    displayErrorMessage("Only one device per tile is allowed")
+
+                    runOnUiThread {
+                        adapter.notifyDataSetChanged()
+                    }
+
+                    return@launch
+                }
+
+                deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position)))
+            }
         }
 
         override fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean) {
-            val response = when (isChecked) {
-                true -> client.turnDeviceOn("${device.id}")
-                false -> client.turnDeviceOff("${device.id}")
+            runBlocking {
+                val response = when (isChecked) {
+                    true -> client.turnDeviceOn(device.id)
+                    false -> client.turnDeviceOff(device.id)
+                }.await()
+
+                loadDevices()
+
+                if (!response?.isSuccess!!)
+                    displayErrorMessage("An unexpected error occured")
             }
-
-            loadDevices()
-
-            if (!response?.isSuccess!!)
-                Snackbar.make(devices_recycler_view, "An unexpected error occured", Snackbar.LENGTH_LONG).show()
         }
     }
 
     private fun loadDevices() {
-        runBlocking {
-            adapter.devices = client.getDevices().await()
-            adapter.notifyDataSetChanged()
-            devices_recycler_view.adapter = adapter
+        progress_bar.visibility = View.VISIBLE
+        devices_recycler_view.adapter = adapter
+
+        launch {
+            adapter.devices = client.getDevices().await() ?: emptyList()
+            runOnUiThread {
+                progress_bar.visibility = View.GONE
+                adapter.notifyDataSetChanged()
+            }
         }
+    }
+
+    private fun displayErrorMessage(message: String) {
+        Snackbar.make(devices_recycler_view, message, Snackbar.LENGTH_LONG).setAction("Ok", { _ -> }).show()
     }
 }
