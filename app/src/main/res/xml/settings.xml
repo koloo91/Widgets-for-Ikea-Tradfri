@@ -13,5 +13,8 @@
             android:title="Gateway security id"
             android:dialogTitle="Enter your security id" />
 
+        <Preference
+            android:key="version"
+            android:title="Version"/>
     </PreferenceCategory>
 </PreferenceScreen>

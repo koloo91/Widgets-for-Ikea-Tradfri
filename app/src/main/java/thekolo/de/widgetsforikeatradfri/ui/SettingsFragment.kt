@@ -20,6 +20,7 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
         updateSummaries()
+        displayVersion()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -36,4 +37,8 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
         securityIdPref.summary = securityIdPref.text
     }
 
+    private fun displayVersion() {
+        val info = activity.packageManager.getPackageInfo(activity.packageName, 0)
+        preferenceManager.findPreference("version").summary = info.versionName
+    }
 }
