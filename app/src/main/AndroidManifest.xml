@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.SettingsActivity"/>
+        <activity android:name=".ui.SettingsActivity" />
 
         <receiver android:name=".widgets.TradfriAppWidgetProvider">
             <intent-filter>

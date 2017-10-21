@@ -95,31 +95,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean) {
-            runBlocking {
-                val response = when (isChecked) {
+            val response = runBlocking {
+                println("onStateSwitchCheckedChanged")
+                when (isChecked) {
                     true -> client.turnDeviceOn(device.id)
                     false -> client.turnDeviceOff(device.id)
                 }.await()
 
-                loadDevices()
-
-                if (!response?.isSuccess!!)
-                    displayErrorMessage("An unexpected error occured")
             }
+            loadDevices()
+
+            if (!response?.isSuccess!!)
+                displayErrorMessage("An unexpected error occured")
         }
     }
 
     private fun loadDevices() {
-        launch {
-            progress_bar.visibility = View.VISIBLE
-            devices_recycler_view.adapter = adapter
+        progress_bar.visibility = View.VISIBLE
+        devices_recycler_view.adapter = adapter
 
-            launch {
-                adapter.devices = client.getDevices().await() ?: emptyList()
-                runOnUiThread {
-                    progress_bar.visibility = View.GONE
-                    adapter.notifyDataSetChanged()
-                }
+        launch {
+            adapter.devices = client.getDevices().await() ?: emptyList()
+            runOnUiThread {
+                progress_bar.visibility = View.GONE
+                adapter.notifyDataSetChanged()
             }
         }
     }
