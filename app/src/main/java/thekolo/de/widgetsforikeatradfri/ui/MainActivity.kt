@@ -19,8 +19,9 @@ import thekolo.de.widgetsforikeatradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
-import thekolo.de.widgetsforikeatradfri.utils.NetworkUtils
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
+import android.preference.PreferenceManager
+import thekolo.de.widgetsforikeatradfri.ui.onboarding.OnboardingActivity
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,6 +41,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        // Check if we need to display our OnboardingFragment
+        //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
+            // The user hasn't seen the OnboardingFragment yet, so show it
+            startActivity(Intent(this, OnboardingActivity::class.java))
+        //}
 
         devices_recycler_view.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(applicationContext
