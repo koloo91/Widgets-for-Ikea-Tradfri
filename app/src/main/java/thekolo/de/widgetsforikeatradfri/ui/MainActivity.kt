@@ -19,6 +19,7 @@ import thekolo.de.widgetsforikeatradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
+import thekolo.de.widgetsforikeatradfri.utils.NetworkUtils
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 
 
@@ -47,6 +48,14 @@ class MainActivity : AppCompatActivity() {
 
         val spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.tiles, android.R.layout.simple_spinner_item)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        launch {
+            val gatewayIp =NetworkUtils.searchGatewayIp { progress ->
+                println(progress)
+            }.await()
+
+            println(gatewayIp)
+        }
 
         adapter = DevicesAdapter(applicationContext, emptyList(), spinnerAdapter, deviceAdapterListener)
         loadDevices()
