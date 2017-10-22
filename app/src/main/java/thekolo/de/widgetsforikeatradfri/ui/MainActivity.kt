@@ -19,6 +19,7 @@ import thekolo.de.widgetsforikeatradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
+import thekolo.de.widgetsforikeatradfri.utils.NetworkUtils
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 
 
