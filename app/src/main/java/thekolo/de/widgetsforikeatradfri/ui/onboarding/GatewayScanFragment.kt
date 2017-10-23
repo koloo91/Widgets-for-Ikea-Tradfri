@@ -1,7 +1,8 @@
-package thekolo.de.widgetsforikeatradfri
+package thekolo.de.widgetsforikeatradfri.ui.onboarding
 
 import android.content.Context
 import android.os.Bundle
+import android.provider.Contacts
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -9,7 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_gateway_scan.*
 import kotlinx.android.synthetic.main.fragment_gateway_scan.view.*
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.*
+import thekolo.de.widgetsforikeatradfri.R
+import thekolo.de.widgetsforikeatradfri.coroutines.Android
 import thekolo.de.widgetsforikeatradfri.utils.NetworkUtils
 import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 
@@ -25,7 +28,7 @@ class GatewayScanFragment : Fragment() {
         }
 
         view.next_button.setOnClickListener {
-            val ip = view.gateway_ip_edit_text.text.toString()
+            val ip = view.security_id_edit_text.text.toString()
             SettingsUtil.setGatewayIp(context, ip)
             listener?.onGatewayScanFragmentNextButtonClicked()
         }
@@ -51,21 +54,22 @@ class GatewayScanFragment : Fragment() {
         view.scan_progress_bar.visibility = View.VISIBLE
         view.scan_progress_bar.max = 100
 
-        runBlocking {
-            val ip = NetworkUtils.searchGatewayIp { progress ->
+        launch(Android) {
+            val asyncIp = NetworkUtils.searchGatewayIp { progress ->
                 view.scan_progress_bar.progress = progress
-            }.await()
+            }
 
+            val ip = asyncIp.await()
             if (ip == null)
                 displayUnableToFindGatewayMessage()
 
             view.scan_progress_bar.visibility = View.INVISIBLE
-            view.gateway_ip_edit_text.setText(ip ?: "")
+            view.security_id_edit_text.setText(ip ?: "")
         }
     }
 
     private fun displayUnableToFindGatewayMessage() {
-        Snackbar.make(gateway_ip_edit_text, "Unable to find gateway in your network", Snackbar.LENGTH_LONG).setAction("OK", {
+        Snackbar.make(security_id_edit_text, "Unable to find gateway in your network", Snackbar.LENGTH_LONG).setAction("OK", {
 
         }).show()
     }

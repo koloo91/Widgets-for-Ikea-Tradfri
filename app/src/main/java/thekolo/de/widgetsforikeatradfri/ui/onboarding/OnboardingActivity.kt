@@ -3,11 +3,10 @@ package thekolo.de.widgetsforikeatradfri.ui.onboarding
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import thekolo.de.widgetsforikeatradfri.GatewayScanFragment
 import thekolo.de.widgetsforikeatradfri.R
 
 
-class OnboardingActivity : AppCompatActivity(), WelcomeFragment.OnWelcomeFragmentInteractionListener, GatewayScanFragment.OnGatewayScanFragmentInteractionListener {
+class OnboardingActivity : AppCompatActivity(), WelcomeFragment.OnWelcomeFragmentInteractionListener, GatewayScanFragment.OnGatewayScanFragmentInteractionListener, SecurityIdFragment.OnSecurityIdFragmentInteractionListener {
     private val fragmentHolder: MutableMap<String, Fragment> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +38,16 @@ class OnboardingActivity : AppCompatActivity(), WelcomeFragment.OnWelcomeFragmen
         displayFragment(fragment)
     }
 
+    private fun displaySecurityIdFragment() {
+        var fragment = getFragment("security_id_fragment") as SecurityIdFragment?
+        if (fragment == null) {
+            fragment = SecurityIdFragment.newInstance()
+
+            fragment.listener = this
+            setFragment("security_id_fragment", fragment)
+        }
+        displayFragment(fragment)
+    }
 
     private fun displayFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
@@ -59,6 +68,10 @@ class OnboardingActivity : AppCompatActivity(), WelcomeFragment.OnWelcomeFragmen
     }
 
     override fun onGatewayScanFragmentNextButtonClicked() {
+        displaySecurityIdFragment()
+    }
 
+    override fun onSecurityIdFragmentFinishClicked() {
+        finish()
     }
 }

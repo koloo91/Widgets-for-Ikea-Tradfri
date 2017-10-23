@@ -21,6 +21,7 @@ import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 import android.preference.PreferenceManager
+import thekolo.de.widgetsforikeatradfri.coroutines.Android
 import thekolo.de.widgetsforikeatradfri.ui.onboarding.OnboardingActivity
 
 
@@ -45,13 +46,12 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         // Check if we need to display our OnboardingFragment
         //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
-            // The user hasn't seen the OnboardingFragment yet, so show it
-            startActivity(Intent(this, OnboardingActivity::class.java))
+        // The user hasn't seen the OnboardingFragment yet, so show it
+        startActivity(Intent(this, OnboardingActivity::class.java))
         //}
 
         devices_recycler_view.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(applicationContext
-        )
+        layoutManager = LinearLayoutManager(applicationContext)
         devices_recycler_view.layoutManager = layoutManager
 
         val spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.tiles, android.R.layout.simple_spinner_item)
@@ -120,15 +120,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadDevices() {
-        progress_bar.visibility = View.VISIBLE
-        devices_recycler_view.adapter = adapter
+        launch(Android) {
+            progress_bar.visibility = View.VISIBLE
+            devices_recycler_view.adapter = adapter
 
-        launch {
             adapter.devices = client.getDevices().await() ?: emptyList()
-            runOnUiThread {
-                progress_bar.visibility = View.GONE
-                adapter.notifyDataSetChanged()
-            }
+            progress_bar.visibility = View.GONE
+            adapter.notifyDataSetChanged()
         }
     }
 
