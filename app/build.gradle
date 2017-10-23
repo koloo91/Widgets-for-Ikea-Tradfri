@@ -44,7 +44,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.1'
     implementation 'android.arch.persistence.room:runtime:1.0.0-rc1'
     kapt 'android.arch.persistence.room:compiler:1.0.0-rc1'
-    implementation 'com.google.android.gms:play-services:11.0.4'
+    implementation 'com.google.android.gms:play-services:11.4.2'
 
 }
 

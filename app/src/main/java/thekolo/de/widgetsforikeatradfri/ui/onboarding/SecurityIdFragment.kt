@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_scan_security_id.view.*
 import thekolo.de.widgetsforikeatradfri.R
+import com.google.android.gms.vision.barcode.Barcode
+import com.google.android.gms.vision.barcode.BarcodeDetector
 
 
 class SecurityIdFragment : Fragment() {
@@ -18,6 +20,18 @@ class SecurityIdFragment : Fragment() {
         val view = inflater!!.inflate(R.layout.fragment_scan_security_id, container, false)
         view.finish_button.setOnClickListener {
             listener?.onSecurityIdFragmentFinishClicked()
+        }
+        view.scan_qr_code_button.setOnClickListener {
+            val detector = BarcodeDetector.Builder(activity.applicationContext)
+                    .setBarcodeFormats(Barcode.DATA_MATRIX or Barcode.QR_CODE)
+                    .build()
+
+            if (!detector.isOperational) {
+                println("Could not set up the detector!")
+                return@setOnClickListener
+            }
+
+
         }
         return view
     }
