@@ -45,7 +45,7 @@ dependencies {
     implementation 'android.arch.persistence.room:runtime:1.0.0-rc1'
     kapt 'android.arch.persistence.room:compiler:1.0.0-rc1'
     implementation 'com.google.android.gms:play-services:11.4.2'
-
+    implementation 'com.karumi:dexter:4.1.0'
 }
 
 repositories {

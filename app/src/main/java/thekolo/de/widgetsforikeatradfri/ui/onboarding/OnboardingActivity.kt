@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import thekolo.de.widgetsforikeatradfri.R
+import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 
 
 class OnboardingActivity : AppCompatActivity(), WelcomeFragment.OnWelcomeFragmentInteractionListener, GatewayScanFragment.OnGatewayScanFragmentInteractionListener, SecurityIdFragment.OnSecurityIdFragmentInteractionListener {
@@ -72,6 +73,7 @@ class OnboardingActivity : AppCompatActivity(), WelcomeFragment.OnWelcomeFragmen
     }
 
     override fun onSecurityIdFragmentFinishClicked() {
+        //SettingsUtil.setOnboardingCompleted(applicationContext, true)
         finish()
     }
 }
