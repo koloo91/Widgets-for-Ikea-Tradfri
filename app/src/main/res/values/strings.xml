@@ -14,4 +14,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="welcome_text">Welcome to Widgets for Ikea Tradfri</string>
+    <string name="next">Next</string>
+    <string name="steps_todo">Before you can use this app we have to setup two things:\n1. Enter the IP address of your gateway\n2. Enter your security ID</string>
 </resources>
