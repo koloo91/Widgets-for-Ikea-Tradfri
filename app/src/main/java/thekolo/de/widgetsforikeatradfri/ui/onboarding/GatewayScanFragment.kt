@@ -1,13 +1,14 @@
 package thekolo.de.widgetsforikeatradfri.ui.onboarding
 
-import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.github.paolorotolo.appintro.ISlideBackgroundColorHolder
+import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_gateway_scan.*
 import kotlinx.android.synthetic.main.fragment_gateway_scan.view.*
 import kotlinx.coroutines.experimental.launch
@@ -17,8 +18,7 @@ import thekolo.de.widgetsforikeatradfri.utils.NetworkUtils
 import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 
 
-class GatewayScanFragment : Fragment() {
-
+class GatewayScanFragment : Fragment(), TextWatcher {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_gateway_scan, container, false)
 
@@ -26,10 +26,7 @@ class GatewayScanFragment : Fragment() {
             startScan(view)
         }
 
-        //TODO:
-        val ip = view.security_id_edit_text.text.toString()
-        SettingsUtil.setGatewayIp(context, ip)
-
+        view.gateway_ip_edit_text.addTextChangedListener(this)
         return view
     }
 
@@ -43,18 +40,31 @@ class GatewayScanFragment : Fragment() {
             }
 
             val ip = asyncIp.await()
-            if (ip == null)
-                displayUnableToFindGatewayMessage()
-
             view.scan_progress_bar.visibility = View.INVISIBLE
-            view.security_id_edit_text.setText(ip ?: "")
+            view.gateway_ip_edit_text.setText(ip ?: "")
+
+            if(ip == null)
+                displayErrorMessage()
         }
     }
 
-    private fun displayUnableToFindGatewayMessage() {
-        Snackbar.make(security_id_edit_text, "Unable to find gateway in your network", Snackbar.LENGTH_LONG).setAction("OK", {
+    private fun displayErrorMessage() {
+        Snackbar.make(view!!, "Unable to find gateway ip. Please enter it manually.", Snackbar.LENGTH_LONG).setAction("OK", {
 
         }).show()
+    }
+
+    override fun afterTextChanged(s: Editable?) {
+        val ip = s?.toString() ?: ""
+        SettingsUtil.setGatewayIp(activity, ip)
+    }
+
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+    }
+
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
     }
 
     companion object {

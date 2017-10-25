@@ -5,6 +5,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,15 +26,15 @@ import thekolo.de.widgetsforikeatradfri.R
 import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 
 
-class SecurityIdFragment : Fragment() {
+class SecurityIdFragment : Fragment(), TextWatcher {
 
     private var cameraSource: CameraSource? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_scan_security_id, container, false)
 
-        SettingsUtil.setSecurityId(context, view.security_id_edit_text.text.toString())
         view.scan_qr_code_button.setOnClickListener(onScanButtonClicked)
+        view.security_id_edit_text.addTextChangedListener(this)
 
         return view
     }
@@ -53,8 +55,7 @@ class SecurityIdFragment : Fragment() {
 
                     }
 
-                })
-                .check()
+                }).check()
     }
 
     @SuppressLint("MissingPermission")
@@ -97,6 +98,19 @@ class SecurityIdFragment : Fragment() {
                 cameraSource?.stop()
             }
         })
+    }
+
+    override fun afterTextChanged(s: Editable?) {
+        val id = s?.toString() ?: ""
+        SettingsUtil.setSecurityId(activity, id)
+    }
+
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+    }
+
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
     }
 
     companion object {

@@ -6,7 +6,7 @@ import android.support.v4.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro
 
 
-class OnboardingActivity : AppIntro() {
+class IntroActivity : AppIntro() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -14,13 +14,13 @@ class OnboardingActivity : AppIntro() {
         addSlide(GatewayScanFragment.newInstance())
         addSlide(SecurityIdFragment.newInstance())
 
-        setBarColor(Color.parseColor("#3F51B5"));
+        setBarColor(Color.parseColor("#3F51B5"))
 
         showSkipButton(false)
     }
 
     override fun onDonePressed(currentFragment: Fragment) {
         super.onDonePressed(currentFragment)
-        println("onDonePressed")
+        finish()
     }
 }

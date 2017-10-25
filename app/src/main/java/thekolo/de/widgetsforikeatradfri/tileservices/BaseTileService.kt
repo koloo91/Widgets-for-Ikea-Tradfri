@@ -64,7 +64,7 @@ abstract class BaseTileService : TileService() {
             tile.icon = Icon.createWithResource(applicationContext, R.drawable.lightbulb_outline)
         }
 
-        tile.label = device.name
+        tile.label = device?.name
         tile.updateTile()
     }
 }

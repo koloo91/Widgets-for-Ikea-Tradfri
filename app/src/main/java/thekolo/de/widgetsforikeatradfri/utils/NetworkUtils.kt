@@ -2,16 +2,14 @@ package thekolo.de.widgetsforikeatradfri.utils
 
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
-import java.net.Inet4Address
+import java.net.InetAddress
 import java.net.NetworkInterface
 
 
 object NetworkUtils {
     private const val GATEWAY_PREFIX = "GW-"
 
-    fun getIpAddress(useIPv4: Boolean = true): String? {
+    private fun getIpAddress(useIPv4: Boolean = true): String? {
         try {
             val interfaces = NetworkInterface.getNetworkInterfaces().toList()
             interfaces.forEach { iface ->
@@ -25,32 +23,25 @@ object NetworkUtils {
                     }
                 }
             }
-        } catch (ex: Exception) {
-        }
+        } catch (ex: Exception) {}
 
         return null
     }
 
-    fun scanNetwork(deviceIp: String, onUpdate: (String, String?) -> Unit) {
+    private fun scanNetwork(deviceIp: String, onUpdate: (String, String?) -> Unit) {
         val baseAddress = deviceIp.split(".").take(3).joinToString(".")
         val addressRange = (0..255)
 
-        val scans = addressRange.map { address ->
-            async {
-                val ip = "${baseAddress}.$address"
-                val hostname = getHostname(ip)
-                onUpdate(ip, hostname)
-            }
-        }
-
-        return runBlocking {
-            scans.forEach { it.join() }
+        addressRange.map { address ->
+            val ip = "$baseAddress.$address"
+            val hostname = getHostname(ip)
+            onUpdate(ip, hostname)
         }
     }
 
-    fun getHostname(ip: String): String? {
+    private fun getHostname(ip: String): String? {
         try {
-            return Inet4Address.getByName(ip).canonicalHostName
+            return InetAddress.getByName(ip).canonicalHostName
         } catch (e: Exception) {
             println(e)
         }
@@ -63,13 +54,14 @@ object NetworkUtils {
             var foundIp: String? = null
             var currentCount = 0
 
-            //TODO: change
-            scanNetwork("192.168.178.1") { ip, hostname ->
+            scanNetwork(deviceIp) { ip, hostname ->
                 currentCount++
                 onProgressChanged(((currentCount / 256.0) * 100).toInt())
 
-                if (hostname != null && hostname.startsWith(GATEWAY_PREFIX))
+                if (hostname != null && hostname.startsWith(GATEWAY_PREFIX)) {
+                    println(foundIp)
                     foundIp = ip
+                }
             }
 
             return@async foundIp

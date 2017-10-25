@@ -11,6 +11,7 @@ private class AndroidContinuation<T>(val cont: Continuation<T>) : Continuation<T
         if (Looper.myLooper() == Looper.getMainLooper()) cont.resume(value)
         else Handler(Looper.getMainLooper()).post { cont.resume(value) }
     }
+
     override fun resumeWithException(exception: Throwable) {
         if (Looper.myLooper() == Looper.getMainLooper()) cont.resumeWithException(exception)
         else Handler(Looper.getMainLooper()).post { cont.resumeWithException(exception) }
@@ -18,6 +19,5 @@ private class AndroidContinuation<T>(val cont: Continuation<T>) : Continuation<T
 }
 
 object Android : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
-    override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> =
-            AndroidContinuation(continuation)
+    override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> = AndroidContinuation(continuation)
 }

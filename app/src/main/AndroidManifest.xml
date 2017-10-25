@@ -27,7 +27,7 @@
             android:label="Settings" />
 
         <activity
-            android:name=".ui.onboarding.OnboardingActivity"
+            android:name=".ui.onboarding.IntroActivity"
             android:label="@string/title_activity_on_boarding"
             android:theme="@style/AppTheme.NoActionBar"/>
 

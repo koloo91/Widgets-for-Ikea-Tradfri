@@ -22,7 +22,7 @@ import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 import android.preference.PreferenceManager
 import thekolo.de.widgetsforikeatradfri.coroutines.Android
-import thekolo.de.widgetsforikeatradfri.ui.onboarding.OnboardingActivity
+import thekolo.de.widgetsforikeatradfri.ui.onboarding.IntroActivity
 
 
 class MainActivity : AppCompatActivity() {
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         // Check if we need to display our OnboardingFragment
         //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
         // The user hasn't seen the OnboardingFragment yet, so show it
-        startActivity(Intent(this, OnboardingActivity::class.java))
+        startActivity(Intent(this, IntroActivity::class.java))
         //}
 
         devices_recycler_view.setHasFixedSize(true)
@@ -58,6 +58,11 @@ class MainActivity : AppCompatActivity() {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         adapter = DevicesAdapter(applicationContext, emptyList(), spinnerAdapter, deviceAdapterListener)
+        loadDevices()
+    }
+
+    override fun onResume() {
+        super.onResume()
         loadDevices()
     }
 
