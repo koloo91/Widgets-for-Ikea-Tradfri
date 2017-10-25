@@ -17,4 +17,7 @@
     <string name="welcome_text">Welcome to Widgets for Ikea Tradfri</string>
     <string name="next">Next</string>
     <string name="steps_todo">Before you can use this app we have to setup two things:\n\n1. Enter the IP address of your gateway\n2. Enter your security ID</string>
+    <string name="gateway_example">Gateway IP e.g. 192.168.178.1</string>
+    <string name="gateway_help_text">Enter your gateways ip address or press the button to search automatically for your gateway.</string>
+    <string name="search_for_gateway_content_description">Search for gateway</string>
 </resources>

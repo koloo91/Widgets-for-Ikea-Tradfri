@@ -43,13 +43,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        // Check if we need to display our OnboardingFragment
-        //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
-        // The user hasn't seen the OnboardingFragment yet, so show it
-        startActivity(Intent(this, IntroActivity::class.java))
-        //}
-
         devices_recycler_view.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(applicationContext)
         devices_recycler_view.layoutManager = layoutManager
@@ -58,11 +51,22 @@ class MainActivity : AppCompatActivity() {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         adapter = DevicesAdapter(applicationContext, emptyList(), spinnerAdapter, deviceAdapterListener)
+
+        // Check if we need to display our OnboardingFragment
+        //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
+        // The user hasn't seen the OnboardingFragment yet, so show it
+        startActivityForResult(Intent(this, IntroActivity::class.java), ONBOARDING_REQUEST_CODE)
+        //}
+
         loadDevices()
     }
 
     override fun onResume() {
         super.onResume()
+        loadDevices()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         loadDevices()
     }
 
@@ -137,5 +141,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayErrorMessage(message: String) {
         Snackbar.make(devices_recycler_view, message, Snackbar.LENGTH_LONG).setAction("Ok", { _ -> }).show()
+    }
+
+    companion object {
+        private const val ONBOARDING_REQUEST_CODE = 808
     }
 }

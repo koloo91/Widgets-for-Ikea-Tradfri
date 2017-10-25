@@ -1,5 +1,6 @@
 package thekolo.de.widgetsforikeatradfri.ui.onboarding
 
+import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -21,6 +22,7 @@ class IntroActivity : AppIntro() {
 
     override fun onDonePressed(currentFragment: Fragment) {
         super.onDonePressed(currentFragment)
+        setResult(Activity.RESULT_OK)
         finish()
     }
 }

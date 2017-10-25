@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="thekolo.de.widgetsforikeatradfri.ui.onboarding.GatewayScanFragment"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    tools:context="thekolo.de.widgetsforikeatradfri.ui.onboarding.GatewayScanFragment">
 
     <TextView
         android:id="@+id/help_text"
@@ -13,43 +13,43 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/hello_blank_fragment"
+        android:textColor="@color/colorSecondaryText"
+        android:text="@string/gateway_help_text"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/gateway_ip_edit_text"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/gateway_ip_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:hint="Gateway IP"
-        app:layout_constraintEnd_toStartOf="@+id/search_button"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/help_text" />
+        app:layout_constraintTop_toBottomOf="@+id/help_text">
+
+        <EditText
+            android:id="@+id/gateway_ip_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/gateway_example"
+            app:layout_constraintTop_toBottomOf="@+id/help_text" />
+    </android.support.design.widget.TextInputLayout>
 
     <ImageButton
         android:id="@+id/search_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:src="@drawable/ic_search"
-        app:layout_constraintBottom_toBottomOf="@+id/gateway_ip_edit_text"
+        style="@style/Widget.AppCompat.Button.Colored"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gateway_ip_edit_text" />
-
-    <Button
-        android:id="@+id/next_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="Next"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/gateway_ip_layout"
+        android:contentDescription="@string/search_for_gateway_content_description" />
 
     <ProgressBar
         android:id="@+id/scan_progress_bar"
@@ -59,11 +59,10 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:max="100"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="invisible"/>
-
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
