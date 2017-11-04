@@ -23,6 +23,8 @@ import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 import android.preference.PreferenceManager
 import thekolo.de.widgetsforikeatradfri.coroutines.Android
 import thekolo.de.widgetsforikeatradfri.ui.onboarding.IntroActivity
+import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
+import java.util.Collections.emptyList
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,9 +57,13 @@ class MainActivity : AppCompatActivity() {
         // Check if we need to display our OnboardingFragment
         //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
         // The user hasn't seen the OnboardingFragment yet, so show it
-        startActivityForResult(Intent(this, IntroActivity::class.java), ONBOARDING_REQUEST_CODE)
+        //startActivityForResult(Intent(this, IntroActivity::class.java), ONBOARDING_REQUEST_CODE)
         //}
 
+        SettingsUtil.setGatewayIp(this, "192.168.178.56")
+        SettingsUtil.setSecurityId(this, "vBPnZjwbl07N8rex")
+
+        client.ping()
         loadDevices()
     }
 

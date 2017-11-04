@@ -20,4 +20,5 @@
     <string name="gateway_example">Gateway IP e.g. 192.168.178.1</string>
     <string name="gateway_help_text">Enter your gateways ip address or press the button to search automatically for your gateway.</string>
     <string name="search_for_gateway_content_description">Search for gateway</string>
+    <string name="title_activity_main2">Main2Activity</string>
 </resources>
