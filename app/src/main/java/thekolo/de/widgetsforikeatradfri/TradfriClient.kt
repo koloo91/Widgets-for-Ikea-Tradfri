@@ -13,7 +13,6 @@ import org.eclipse.californium.core.network.config.NetworkConfig
 import org.eclipse.californium.scandium.DTLSConnector
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.pskstore.StaticPskStore
-import thekolo.de.widgetsforikeatradfri.coroutines.Android
 import thekolo.de.widgetsforikeatradfri.models.RegisterResult
 import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 import java.net.InetSocketAddress
@@ -156,7 +155,7 @@ class TradfriClient(ip: String,
     }
 
     private fun <T> tryAsync(f: suspend () -> T): Deferred<T?> {
-        return async(Android) {
+        return async {
             return@async try {
                 f()
             } catch (e: Exception) {
@@ -175,11 +174,11 @@ class TradfriClient(ip: String,
                 val securityId = SettingsUtil.getSecurityId(context) ?: ""
 
                 val identity = SettingsUtil.getIdentity(context)
-                val registerResult = SettingsUtil.getPreSharedKey(context)
+                val preSharedKey = SettingsUtil.getPreSharedKey(context)
 
-                client = TradfriClient(ip, securityId, identity, registerResult?.preSharedKey)
+                client = TradfriClient(ip, securityId, identity, preSharedKey)
 
-                if (registerResult == null) {
+                if (preSharedKey == null) {
                     runBlocking {
                         register(context, client!!)
                     }
@@ -189,17 +188,17 @@ class TradfriClient(ip: String,
             return client!!
         }
 
-        private fun register(context: Context, client: TradfriClient) {
+        private suspend fun register(context: Context, client: TradfriClient) {
             val identity = "${UUID.randomUUID()}"
             SettingsUtil.setIdentity(context, identity)
 
-            async(Android) {
-                val result = client.register(identity).await() ?: return@async
-                SettingsUtil.setPreSharedKey(context, result)
 
-                client.identity = identity
-                client.preSharedKey = result.preSharedKey
-            }
+            val result = client.register(identity).await() ?: return
+            SettingsUtil.setPreSharedKey(context, result.preSharedKey)
+
+            client.identity = identity
+            client.preSharedKey = result.preSharedKey
+
         }
     }
 }
