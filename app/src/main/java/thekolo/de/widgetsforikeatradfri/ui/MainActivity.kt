@@ -19,8 +19,12 @@ import thekolo.de.widgetsforikeatradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
-import thekolo.de.widgetsforikeatradfri.utils.NetworkUtils
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
+import android.preference.PreferenceManager
+import thekolo.de.widgetsforikeatradfri.coroutines.Android
+import thekolo.de.widgetsforikeatradfri.ui.onboarding.IntroActivity
+import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
+import java.util.Collections.emptyList
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,14 +46,33 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         devices_recycler_view.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(applicationContext
-        )
+        layoutManager = LinearLayoutManager(applicationContext)
         devices_recycler_view.layoutManager = layoutManager
 
         val spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.tiles, android.R.layout.simple_spinner_item)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         adapter = DevicesAdapter(applicationContext, emptyList(), spinnerAdapter, deviceAdapterListener)
+
+        // Check if we need to display our OnboardingFragment
+        //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
+        // The user hasn't seen the OnboardingFragment yet, so show it
+        //startActivityForResult(Intent(this, IntroActivity::class.java), ONBOARDING_REQUEST_CODE)
+        //}
+
+        SettingsUtil.setGatewayIp(this, "192.168.178.56")
+        SettingsUtil.setSecurityId(this, "vBPnZjwbl07N8rex")
+
+        client.getDevices()
+        loadDevices()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadDevices()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         loadDevices()
     }
 
@@ -112,19 +135,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadDevices() {
-        progress_bar.visibility = View.VISIBLE
-        devices_recycler_view.adapter = adapter
+        launch(Android) {
+            progress_bar.visibility = View.VISIBLE
+            devices_recycler_view.adapter = adapter
 
-        launch {
             adapter.devices = client.getDevices().await() ?: emptyList()
-            runOnUiThread {
-                progress_bar.visibility = View.GONE
-                adapter.notifyDataSetChanged()
-            }
+            progress_bar.visibility = View.GONE
+            adapter.notifyDataSetChanged()
         }
     }
 
     private fun displayErrorMessage(message: String) {
         Snackbar.make(devices_recycler_view, message, Snackbar.LENGTH_LONG).setAction("Ok", { _ -> }).show()
+    }
+
+    companion object {
+        private const val ONBOARDING_REQUEST_CODE = 808
     }
 }

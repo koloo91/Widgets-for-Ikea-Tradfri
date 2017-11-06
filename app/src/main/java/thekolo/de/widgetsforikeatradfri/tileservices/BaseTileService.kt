@@ -56,12 +56,6 @@ abstract class BaseTileService : TileService() {
     private fun updateTile(device: Device?) {
         val tile = qsTile
 
-        if (device == null) {
-            tile.state = Tile.STATE_UNAVAILABLE
-            tile.updateTile()
-            return
-        }
-
         if (DeviceUtil.isDeviceOn(device)) {
             tile.state = Tile.STATE_ACTIVE
             tile.icon = Icon.createWithResource(applicationContext, R.drawable.lightbulb_on_outline)
@@ -70,7 +64,7 @@ abstract class BaseTileService : TileService() {
             tile.icon = Icon.createWithResource(applicationContext, R.drawable.lightbulb_outline)
         }
 
-        tile.label = device.name
+        tile.label = device?.name
         tile.updateTile()
     }
 }
