@@ -9,7 +9,7 @@ object SettingsUtil {
     const val GATEWAY_IP_KEY = "gateway_ip"
     const val SECURITY_ID_KEY = "security_id"
     const val IDENTITY_KEY = "identity"
-    const val REGISTER_RESULT_KEY = "register_result"
+    const val PRESHARED_KEY_KEY = "preshared_key"
     const val ON_BOARDING_COMPLETED_KEY = "on_boarding_completed"
 
     private val gson = Gson()
@@ -44,15 +44,13 @@ object SettingsUtil {
         prefsEdit.apply()
     }
 
-    fun getRegisterResult(context: Context): RegisterResult? {
-        val resultString = context.getSharedPreferences(DEFAULT_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE).getString(REGISTER_RESULT_KEY, "")
-        return gson.fromJson(resultString, RegisterResult::class.java)
+    fun getPreSharedKey(context: Context): String? {
+        return context.getSharedPreferences(DEFAULT_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE).getString(PRESHARED_KEY_KEY, null)
     }
 
-    fun setRegisterResult(context: Context, result: RegisterResult) {
-        val resultString = gson.toJson(result)
+    fun setPreSharedKey(context: Context, preSharedKey: String) {
         val prefsEdit = context.getSharedPreferences(DEFAULT_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE).edit()
-        prefsEdit.putString(REGISTER_RESULT_KEY, resultString)
+        prefsEdit.putString(PRESHARED_KEY_KEY, preSharedKey)
         prefsEdit.apply()
     }
 

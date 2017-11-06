@@ -170,19 +170,19 @@ class TradfriClient(ip: String,
         private var client: TradfriClient? = null
 
         fun getInstance(context: Context): TradfriClient {
-            if (client == null) {
-                val ip = SettingsUtil.getGatewayIp(context) ?: ""
-                val securityId = SettingsUtil.getSecurityId(context) ?: ""
+            if (client != null) return client!!
 
-                val identity = SettingsUtil.getIdentity(context)
-                val registerResult = SettingsUtil.getRegisterResult(context)
+            val ip = SettingsUtil.getGatewayIp(context) ?: ""
+            val securityId = SettingsUtil.getSecurityId(context) ?: ""
 
-                client = TradfriClient(ip, securityId, identity, registerResult?.preSharedKey)
+            val identity = SettingsUtil.getIdentity(context)
+            val preSharedKey = SettingsUtil.getPreSharedKey(context)
 
-                if (registerResult == null) {
-                    runBlocking {
-                        register(context, client!!)
-                    }
+            client = TradfriClient(ip, securityId, identity, preSharedKey)
+
+            if (preSharedKey == null) {
+                runBlocking {
+                    register(context, client!!)
                 }
             }
 
@@ -195,7 +195,7 @@ class TradfriClient(ip: String,
 
             async(Android) {
                 val result = client.register(identity).await() ?: return@async
-                SettingsUtil.setRegisterResult(context, result)
+                SettingsUtil.setPreSharedKey(context, result.preSharedKey)
 
                 client.identity = identity
                 client.preSharedKey = result.preSharedKey

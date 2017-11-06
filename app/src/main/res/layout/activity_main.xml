@@ -11,10 +11,21 @@
         android:layout_height="match_parent"
         android:scrollbars="vertical"/>
 
+    <TextView
+        android:id="@+id/configuration_hint_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/configure_app"
+        android:textAlignment="center"
+        android:textColor="@color/colorSecondaryText"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_centerInParent="true" />
 
 </RelativeLayout>

@@ -60,10 +60,9 @@ class MainActivity : AppCompatActivity() {
         //startActivityForResult(Intent(this, IntroActivity::class.java), ONBOARDING_REQUEST_CODE)
         //}
 
-        SettingsUtil.setGatewayIp(this, "192.168.178.56")
-        SettingsUtil.setSecurityId(this, "vBPnZjwbl07N8rex")
+        //SettingsUtil.setGatewayIp(this, "192.168.178.56")
+        //SettingsUtil.setSecurityId(this, "vBPnZjwbl07N8rex")
 
-        client.getDevices()
         loadDevices()
     }
 
@@ -120,12 +119,10 @@ class MainActivity : AppCompatActivity() {
 
         override fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean) {
             val response = runBlocking {
-                println("onStateSwitchCheckedChanged")
                 when (isChecked) {
                     true -> client.turnDeviceOn(device.id)
                     false -> client.turnDeviceOff(device.id)
                 }.await()
-
             }
             loadDevices()
 
@@ -135,6 +132,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadDevices() {
+        if (SettingsUtil.getGatewayIp(this) == null || SettingsUtil.getSecurityId(this) == null) {
+            configuration_hint_text_view.visibility = View.VISIBLE
+            return
+        }
+
+        configuration_hint_text_view.visibility = View.GONE
+
         launch(Android) {
             progress_bar.visibility = View.VISIBLE
             devices_recycler_view.adapter = adapter
