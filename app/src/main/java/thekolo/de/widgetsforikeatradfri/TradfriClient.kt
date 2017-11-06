@@ -17,6 +17,7 @@ import thekolo.de.widgetsforikeatradfri.coroutines.Android
 import thekolo.de.widgetsforikeatradfri.models.RegisterResult
 import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 import java.net.InetSocketAddress
+import java.util.*
 
 
 class TradfriClient(ip: String,
@@ -77,14 +78,15 @@ class TradfriClient(ip: String,
 
     fun register(identity: String): Deferred<RegisterResult?> {
         return tryAsync {
-            val response = registerClient("$baseUrl/15011/9063").post("{\"9090\": \"`$identity`\"}", MediaTypeRegistry.APPLICATION_JSON)
+            val response = registerClient("$baseUrl/15011/9063").post("{\"9090\": \"$identity\"}", MediaTypeRegistry.APPLICATION_JSON)
             parseResponse(response, RegisterResult::class.java)
         }
     }
 
     fun ping() {
         tryAsync {
-            val response = client("$baseUrl/.well-known/core").get()
+            val request = client("$baseUrl/.well-known/core")
+            val response = request.get()
             println(String(response.payload))
         }
     }
@@ -188,7 +190,7 @@ class TradfriClient(ip: String,
         }
 
         private fun register(context: Context, client: TradfriClient) {
-            val identity = "lalallalalalalla"//"${UUID.randomUUID()}"
+            val identity = "${UUID.randomUUID()}"
             SettingsUtil.setIdentity(context, identity)
 
             async(Android) {

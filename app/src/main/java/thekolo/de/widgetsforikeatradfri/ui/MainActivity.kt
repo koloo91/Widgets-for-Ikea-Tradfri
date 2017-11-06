@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         SettingsUtil.setGatewayIp(this, "192.168.178.56")
         SettingsUtil.setSecurityId(this, "vBPnZjwbl07N8rex")
 
-        client.ping()
+        client.getDevices()
         loadDevices()
     }
 
