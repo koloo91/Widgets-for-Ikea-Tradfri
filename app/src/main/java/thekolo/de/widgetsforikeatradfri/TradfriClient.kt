@@ -47,11 +47,9 @@ class TradfriClient(ip: String,
         builder.setRetransmissionTimeout(50000)
 
         val dtlsConnector = DTLSConnector(builder.build())
-        dtlsConnector.setErrorHandler { peerAddress, level, description ->
-            println("$peerAddress $level $description")
-        }
 
         val network = NetworkConfig.createStandardWithoutFile()
+
         return CoapEndpoint(dtlsConnector, network)
     }
 
@@ -65,6 +63,7 @@ class TradfriClient(ip: String,
     private fun client(url: String): CoapClient {
         val client = CoapClient(url)
         client.endpoint = getCoapEndpoint()
+        client.timeout = 6000
         return client
     }
 
