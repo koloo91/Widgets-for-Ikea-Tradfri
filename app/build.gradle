@@ -48,6 +48,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services:11.4.2'
     implementation 'com.karumi:dexter:4.1.0'
     implementation 'com.github.apl-devs:appintro:v4.2.2'
+    implementation "org.jetbrains.anko:anko:0.10.2"
 }
 
 repositories {

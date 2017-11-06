@@ -5,7 +5,8 @@
         <EditTextPreference
             android:dialogTitle="Enter your gateways ip address"
             android:key="gateway_ip"
-            android:title="Gateway IP" />
+            android:title="Gateway IP"
+            android:hint="e.g. 192.168.178.56"/>
 
         <EditTextPreference
             android:dialogTitle="Enter your security id"

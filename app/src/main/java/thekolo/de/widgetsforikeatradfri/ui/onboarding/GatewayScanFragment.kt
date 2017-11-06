@@ -8,12 +8,11 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import kotlinx.android.synthetic.main.fragment_gateway_scan.*
 import kotlinx.android.synthetic.main.fragment_gateway_scan.view.*
+import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.Android
 import thekolo.de.widgetsforikeatradfri.R
-import thekolo.de.widgetsforikeatradfri.coroutines.Android
 import thekolo.de.widgetsforikeatradfri.utils.NetworkUtils
 import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 
@@ -34,7 +33,7 @@ class GatewayScanFragment : Fragment(), TextWatcher {
         view.scan_progress_bar.visibility = View.VISIBLE
         view.scan_progress_bar.max = 100
 
-        launch(Android) {
+        launch(UI) {
             val asyncIp = NetworkUtils.searchGatewayIp { progress ->
                 view.scan_progress_bar.progress = progress
             }

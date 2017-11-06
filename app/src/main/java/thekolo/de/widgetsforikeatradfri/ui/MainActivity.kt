@@ -11,19 +11,18 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
+import org.jetbrains.anko.coroutines.experimental.bg
 import thekolo.de.widgetsforikeatradfri.Device
 import thekolo.de.widgetsforikeatradfri.R
 import thekolo.de.widgetsforikeatradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
-import thekolo.de.widgetsforikeatradfri.utils.TileUtil
-import android.preference.PreferenceManager
-import thekolo.de.widgetsforikeatradfri.coroutines.Android
-import thekolo.de.widgetsforikeatradfri.ui.onboarding.IntroActivity
 import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
+import thekolo.de.widgetsforikeatradfri.utils.TileUtil
 import java.util.Collections.emptyList
 
 
@@ -124,6 +123,7 @@ class MainActivity : AppCompatActivity() {
                     false -> client.turnDeviceOff(device.id)
                 }.await()
             }
+
             loadDevices()
 
             if (!response?.isSuccess!!)
@@ -132,17 +132,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadDevices() {
-        if (SettingsUtil.getGatewayIp(this) == null || SettingsUtil.getSecurityId(this) == null) {
+        val gatewayIp = SettingsUtil.getGatewayIp(this)
+        val securityId = SettingsUtil.getSecurityId(this)
+
+        if (gatewayIp == null || gatewayIp?.isEmpty() || securityId == null || securityId?.isEmpty()) {
             configuration_hint_text_view.visibility = View.VISIBLE
             return
         }
 
         configuration_hint_text_view.visibility = View.GONE
+        progress_bar.visibility = View.VISIBLE
+        devices_recycler_view.adapter = adapter
 
-        launch(Android) {
-            progress_bar.visibility = View.VISIBLE
-            devices_recycler_view.adapter = adapter
-
+        launch(UI) {
             adapter.devices = client.getDevices().await() ?: emptyList()
             progress_bar.visibility = View.GONE
             adapter.notifyDataSetChanged()
