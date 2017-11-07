@@ -6,7 +6,7 @@ import android.arch.persistence.room.RoomDatabase
 import android.content.Context
 
 
-@Database(entities = arrayOf(DeviceData::class), version = 1)
+@Database(entities = arrayOf(DeviceData::class), version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun deviceDataDao(): DeviceDataDao
 }
