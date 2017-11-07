@@ -53,6 +53,9 @@ class MainActivity : AppCompatActivity() {
 
         adapter = DevicesAdapter(applicationContext, emptyList(), spinnerAdapter, deviceAdapterListener)
 
+        swipe_refresh_layout.setOnRefreshListener {
+            loadDevices()
+        }
         // Check if we need to display our OnboardingFragment
         //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
         // The user hasn't seen the OnboardingFragment yet, so show it
@@ -137,6 +140,7 @@ class MainActivity : AppCompatActivity() {
 
         if (gatewayIp == null || gatewayIp?.isEmpty() || securityId == null || securityId?.isEmpty()) {
             configuration_hint_text_view.visibility = View.VISIBLE
+            swipe_refresh_layout.isRefreshing = false
             return
         }
 
@@ -148,6 +152,7 @@ class MainActivity : AppCompatActivity() {
             adapter.devices = client.getDevices().await() ?: emptyList()
             progress_bar.visibility = View.GONE
             adapter.notifyDataSetChanged()
+            swipe_refresh_layout.isRefreshing = false
         }
     }
 
