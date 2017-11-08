@@ -1,8 +1,10 @@
 package thekolo.de.widgetsforikeatradfri.tradfri
 
 import android.content.Context
+import android.util.Log
 import com.google.gson.Gson
 import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.eclipse.californium.core.CoapResponse
@@ -13,6 +15,10 @@ import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 class TradfriService(context: Context) {
     private val client: TradfriClient
     private val gson = Gson()
+
+    private val handler = CoroutineExceptionHandler { _, ex ->
+        Log.println(Log.ERROR, "TradfriService", Log.getStackTraceString(ex))
+    }
 
     init {
         val gatewayIp = SettingsUtil.getGatewayIp(context) ?: ""
@@ -41,7 +47,7 @@ class TradfriService(context: Context) {
     }
 
     fun register(identity: String, onSuccess: (RegisterResult) -> Unit, onError: () -> Unit) {
-        launch(CommonPool) {
+        launch(CommonPool + handler) {
             val response = client.register(identity)
 
             if (response == null) {
@@ -65,7 +71,7 @@ class TradfriService(context: Context) {
     }
 
     fun ping(onSuccess: (String) -> Unit, onError: () -> Unit) {
-        launch(CommonPool) {
+        launch(CommonPool + handler) {
             val response = client.ping()
             if (response == null) {
                 launch(UI) { onError() }
@@ -106,7 +112,7 @@ class TradfriService(context: Context) {
     }
 
     fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit) {
-        launch(CommonPool) {
+        launch(CommonPool + handler) {
             val response = client.getDevice(id)
             if (response == null) {
                 launch(UI) { onError() }
@@ -129,7 +135,7 @@ class TradfriService(context: Context) {
     }
 
     fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit) {
-        launch(CommonPool) {
+        launch(CommonPool + handler) {
             val deviceIds = getDeviceIds()
 
             val devices = deviceIds.mapNotNull { id ->
@@ -173,7 +179,7 @@ class TradfriService(context: Context) {
     }
 
     fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-        launch(CommonPool) {
+        launch(CommonPool + handler) {
             val device = getDevice(deviceId)
             if (device == null) {
                 launch(UI) { onError() }

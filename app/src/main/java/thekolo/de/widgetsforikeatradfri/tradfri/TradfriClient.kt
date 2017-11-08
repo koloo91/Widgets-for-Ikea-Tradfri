@@ -1,10 +1,6 @@
 package thekolo.de.widgetsforikeatradfri.tradfri
 
-import android.content.Context
 import com.google.gson.Gson
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
 import org.eclipse.californium.core.CoapClient
 import org.eclipse.californium.core.CoapResponse
 import org.eclipse.californium.core.coap.MediaTypeRegistry
@@ -13,13 +9,9 @@ import org.eclipse.californium.core.network.config.NetworkConfig
 import org.eclipse.californium.scandium.DTLSConnector
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.pskstore.StaticPskStore
-import thekolo.de.widgetsforikeatradfri.Device
 import thekolo.de.widgetsforikeatradfri.DeviceState
 import thekolo.de.widgetsforikeatradfri.DeviceUpdater
-import thekolo.de.widgetsforikeatradfri.models.RegisterResult
-import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 import java.net.InetSocketAddress
-import java.util.*
 
 
 class TradfriClient(ip: String,
@@ -46,7 +38,7 @@ class TradfriClient(ip: String,
 
     private fun getCoapEndpoint(): CoapEndpoint {
         val builder = DtlsConnectorConfig.Builder(InetSocketAddress(0))
-        builder.setPskStore(StaticPskStore(identity!!, (preSharedKey!!).toByteArray()))
+        builder.setPskStore(StaticPskStore(identity ?: "", (preSharedKey ?: "").toByteArray()))
         builder.setRetransmissionTimeout(50000)
 
         val dtlsConnector = DTLSConnector(builder.build())

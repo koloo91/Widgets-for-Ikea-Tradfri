@@ -6,18 +6,17 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
 import thekolo.de.widgetsforikeatradfri.Device
 import thekolo.de.widgetsforikeatradfri.R
-import thekolo.de.widgetsforikeatradfri.tradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
@@ -44,6 +43,10 @@ class MainActivity : AppCompatActivity() {
 
     private var isLoadingDevices = false
 
+    private val handler = CoroutineExceptionHandler { _, ex ->
+        Log.println(Log.ERROR, "MainActivity", Log.getStackTraceString(ex))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -58,17 +61,8 @@ class MainActivity : AppCompatActivity() {
         adapter = DevicesAdapter(applicationContext, emptyList(), spinnerAdapter, deviceAdapterListener)
 
         swipe_refresh_layout.setOnRefreshListener {
-            loadDevices()
+            startLoadDevicesProcess()
         }
-
-        // Check if we need to display our OnboardingFragment
-        //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
-        // The user hasn't seen the OnboardingFragment yet, so show it
-        //startActivityForResult(Intent(this, IntroActivity::class.java), ONBOARDING_REQUEST_CODE)
-        //}
-
-        //SettingsUtil.setGatewayIp(this, "192.168.178.56")
-        //SettingsUtil.setSecurityId(this, "vBPnZjwbl07N8rex")
 
         startLoadDevicesProcess()
     }
@@ -107,7 +101,7 @@ class MainActivity : AppCompatActivity() {
 
     private val deviceAdapterListener = object : DevicesAdapter.DevicesAdapterActions {
         override fun onSpinnerItemSelected(device: Device, position: Int) {
-            launch(CommonPool) {
+            launch(CommonPool + handler) {
                 if (position == TileUtil.NONE.index) return@launch
                 if (isOtherDeviceOnTile(device, position)) {
                     displayErrorMessage("Only one device per tile is allowed")
@@ -145,6 +139,8 @@ class MainActivity : AppCompatActivity() {
             startRegisterProcess {
                 loadDevices()
             }
+        } else {
+            configuration_hint_text_view.visibility = View.VISIBLE
         }
     }
 
@@ -198,14 +194,10 @@ class MainActivity : AppCompatActivity() {
             SettingsUtil.setPreSharedKey(applicationContext, registerResult.preSharedKey)
 
             onFinish()
-        }, { onError("Unable to register app at gateway") })
+        }, { onError("Unable to register app at gateway! Please try it later again") })
     }
 
     private fun displayErrorMessage(message: String) {
         Snackbar.make(devices_recycler_view, message, Snackbar.LENGTH_LONG).setAction("Ok", { _ -> }).show()
-    }
-
-    companion object {
-        private const val ONBOARDING_REQUEST_CODE = 808
     }
 }
