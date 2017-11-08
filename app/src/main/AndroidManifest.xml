@@ -37,7 +37,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/tradfri_appwidget_info" />
         </receiver>
-        <receiver android:name=".ListViewItemClickedBroadcastReceiver" />
+        <receiver android:name=".widgets.ListViewItemClickedBroadcastReceiver" />
 
         <service
             android:name=".widgets.TradfriWidgetService"

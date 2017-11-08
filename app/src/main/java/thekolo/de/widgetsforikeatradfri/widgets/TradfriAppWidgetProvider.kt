@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.RemoteViews
-import thekolo.de.widgetsforikeatradfri.ListViewItemClickedBroadcastReceiver
 import thekolo.de.widgetsforikeatradfri.R
 
 
