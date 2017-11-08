@@ -3,6 +3,8 @@ package thekolo.de.widgetsforikeatradfri
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import thekolo.de.widgetsforikeatradfri.tradfri.TradfriClient
+import thekolo.de.widgetsforikeatradfri.tradfri.TradfriService
 import thekolo.de.widgetsforikeatradfri.widgets.TradfriAppWidgetProvider
 
 class ListViewItemClickedBroadcastReceiver : BroadcastReceiver() {
@@ -10,7 +12,11 @@ class ListViewItemClickedBroadcastReceiver : BroadcastReceiver() {
         if (context == null || intent == null) return
         val id = intent.getIntExtra(TradfriAppWidgetProvider.DEVICE_ID, -1)
         println("OnReceive id: $id")
-        TradfriClient.getInstance(context.applicationContext).toggleDevice(id)
+        TradfriService.instance(context).toggleDevice(id, {
+            println("OnSuccess Toggle")
+        }, {
+            println("OnError Toggle")
+        })
     }
 
     companion object {

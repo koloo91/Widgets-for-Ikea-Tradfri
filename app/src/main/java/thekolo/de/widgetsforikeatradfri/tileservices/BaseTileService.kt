@@ -10,18 +10,19 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import thekolo.de.widgetsforikeatradfri.Device
 import thekolo.de.widgetsforikeatradfri.R
-import thekolo.de.widgetsforikeatradfri.TradfriClient
+import thekolo.de.widgetsforikeatradfri.tradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
+import thekolo.de.widgetsforikeatradfri.tradfri.TradfriService
 import thekolo.de.widgetsforikeatradfri.utils.DeviceUtil
 
 @RequiresApi(Build.VERSION_CODES.N)
 abstract class BaseTileService : TileService() {
     abstract val TILE_NAME: String
 
-    private val client: TradfriClient
-        get() = TradfriClient.getInstance(applicationContext)
+    private val service: TradfriService
+        get() = TradfriService.instance(applicationContext)
 
     private val deviceDataDao: DeviceDataDao
         get() = Database.get(applicationContext).deviceDataDao()
@@ -41,12 +42,16 @@ abstract class BaseTileService : TileService() {
 
         val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return
 
-        val device = runBlocking {
-            client.toggleDevice(deviceData.id).await()
-            client.getDevice(deviceData.id).await()
-        }
 
-        updateTile(device)
+        service.toggleDevice(deviceData.id, {
+            service.getDevice(deviceData.id, { device ->
+                updateTile(device)
+            }, {
+                println("GetDevice onError")
+            })
+        }, {
+            println("toggleDevice onError")
+        })
     }
 
     private fun deviceDataFromDatabase(): Deferred<DeviceData?> {

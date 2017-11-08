@@ -11,18 +11,20 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
-import org.jetbrains.anko.coroutines.experimental.bg
 import thekolo.de.widgetsforikeatradfri.Device
 import thekolo.de.widgetsforikeatradfri.R
-import thekolo.de.widgetsforikeatradfri.TradfriClient
+import thekolo.de.widgetsforikeatradfri.tradfri.TradfriClient
 import thekolo.de.widgetsforikeatradfri.room.Database
 import thekolo.de.widgetsforikeatradfri.room.DeviceData
 import thekolo.de.widgetsforikeatradfri.room.DeviceDataDao
+import thekolo.de.widgetsforikeatradfri.tradfri.TradfriService
 import thekolo.de.widgetsforikeatradfri.utils.SettingsUtil
 import thekolo.de.widgetsforikeatradfri.utils.TileUtil
+import java.util.*
 import java.util.Collections.emptyList
 
 
@@ -31,14 +33,16 @@ class MainActivity : AppCompatActivity() {
     /*private val ip = "192.168.178.56"
     private val securityId = "vBPnZjwbl07N8rex"*/
 
-    private val client: TradfriClient
-        get() = TradfriClient.getInstance(applicationContext)
+    private val service: TradfriService
+        get() = TradfriService(applicationContext)
 
     private val deviceDataDao: DeviceDataDao
         get() = Database.get(applicationContext).deviceDataDao()
 
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: DevicesAdapter
+
+    private var isLoadingDevices = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         swipe_refresh_layout.setOnRefreshListener {
             loadDevices()
         }
+
         // Check if we need to display our OnboardingFragment
         //if (!sharedPreferences.getBoolean(GuidedStepWelcomeFragment.ONBOARDING_COMPLETED_PREF_KEY, false)) {
         // The user hasn't seen the OnboardingFragment yet, so show it
@@ -65,16 +70,16 @@ class MainActivity : AppCompatActivity() {
         //SettingsUtil.setGatewayIp(this, "192.168.178.56")
         //SettingsUtil.setSecurityId(this, "vBPnZjwbl07N8rex")
 
-        loadDevices()
+        startLoadDevicesProcess()
     }
 
     override fun onResume() {
         super.onResume()
-        loadDevices()
+        startLoadDevicesProcess()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        loadDevices()
+        startLoadDevicesProcess()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -89,7 +94,6 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
-                println("Open settings")
             }
         }
 
@@ -103,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
     private val deviceAdapterListener = object : DevicesAdapter.DevicesAdapterActions {
         override fun onSpinnerItemSelected(device: Device, position: Int) {
-            launch {
+            launch(CommonPool) {
                 if (position == TileUtil.NONE.index) return@launch
                 if (isOtherDeviceOnTile(device, position)) {
                     displayErrorMessage("Only one device per tile is allowed")
@@ -120,40 +124,81 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean) {
-            val response = runBlocking {
-                when (isChecked) {
-                    true -> client.turnDeviceOn(device.id)
-                    false -> client.turnDeviceOff(device.id)
-                }.await()
+
+            when (isChecked) {
+                true -> service.turnDeviceOn(device.id, {
+                    println("turnDeviceOn onSuccess")
+                    startLoadDevicesProcess()
+                }, this@MainActivity::onError)
+                false -> service.turnDeviceOff(device.id, {
+                    println("turnDeviceOff onSuccess")
+                    startLoadDevicesProcess()
+                }, this@MainActivity::onError)
             }
+        }
+    }
 
+    private fun startLoadDevicesProcess() {
+        if (appHasBeenConfigured() && service.isRegistered(applicationContext))
             loadDevices()
-
-            if (!response?.isSuccess!!)
-                displayErrorMessage("An unexpected error occured")
+        else if (appHasBeenConfigured()) {
+            startRegisterProcess {
+                loadDevices()
+            }
         }
     }
 
     private fun loadDevices() {
+        if (isLoadingDevices) return
+
+        configuration_hint_text_view.visibility = View.GONE
+
+        devices_recycler_view.adapter = adapter
+        adapter.devices = emptyList()
+        adapter.notifyDataSetChanged()
+
+        swipe_refresh_layout.isRefreshing = true
+        isLoadingDevices = true
+
+        service.getDevices({ devices ->
+            adapter.devices = devices
+            adapter.notifyDataSetChanged()
+
+            swipe_refresh_layout.isRefreshing = false
+            isLoadingDevices = false
+        }, {
+            swipe_refresh_layout.isRefreshing = false
+            isLoadingDevices = false
+
+            onError()
+        })
+    }
+
+    private fun onError() {
+        onError("An unexpected error occurred!")
+    }
+
+    private fun onError(message: String) {
+        displayErrorMessage(message)
+    }
+
+    private fun appHasBeenConfigured(): Boolean {
         val gatewayIp = SettingsUtil.getGatewayIp(this)
         val securityId = SettingsUtil.getSecurityId(this)
 
-        if (gatewayIp == null || gatewayIp?.isEmpty() || securityId == null || securityId?.isEmpty()) {
-            configuration_hint_text_view.visibility = View.VISIBLE
-            swipe_refresh_layout.isRefreshing = false
-            return
-        }
+        return gatewayIp != null && gatewayIp.isNotEmpty() && securityId != null && securityId.isNotEmpty()
+    }
 
-        configuration_hint_text_view.visibility = View.GONE
-        progress_bar.visibility = View.VISIBLE
-        devices_recycler_view.adapter = adapter
+    private fun startRegisterProcess(onFinish: () -> Unit) {
+        if (service.isRegistered(applicationContext)) return
 
-        launch(UI) {
-            adapter.devices = client.getDevices().await() ?: emptyList()
-            progress_bar.visibility = View.GONE
-            adapter.notifyDataSetChanged()
-            swipe_refresh_layout.isRefreshing = false
-        }
+        val identity = "${UUID.randomUUID()}"
+        service.register(identity, { registerResult ->
+            SettingsUtil.setIdentity(applicationContext, identity)
+            SettingsUtil.setPreSharedKey(applicationContext, registerResult.preSharedKey)
+
+            onFinish()
+        }, { onError("Unable to register app at gateway") })
     }
 
     private fun displayErrorMessage(message: String) {

@@ -8,11 +8,12 @@ import android.widget.RemoteViewsService
 import kotlinx.coroutines.experimental.runBlocking
 import thekolo.de.widgetsforikeatradfri.Device
 import thekolo.de.widgetsforikeatradfri.R
-import thekolo.de.widgetsforikeatradfri.TradfriClient
+import thekolo.de.widgetsforikeatradfri.tradfri.TradfriClient
+import thekolo.de.widgetsforikeatradfri.tradfri.TradfriService
 
 
 class TradfriViewsFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
-    private val client = TradfriClient.getInstance(context)
+    private val client = TradfriService.instance(context)
     private var devices: List<Device> = emptyList()
 
     override fun onCreate() {
@@ -29,9 +30,11 @@ class TradfriViewsFactory(private val context: Context) : RemoteViewsService.Rem
 
     override fun onDataSetChanged() {
         println("TradfriViewsFactory onDataSetChanged")
-        runBlocking {
-            devices = client.getDevices().await() ?: emptyList()
-        }
+        client.getDevices({ devices ->
+            this.devices = devices
+        }, {
+
+        })
     }
 
     override fun hasStableIds(): Boolean {
