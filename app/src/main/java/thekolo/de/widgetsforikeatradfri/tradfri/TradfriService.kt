@@ -83,13 +83,7 @@ class TradfriService(context: Context) {
                 return@launch
             }
 
-            val result = parseResponse(response, String::class.java)
-            if (result == null) {
-                launch(UI) { onError() }
-                return@launch
-            }
-
-            launch(UI) { onSuccess(result) }
+            launch(UI) { onSuccess(String(response.payload)) }
         }
     }
 

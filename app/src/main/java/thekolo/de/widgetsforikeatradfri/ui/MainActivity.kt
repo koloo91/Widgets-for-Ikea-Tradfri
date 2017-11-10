@@ -6,7 +6,6 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -108,7 +107,7 @@ class MainActivity : AppCompatActivity() {
             launch(CommonPool + handler) {
                 if (position == TileUtil.NONE.index) return@launch
                 if (isOtherDeviceOnTile(device, position)) {
-                    displayErrorMessage("Only one device per tile is allowed")
+                    displayMessage("Only one device per tile is allowed")
 
                     runOnUiThread {
                         adapter.notifyDataSetChanged()
@@ -137,9 +136,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startLoadDevicesProcess() {
-        if (appHasBeenConfigured() && service.isRegistered(applicationContext))
-            loadDevices()
-        else if (appHasBeenConfigured()) {
+
+
+        if (appHasBeenConfigured() && service.isRegistered(applicationContext)) {
+            service.ping({ _ ->
+                loadDevices()
+            }, {
+                displayMessage("Unable to reach gateway. Please try it again")
+            })
+        } else if (appHasBeenConfigured()) {
             startRegisterProcess {
                 loadDevices()
             }
@@ -164,6 +169,9 @@ class MainActivity : AppCompatActivity() {
 
             swipe_refresh_layout.isRefreshing = false
             isLoadingDevices = false
+
+            if (devices.isEmpty())
+                displayMessage("No devices found.")
         }, {
             swipe_refresh_layout.isRefreshing = false
             isLoadingDevices = false
@@ -177,7 +185,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onError(message: String) {
-        displayErrorMessage(message)
+        displayMessage(message)
     }
 
     private fun appHasBeenConfigured(): Boolean {
@@ -199,7 +207,7 @@ class MainActivity : AppCompatActivity() {
         }, { onError("Unable to register app at gateway! Please try it later again") })
     }
 
-    private fun displayErrorMessage(message: String) {
+    private fun displayMessage(message: String) {
         Snackbar.make(devices_recycler_view, message, Snackbar.LENGTH_LONG).setAction("Ok", { _ -> }).show()
     }
 }
