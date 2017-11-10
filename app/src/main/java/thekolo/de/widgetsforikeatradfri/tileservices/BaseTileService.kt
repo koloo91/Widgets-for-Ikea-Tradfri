@@ -44,20 +44,15 @@ abstract class BaseTileService : TileService() {
 
     override fun onClick() {
         println("OnClickTile")
-        val tile = qsTile
 
         launch(CommonPool) {
             val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return@launch
-            val prevIcon = tile.icon
-
-            tile.icon = Icon.createWithResource(applicationContext, R.drawable.ic_refresh)
-            tile.updateTile()
 
             service.toggleDevice(deviceData.id, {
                 service.getDevice(deviceData.id, { device ->
                     updateTile(device)
-                }, { onError(tile, prevIcon) })
-            }, { onError(tile, prevIcon) })
+                }, { onError() })
+            }, { onError() })
         }
     }
 
@@ -80,10 +75,7 @@ abstract class BaseTileService : TileService() {
         tile.updateTile()
     }
 
-    private fun onError(tile: Tile, prevIcon: Icon) {
-        tile.icon = prevIcon
-        tile.updateTile()
-
+    private fun onError() {
         Toast.makeText(applicationContext, "Unable to toggle device", Toast.LENGTH_LONG).show()
     }
 }

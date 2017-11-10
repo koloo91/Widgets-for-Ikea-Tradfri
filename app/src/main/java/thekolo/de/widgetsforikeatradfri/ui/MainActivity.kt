@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     private val deviceDataDao: DeviceDataDao
         get() = Database.get(applicationContext).deviceDataDao()
 
-    private lateinit var layoutManager: RecyclerView.LayoutManager
+    private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: DevicesAdapter
 
     private var isLoadingDevices = false
@@ -54,6 +55,9 @@ class MainActivity : AppCompatActivity() {
         devices_recycler_view.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(applicationContext)
         devices_recycler_view.layoutManager = layoutManager
+
+        val dividerItemDecoration = DividerItemDecoration(applicationContext, layoutManager.orientation)
+        devices_recycler_view.addItemDecoration(dividerItemDecoration)
 
         val spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.tiles, android.R.layout.simple_spinner_item)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -150,8 +154,6 @@ class MainActivity : AppCompatActivity() {
         configuration_hint_text_view.visibility = View.GONE
 
         devices_recycler_view.adapter = adapter
-        adapter.devices = emptyList()
-        adapter.notifyDataSetChanged()
 
         swipe_refresh_layout.isRefreshing = true
         isLoadingDevices = true

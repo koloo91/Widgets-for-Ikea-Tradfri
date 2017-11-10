@@ -2,23 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
-
-    <TextView
-        android:id="@+id/device_name_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginBottom="24dp"
-        android:text="Foo" />
-
-    <Switch
-        android:id="@+id/device_state_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true" />
+    android:minHeight="48dp">
 
     <Spinner
         android:id="@+id/tiles_spinner"
@@ -26,8 +10,28 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/device_state_switch"
         android:layout_centerVertical="true"
-        android:layout_marginRight="16dp"
-        android:layout_toLeftOf="@+id/device_state_switch"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:id="@+id/device_name_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/device"
         android:layout_toStartOf="@+id/device_state_switch"
-        android:layout_marginEnd="16dp" />
+        android:layout_toEndOf="@+id/tiles_spinner"
+        android:textAlignment="center"/>
+
+    <Switch
+        android:id="@+id/device_state_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"/>
+
 </RelativeLayout>
