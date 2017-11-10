@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Settings">
+
+        <EditTextPreference
+            android:dialogTitle="Enter your gateways ip address"
+            android:key="gateway_ip"
+            android:title="Gateway IP"
+            android:hint="e.g. 192.168.178.56"/>
+
+        <EditTextPreference
+            android:dialogTitle="Enter your security id"
+            android:key="security_id"
+            android:title="Gateway security id" />
+
+        <Preference
+            android:enabled="false"
+            android:key="identity"
+            android:title="Identity" />
+
+        <Preference
+            android:enabled="false"
+            android:key="preshared_key"
+            android:title="PreSharedKey" />
+
+        <Preference
+            android:enabled="false"
+            android:key="version"
+            android:title="Version" />
+    </PreferenceCategory>
+</PreferenceScreen>
