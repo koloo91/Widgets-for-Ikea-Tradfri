@@ -23,4 +23,5 @@
     <string name="title_activity_main2">Main2Activity</string>
     <string name="configure_app">Please click on the settings icon and enter your gateways ip and security id.</string>
     <string name="device">Device</string>
+    <string name="unable_to_reach_gateway">Unable to reach gateway. Please try it again</string>
 </resources>

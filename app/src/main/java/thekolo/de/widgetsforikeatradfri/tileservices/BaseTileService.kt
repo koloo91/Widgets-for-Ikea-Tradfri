@@ -48,11 +48,15 @@ abstract class BaseTileService : TileService() {
         launch(CommonPool) {
             val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return@launch
 
-            service.toggleDevice(deviceData.id, {
-                service.getDevice(deviceData.id, { device ->
-                    updateTile(device)
+            service.ping({ _ ->
+                service.toggleDevice(deviceData.id, {
+                    service.getDevice(deviceData.id, { device ->
+                        updateTile(device)
+                    }, { onError() })
                 }, { onError() })
-            }, { onError() })
+            }, {
+                onError(getString(R.string.unable_to_reach_gateway))
+            })
         }
     }
 
@@ -75,7 +79,7 @@ abstract class BaseTileService : TileService() {
         tile.updateTile()
     }
 
-    private fun onError() {
-        Toast.makeText(applicationContext, "Unable to toggle device", Toast.LENGTH_LONG).show()
+    private fun onError(message: String = "Unable to toggle device") {
+        Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
     }
 }

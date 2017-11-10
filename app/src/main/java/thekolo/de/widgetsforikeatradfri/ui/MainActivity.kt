@@ -135,23 +135,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startLoadDevicesProcess() {
-
-
-        if (appHasBeenConfigured() && service.isRegistered(applicationContext)) {
-            service.ping({ _ ->
-                loadDevices()
-            }, {
-                displayMessage("Unable to reach gateway. Please try it again")
-            })
-        } else if (appHasBeenConfigured()) {
-            startRegisterProcess {
-                loadDevices()
+    private fun startLoadDevicesProcess() =
+            if (appHasBeenConfigured() && service.isRegistered(applicationContext)) {
+                service.ping({ _ ->
+                    loadDevices()
+                }, {
+                    displayMessage(getString(R.string.unable_to_reach_gateway))
+                })
+            } else if (appHasBeenConfigured()) {
+                startRegisterProcess {
+                    loadDevices()
+                }
+            } else {
+                configuration_hint_text_view.visibility = View.VISIBLE
             }
-        } else {
-            configuration_hint_text_view.visibility = View.VISIBLE
-        }
-    }
 
     private fun loadDevices() {
         if (isLoadingDevices) return
