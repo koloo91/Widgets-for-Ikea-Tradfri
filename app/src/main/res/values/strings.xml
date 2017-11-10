@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Quicktiles for Ikea Tradfri</string>
+    <string name="app_name">Quicktiles for Ikea TRÅDFRI</string>
     <string name="device_name">Name</string>
 
     <string-array name="tiles">

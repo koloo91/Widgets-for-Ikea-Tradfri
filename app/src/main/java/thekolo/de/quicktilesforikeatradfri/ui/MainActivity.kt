@@ -105,7 +105,11 @@ class MainActivity : AppCompatActivity() {
     private val deviceAdapterListener = object : DevicesAdapter.DevicesAdapterActions {
         override fun onSpinnerItemSelected(device: Device, position: Int) {
             launch(CommonPool + handler) {
-                if (position == TileUtil.NONE.index) return@launch
+                if (position == TileUtil.NONE.index) {
+                    deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position)))
+                    return@launch
+                }
+
                 if (isOtherDeviceOnTile(device, position)) {
                     displayMessage("Only one device per tile is allowed")
 
