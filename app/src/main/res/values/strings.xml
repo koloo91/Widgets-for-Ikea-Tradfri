@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Widgets for Ikea Tradfri</string>
+    <string name="app_name">Quicktiles for Ikea Tradfri</string>
     <string name="device_name">Name</string>
 
     <string-array name="tiles">
@@ -10,17 +10,8 @@
         <item>Tile 4</item>
         <item>Tile 5</item>
     </string-array>
-    <string name="title_activity_on_boarding">OnBoardingActivity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="welcome_text">Welcome to Widgets for Ikea Tradfri</string>
-    <string name="next">Next</string>
-    <string name="steps_todo">Before you can use this app we have to setup two things:\n\n1. Enter the IP address of your gateway\n2. Enter your security ID</string>
     <string name="gateway_example">Gateway IP e.g. 192.168.178.1</string>
-    <string name="gateway_help_text">Enter your gateways ip address or press the button to search automatically for your gateway.</string>
-    <string name="search_for_gateway_content_description">Search for gateway</string>
-    <string name="title_activity_main2">Main2Activity</string>
     <string name="configure_app">Please click on the settings icon and enter your gateways ip and security id.</string>
     <string name="device">Device</string>
     <string name="unable_to_reach_gateway">Unable to reach gateway. Please try it again</string>
