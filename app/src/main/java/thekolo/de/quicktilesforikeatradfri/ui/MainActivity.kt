@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         startLoadDevicesProcess()
+
     }
 
     override fun onResume() {
@@ -157,6 +158,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadDevices() {
         if (isLoadingDevices) return
 
+
         configuration_hint_text_view.visibility = View.GONE
 
         devices_recycler_view.adapter = adapter
@@ -173,12 +175,20 @@ class MainActivity : AppCompatActivity() {
 
             if (devices.isEmpty())
                 displayMessage("No devices found.")
+
+            loadGroups()
         }, {
             swipe_refresh_layout.isRefreshing = false
             isLoadingDevices = false
 
             onError()
         })
+    }
+
+    private fun loadGroups() {
+        service.getGroups({ groups ->
+            println(groups)
+        }, { println("Error getting groups") })
     }
 
     private fun onError() {
