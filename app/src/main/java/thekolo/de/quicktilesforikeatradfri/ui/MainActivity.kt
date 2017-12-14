@@ -2,6 +2,8 @@ package thekolo.de.quicktilesforikeatradfri.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -56,6 +58,9 @@ class MainActivity : AppCompatActivity() {
         layoutManager = LinearLayoutManager(applicationContext)
         devices_recycler_view.layoutManager = layoutManager
 
+        bottom_navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        bottom_navigation.selectedItemId = R.id.devices
+
         val dividerItemDecoration = DividerItemDecoration(applicationContext, layoutManager.orientation)
         devices_recycler_view.addItemDecoration(dividerItemDecoration)
 
@@ -69,7 +74,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         startLoadDevicesProcess()
-
     }
 
     override fun onResume() {
@@ -97,6 +101,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         return true
+    }
+
+    private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        when (item.itemId) {
+            R.id.devices -> {
+                println("DevicesSelected")
+            }
+            R.id.groups -> {
+                println("GroupsSelected")
+            }
+        }
+
+        return@OnNavigationItemSelectedListener true
     }
 
     private fun isOtherDeviceOnTile(device: Device, position: Int): Boolean {
