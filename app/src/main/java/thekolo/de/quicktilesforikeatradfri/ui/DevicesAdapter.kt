@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.device_recycler_view_item.view.*
 import kotlinx.coroutines.experimental.async
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
+import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
@@ -22,7 +23,6 @@ class DevicesAdapter(context: Context,
     private val deviceDataDao = Database.get(context).deviceDataDao()
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        // create a new view
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.device_recycler_view_item, parent, false)
 
         return ViewHolder(view)
@@ -70,8 +70,8 @@ class DevicesAdapter(context: Context,
         if (device.states.isEmpty()) return false
         if (device.states.first().on == null) return false
         return when (device.states.first().on) {
-            0 -> false
-            1 -> true
+            BulbState.Off -> false
+            BulbState.On -> true
             else -> false
         }
     }

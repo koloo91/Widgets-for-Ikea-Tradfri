@@ -12,14 +12,15 @@ import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.pskstore.StaticPskStore
 import thekolo.de.quicktilesforikeatradfri.DeviceState
 import thekolo.de.quicktilesforikeatradfri.DeviceUpdater
+import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.GroupUpdater
 import java.net.InetSocketAddress
 
 
 class TradfriClient(ip: String,
                     private val securityId: String,
-                    var identity: String?,
-                    var preSharedKey: String?) {
+                    private var identity: String?,
+                    private var preSharedKey: String?) {
 
     private val baseUrl = "coaps://$ip:5684"
 
@@ -81,12 +82,12 @@ class TradfriClient(ip: String,
     }
 
     fun turnDeviceOn(deviceId: Int): CoapResponse? {
-        val updateData = DeviceUpdater(listOf(DeviceState(1)))
+        val updateData = DeviceUpdater(listOf(DeviceState(BulbState.On)))
         return client("$baseUrl/15001/$deviceId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
     }
 
     fun turnDeviceOff(deviceId: Int): CoapResponse? {
-        val updateData = DeviceUpdater(listOf(DeviceState(0)))
+        val updateData = DeviceUpdater(listOf(DeviceState(BulbState.Off)))
         return client("$baseUrl/15001/$deviceId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
     }
 
@@ -101,12 +102,12 @@ class TradfriClient(ip: String,
     }
 
     fun turnGroupOn(groupId: Int): CoapResponse? {
-        val updateData = GroupUpdater(1)
+        val updateData = GroupUpdater(BulbState.On)
         return client("$baseUrl/15004/$groupId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
     }
 
     fun turnGroupOff(groupId: Int): CoapResponse? {
-        val updateData = GroupUpdater(0)
+        val updateData = GroupUpdater(BulbState.Off)
         return client("$baseUrl/15004/$groupId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
     }
 

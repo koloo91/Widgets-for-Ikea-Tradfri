@@ -17,6 +17,7 @@ import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.launch
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
+import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
@@ -128,14 +129,20 @@ class MainActivity : AppCompatActivity() {
         override fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean) {
 
             when (isChecked) {
-                true -> service.turnDeviceOn(device.id, {
-                    println("turnDeviceOn onSuccess")
-                    startLoadDevicesProcess()
-                }, this@MainActivity::onError)
-                false -> service.turnDeviceOff(device.id, {
-                    println("turnDeviceOff onSuccess")
-                    startLoadDevicesProcess()
-                }, this@MainActivity::onError)
+                true -> {
+                    device.states?.first()?.on = BulbState.On
+                    service.turnDeviceOn(device.id, {
+                        println("turnDeviceOn onSuccess")
+                        startLoadDevicesProcess()
+                    }, this@MainActivity::onError)
+                }
+                false -> {
+                    device.states?.first()?.on = BulbState.Off
+                    service.turnDeviceOff(device.id, {
+                        println("turnDeviceOff onSuccess")
+                        startLoadDevicesProcess()
+                    }, this@MainActivity::onError)
+                }
             }
         }
     }
@@ -157,7 +164,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadDevices() {
         if (isLoadingDevices) return
-
 
         configuration_hint_text_view.visibility = View.GONE
 
