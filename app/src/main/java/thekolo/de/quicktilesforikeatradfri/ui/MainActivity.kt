@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.groups -> {
                 println("GroupsSelected")
+                displayGroupsFragment()
             }
         }
 
@@ -114,9 +115,9 @@ class MainActivity : AppCompatActivity() {
         }, { onError("Unable to register app at gateway! Please try it later again") })
     }
 
-    fun isOtherDeviceOnTile(device: Device, position: Int): Boolean {
+    fun isOtherDeviceOnTile(groupId: Int, position: Int): Boolean {
         val deviceOnTile = deviceDataDao.findByTile(TileUtil.nameForIndex(position))
-        return deviceOnTile != null && device.id != deviceOnTile.id
+        return deviceOnTile != null && groupId != deviceOnTile.id
     }
 
     fun displayMessage(message: String) {
@@ -133,6 +134,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayDevicesFragment() {
         displayFragment(DevicesFragment.newInstance())
+    }
+
+    private fun displayGroupsFragment() {
+        displayFragment(GroupsFragment.newInstance())
     }
 
     private fun displayFragment(fragment: Fragment) {
