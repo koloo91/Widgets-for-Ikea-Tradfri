@@ -122,7 +122,7 @@ class DevicesFragment : Fragment() {
             isLoadingDevices = false
 
             if (devices.isEmpty())
-                mainActivity.displayMessage("No groups found.")
+                mainActivity.displayMessage("No devices found.")
         }, {
             view.swipe_refresh_layout.isRefreshing = false
             isLoadingDevices = false

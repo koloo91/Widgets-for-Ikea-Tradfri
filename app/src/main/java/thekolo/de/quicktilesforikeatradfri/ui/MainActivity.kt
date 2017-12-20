@@ -12,7 +12,6 @@ import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.CoroutineExceptionHandler
-import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
@@ -36,6 +35,8 @@ class MainActivity : AppCompatActivity() {
     val handler = CoroutineExceptionHandler { _, ex ->
         Log.println(Log.ERROR, "MainActivity", Log.getStackTraceString(ex))
     }
+
+    private val fragments: MutableMap<String, Fragment> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,11 +134,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun displayDevicesFragment() {
-        displayFragment(DevicesFragment.newInstance())
+        var fragment = fragments["DevicesFragment"]
+        if(fragment == null) {
+            fragment = DevicesFragment.newInstance()
+            fragments["DevicesFragment"] = fragment
+        }
+
+        displayFragment(fragment)
     }
 
     private fun displayGroupsFragment() {
-        displayFragment(GroupsFragment.newInstance())
+        var fragment = fragments["GroupsFragment"]
+        if(fragment == null) {
+            fragment = GroupsFragment.newInstance()
+            fragments["GroupsFragment"] = fragment
+        }
+
+        displayFragment(fragment)
     }
 
     private fun displayFragment(fragment: Fragment) {
