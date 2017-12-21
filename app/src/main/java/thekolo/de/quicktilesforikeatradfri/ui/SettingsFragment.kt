@@ -36,6 +36,8 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
     }
 
     private fun updateSummaries() {
+        if(activity == null) return
+
         val gatewayPref = preferenceManager.findPreference(SettingsUtil.GATEWAY_IP_KEY) as EditTextPreference
         gatewayPref.summary = gatewayPref.text
         gatewayPref.setOnPreferenceChangeListener { preference, newValue ->

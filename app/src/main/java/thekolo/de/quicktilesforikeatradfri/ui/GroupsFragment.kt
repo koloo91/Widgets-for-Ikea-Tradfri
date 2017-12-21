@@ -66,7 +66,7 @@ class GroupsFragment : Fragment() {
         override fun onSpinnerItemSelected(group: Group, position: Int) {
             launch(CommonPool + mainActivity.handler) {
                 if (position == TileUtil.NONE.index) {
-                    mainActivity.deviceDataDao.insert(DeviceData(group.id, group.name, TileUtil.nameForIndex(position)))
+                    mainActivity.deviceDataDao.insert(DeviceData(group.id, group.name, TileUtil.nameForIndex(position), false))
                     return@launch
                 }
 
@@ -80,7 +80,7 @@ class GroupsFragment : Fragment() {
                     return@launch
                 }
 
-                mainActivity.deviceDataDao.insert(DeviceData(group.id, group.name, TileUtil.nameForIndex(position)))
+                mainActivity.deviceDataDao.insert(DeviceData(group.id, group.name, TileUtil.nameForIndex(position), false))
             }
         }
 

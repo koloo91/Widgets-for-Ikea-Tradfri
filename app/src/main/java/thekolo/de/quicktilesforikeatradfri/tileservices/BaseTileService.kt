@@ -10,6 +10,7 @@ import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
+import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
@@ -44,29 +45,46 @@ abstract class BaseTileService : TileService() {
     override fun onClick() {
         println("OnClickTile")
 
-        launch(CommonPool) {
-            val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return@launch
-
-            service.ping({ _ ->
-                service.toggleDevice(deviceData.id, {
-                    service.getDevice(deviceData.id, { device ->
-                        updateTile(device)
-                    }, { onError() })
-                }, { onError() })
-            }, {
-                onError(getString(R.string.unable_to_reach_gateway))
-            })
-        }
+        handleClick()
     }
 
     private fun deviceDataFromDatabase(): Deferred<DeviceData?> {
         return async { deviceDataDao.findByTile(TILE_NAME) }
     }
 
-    private fun updateTile(device: Device?) {
+    private fun handleClick() {
+        launch(CommonPool) {
+            val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return@launch
+
+            service.ping({ _ ->
+                if (deviceData.isDevice) handleDevice(deviceData)
+                else handleGroup(deviceData)
+            }, {
+                onError(getString(R.string.unable_to_reach_gateway))
+            })
+        }
+    }
+
+    private fun handleDevice(deviceData: DeviceData) {
+        service.toggleDevice(deviceData.id, {
+            service.getDevice(deviceData.id, { device ->
+                updateTile(device.name, DeviceUtil.isDeviceOn(device))
+            }, { onError() })
+        }, { onError() })
+    }
+
+    private fun handleGroup(deviceData: DeviceData) {
+        service.toggleGroup(deviceData.id, {
+            service.getGroup(deviceData.id, { group ->
+                updateTile(group.name, DeviceUtil.isGroupOn(group))
+            }, { onError() })
+        }, { onError() })
+    }
+
+    private fun updateTile(name: String?, isOn: Boolean) {
         val tile = qsTile
 
-        if (DeviceUtil.isDeviceOn(device)) {
+        if (isOn) {
             tile.state = Tile.STATE_ACTIVE
             tile.icon = Icon.createWithResource(applicationContext, R.drawable.lightbulb_on_outline)
         } else {
@@ -74,7 +92,7 @@ abstract class BaseTileService : TileService() {
             tile.icon = Icon.createWithResource(applicationContext, R.drawable.lightbulb_outline)
         }
 
-        tile.label = device?.name ?: DISPLAY_NAME
+        tile.label = name ?: DISPLAY_NAME
         tile.updateTile()
     }
 

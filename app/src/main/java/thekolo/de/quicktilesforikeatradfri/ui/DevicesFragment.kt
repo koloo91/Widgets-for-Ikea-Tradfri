@@ -67,7 +67,7 @@ class DevicesFragment : Fragment() {
         override fun onSpinnerItemSelected(device: Device, position: Int) {
             launch(CommonPool + mainActivity.handler) {
                 if (position == TileUtil.NONE.index) {
-                    mainActivity.deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position)))
+                    mainActivity.deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position), true))
                     return@launch
                 }
 
@@ -81,7 +81,7 @@ class DevicesFragment : Fragment() {
                     return@launch
                 }
 
-                mainActivity.deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position)))
+                mainActivity.deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position), true))
             }
         }
 

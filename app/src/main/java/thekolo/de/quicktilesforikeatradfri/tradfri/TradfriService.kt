@@ -197,6 +197,29 @@ class TradfriService(context: Context) {
         return parseResponse(response, List::class.java) as List<Int>? ?: return emptyList()
     }
 
+    fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit) {
+        launch(CommonPool + handler) {
+            val response = client.getGroup(id)
+            if (response == null) {
+                launch(UI) { onError() }
+                return@launch
+            }
+
+            if (!response.isSuccess) {
+                launch(UI) { onError() }
+                return@launch
+            }
+
+            val result = parseResponse(response, Group::class.java)
+            if (result == null) {
+                launch(UI) { onError() }
+                return@launch
+            }
+
+            launch(UI) { onSuccess(result) }
+        }
+    }
+
     private fun getGroup(id: Int): Group? {
         val response = client.getGroup(id) ?: return null
 
