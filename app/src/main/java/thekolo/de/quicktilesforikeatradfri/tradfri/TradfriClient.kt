@@ -1,5 +1,6 @@
 package thekolo.de.quicktilesforikeatradfri.tradfri
 
+import android.util.Log
 import com.google.gson.Gson
 import org.eclipse.californium.core.CoapClient
 import org.eclipse.californium.core.CoapResponse
@@ -11,13 +12,15 @@ import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.pskstore.StaticPskStore
 import thekolo.de.quicktilesforikeatradfri.DeviceState
 import thekolo.de.quicktilesforikeatradfri.DeviceUpdater
+import thekolo.de.quicktilesforikeatradfri.models.BulbState
+import thekolo.de.quicktilesforikeatradfri.models.GroupUpdater
 import java.net.InetSocketAddress
 
 
 class TradfriClient(ip: String,
                     private val securityId: String,
-                    var identity: String?,
-                    var preSharedKey: String?) {
+                    private var identity: String?,
+                    private var preSharedKey: String?) {
 
     private val baseUrl = "coaps://$ip:5684"
 
@@ -66,34 +69,49 @@ class TradfriClient(ip: String,
         return registerClient("$baseUrl/15011/9063").post("{\"9090\": \"$identity\"}", MediaTypeRegistry.APPLICATION_JSON)
     }
 
-    fun getDeviceIds(): CoapResponse? {
-        return client("$baseUrl/15001").get()
-        //parseResponse(response, List::class.java) as List<Int>
-    }
-
     fun ping(): CoapResponse? {
         return client("$baseUrl/.well-known/core").get()
+    }
+
+    fun getDeviceIds(): CoapResponse? {
+        return client("$baseUrl/15001").get()
     }
 
     fun getDevice(deviceId: Int): CoapResponse? {
         return client("$baseUrl/15001/$deviceId").get()
     }
 
-    fun getGroups(): CoapResponse? {
-        return client("$baseUrl/15004").get()
-    }
-
-    fun getGroup(groupId: String): CoapResponse? {
-        return client("$baseUrl/15004/$groupId").get()
-    }
-
     fun turnDeviceOn(deviceId: Int): CoapResponse? {
-        val updateData = DeviceUpdater(listOf(DeviceState(1)))
+        val updateData = DeviceUpdater(listOf(DeviceState(BulbState.On)))
         return client("$baseUrl/15001/$deviceId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
     }
 
     fun turnDeviceOff(deviceId: Int): CoapResponse? {
-        val updateData = DeviceUpdater(listOf(DeviceState(0)))
+        val updateData = DeviceUpdater(listOf(DeviceState(BulbState.Off)))
         return client("$baseUrl/15001/$deviceId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
+    }
+
+    fun getGroupIds(): CoapResponse? {
+        Log.d(LogName, "GET $baseUrl/15004")
+        return client("$baseUrl/15004").get()
+    }
+
+    fun getGroup(groupId: Int): CoapResponse? {
+        Log.d(LogName, "GET $baseUrl/15004/$groupId")
+        return client("$baseUrl/15004/$groupId").get()
+    }
+
+    fun turnGroupOn(groupId: Int): CoapResponse? {
+        val updateData = GroupUpdater(BulbState.On)
+        return client("$baseUrl/15004/$groupId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
+    }
+
+    fun turnGroupOff(groupId: Int): CoapResponse? {
+        val updateData = GroupUpdater(BulbState.Off)
+        return client("$baseUrl/15004/$groupId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
+    }
+
+    companion object {
+        const val LogName = "TradfriClient"
     }
 }

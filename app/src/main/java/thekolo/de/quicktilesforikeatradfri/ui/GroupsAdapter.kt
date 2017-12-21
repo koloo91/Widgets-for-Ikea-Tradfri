@@ -8,17 +8,17 @@ import android.view.ViewGroup
 import android.widget.*
 import kotlinx.android.synthetic.main.device_recycler_view_item.view.*
 import kotlinx.coroutines.experimental.async
-import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
+import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
 
-class DevicesAdapter(context: Context,
-                     var devices: List<Device>,
-                     private val spinnerAdapter: ArrayAdapter<CharSequence>,
-                     private val listener: DevicesAdapterActions) : RecyclerView.Adapter<DevicesAdapter.ViewHolder>() {
+class GroupsAdapter(context: Context,
+                    var groups: List<Group>,
+                    private val spinnerAdapter: ArrayAdapter<CharSequence>,
+                    private val listener: GroupsAdapterActions) : RecyclerView.Adapter<GroupsAdapter.ViewHolder>() {
 
     private val deviceDataDao = Database.get(context).deviceDataDao()
 
@@ -30,16 +30,16 @@ class DevicesAdapter(context: Context,
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         if (holder == null) return
-        val device = devices[position]
+        val group = groups[position]
 
-        holder.nameTextView.text = device.name
-        holder.stateSwitch.isChecked = isDeviceOn(device)
+        holder.nameTextView.text = group.name
+        holder.stateSwitch.isChecked = isGroupOn(group)
         holder.stateSwitch.setOnCheckedChangeListener { _, isChecked ->
-            listener.onStateSwitchCheckedChanged(device, isChecked)
+            listener.onStateSwitchCheckedChanged(group, isChecked)
         }
 
         async {
-            val deviceData = deviceDataDao.byId(device.id)
+            val deviceData = deviceDataDao.byId(group.id)
             holder.tilesSpinner.setSelection(TileUtil.positionFromName(deviceData?.tile ?: TileUtil.NONE.name), false)
         }
 
@@ -50,13 +50,13 @@ class DevicesAdapter(context: Context,
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                listener.onSpinnerItemSelected(device, position)
+                listener.onSpinnerItemSelected(group, position)
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return devices.size
+        return groups.size
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -65,20 +65,17 @@ class DevicesAdapter(context: Context,
         val tilesSpinner: Spinner = view.tiles_spinner
     }
 
-    private fun isDeviceOn(device: Device): Boolean {
-        if (device.states == null) return false
-        if (device.states.isEmpty()) return false
-        if (device.states.first().on == null) return false
-        return when (device.states.first().on) {
+    private fun isGroupOn(group: Group): Boolean {
+        if (group.on == null) return false
+        return when (group.on) {
             BulbState.Off -> false
             BulbState.On -> true
             else -> false
         }
     }
 
-    interface DevicesAdapterActions {
-        fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean)
-        fun onSpinnerItemSelected(device: Device, position: Int)
+    interface GroupsAdapterActions {
+        fun onStateSwitchCheckedChanged(group: Group, isChecked: Boolean)
+        fun onSpinnerItemSelected(group: Group, position: Int)
     }
-
 }

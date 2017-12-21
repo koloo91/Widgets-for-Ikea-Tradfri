@@ -9,6 +9,7 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.eclipse.californium.core.CoapResponse
 import thekolo.de.quicktilesforikeatradfri.Device
+import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.models.RegisterResult
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 
@@ -34,16 +35,6 @@ class TradfriService(context: Context) {
         val preSharedKey = SettingsUtil.getPreSharedKey(context)
 
         return identity != null && identity.isNotEmpty() && preSharedKey != null && preSharedKey.isNotEmpty()
-    }
-
-    fun register(identity: String) {
-
-        val response = client.register(identity) ?: return
-
-        if (!response.isSuccess)
-            return
-
-        val result = parseResponse(response, RegisterResult::class.java)
     }
 
     fun register(identity: String, onSuccess: (RegisterResult) -> Unit, onError: () -> Unit) {
@@ -193,6 +184,111 @@ class TradfriService(context: Context) {
         }
     }
 
+    private fun getGroupIds(): List<Int> {
+        Log.d(LogName, "getGroupIds")
+        val response = client.getGroupIds() ?: return emptyList()
+
+        if (!response.isSuccess) {
+            Log.d(LogName, "getGroupIds was not successful")
+            return emptyList()
+        }
+
+        Log.d(LogName, "getGroupIds was successful -> found ${String(response.payload)}")
+        return parseResponse(response, List::class.java) as List<Int>? ?: return emptyList()
+    }
+
+    fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit) {
+        launch(CommonPool + handler) {
+            val response = client.getGroup(id)
+            if (response == null) {
+                launch(UI) { onError() }
+                return@launch
+            }
+
+            if (!response.isSuccess) {
+                launch(UI) { onError() }
+                return@launch
+            }
+
+            val result = parseResponse(response, Group::class.java)
+            if (result == null) {
+                launch(UI) { onError() }
+                return@launch
+            }
+
+            launch(UI) { onSuccess(result) }
+        }
+    }
+
+    private fun getGroup(id: Int): Group? {
+        val response = client.getGroup(id) ?: return null
+
+        if (!response.isSuccess)
+            return null
+
+        Log.d(LogName, "getGroup was successful -> found ${String(response.payload)}")
+        return parseResponse(response, Group::class.java)
+    }
+
+    fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit) {
+        launch(CommonPool + handler) {
+            val groupIds = getGroupIds()
+            val groups = groupIds.mapNotNull { getGroup(it) }
+
+            launch(UI) { onSuccess(groups) }
+        }
+    }
+
+    fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
+        val response = client.turnGroupOn(id)
+        if (response == null) {
+            launch(UI) { onError() }
+            return
+        }
+
+        if (!response.isSuccess) {
+            launch(UI) { onError() }
+            return
+        }
+
+        launch(UI) { onSuccess() }
+    }
+
+    fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
+        val response = client.turnGroupOff(id)
+        if (response == null) {
+            launch(UI) { onError() }
+            return
+        }
+
+        if (!response.isSuccess) {
+            launch(UI) { onError() }
+            return onError()
+        }
+
+        launch(UI) { onSuccess() }
+    }
+
+    fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit) {
+        launch(CommonPool + handler) {
+            val device = getGroup(groupId)
+            if (device == null) {
+                launch(UI) { onError() }
+                return@launch
+            }
+
+            if (device.on != null) {
+                when (device.on) {
+                    0 -> turnGroupOn(groupId, onSuccess, onError)
+                    1 -> turnGroupOff(groupId, onSuccess, onError)
+                    else -> turnGroupOn(groupId, onSuccess, onError)
+                }
+            } else {
+                turnGroupOn(groupId, onSuccess, onError)
+            }
+        }
+    }
+
     private fun <T> parseResponse(response: CoapResponse, type: Class<T>): T? {
         return try {
             val payload = String(response.payload)
@@ -204,6 +300,8 @@ class TradfriService(context: Context) {
     }
 
     companion object {
+        const val LogName = "TradfriService"
+
         private var instance: TradfriService? = null
 
         fun instance(context: Context): TradfriService {

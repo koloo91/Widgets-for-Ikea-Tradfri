@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/devices"
+        android:title="@string/devices"
+        android:icon="@drawable/lightbulb_on_outline"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/groups"
+        android:title="@string/groups"
+        android:icon="@drawable/bulb_group"
+        app:showAsAction="ifRoom"/>
+</menu>

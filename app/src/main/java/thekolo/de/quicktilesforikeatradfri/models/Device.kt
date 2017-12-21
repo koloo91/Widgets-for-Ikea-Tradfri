@@ -1,13 +1,14 @@
 package thekolo.de.quicktilesforikeatradfri
 
 import com.google.gson.annotations.SerializedName
+import thekolo.de.quicktilesforikeatradfri.models.TradfriDevice
 
-class Device(@SerializedName("9003") val id: Int,
-             @SerializedName("9001") val name: String,
+class Device(@SerializedName("9003") override val id: Int,
+             @SerializedName("9001") override val name: String,
              @SerializedName("3") val type: DeviceType,
-             @SerializedName("3311") val states: List<DeviceState>?)
+             @SerializedName("3311") val states: List<DeviceState>?) : TradfriDevice(id, name)
 
-class DeviceState(@SerializedName("5850") val on: Int? = null,
+class DeviceState(@SerializedName("5850") var on: Int? = null,
                   @SerializedName("5706") val color: String? = null,
                   @SerializedName("5851") val brightness: Int? = null)
 
