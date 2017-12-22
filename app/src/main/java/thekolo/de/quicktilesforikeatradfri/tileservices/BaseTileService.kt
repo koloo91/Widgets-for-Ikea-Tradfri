@@ -5,6 +5,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.support.annotation.RequiresApi
+import android.util.Log
 import android.widget.Toast
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
@@ -28,13 +29,17 @@ abstract class BaseTileService : TileService() {
     private val deviceDataDao: DeviceDataDao
         get() = Database.get(applicationContext).deviceDataDao()
 
+    private val handler = CoroutineExceptionHandler { _, ex ->
+        Log.println(Log.ERROR, "BaseTileService", Log.getStackTraceString(ex))
+    }
+
     override fun onStartListening() {
         println("onStartListeningTile")
 
-        launch(CommonPool) {
+        launch(CommonPool + handler) {
             val deviceData = deviceDataFromDatabase().await() ?: return@launch
 
-            launch(UI) {
+            launch(UI + handler) {
                 val tile = qsTile
                 tile.label = deviceData.name
                 tile.updateTile()
@@ -53,7 +58,7 @@ abstract class BaseTileService : TileService() {
     }
 
     private fun handleClick() {
-        launch(CommonPool) {
+        launch(CommonPool + handler) {
             val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return@launch
 
             service.ping({ _ ->
