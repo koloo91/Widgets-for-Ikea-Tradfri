@@ -17,6 +17,7 @@ import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
+import thekolo.de.quicktilesforikeatradfri.ui.adapter.DevicesFragment
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import java.util.*
@@ -47,6 +48,9 @@ class MainActivity : AppCompatActivity() {
 
         bottom_navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         bottom_navigation.selectedItemId = R.id.devices
+
+        val onboardingIntent = Intent(this, IntroActivity::class.java)
+        startActivity(onboardingIntent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -57,6 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item == null) return true
+
         when (item.itemId) {
             R.id.action_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
@@ -68,6 +73,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        //TODO: if onboarding not completed skip
+
         when (item.itemId) {
             R.id.devices -> {
                 println("DevicesSelected")

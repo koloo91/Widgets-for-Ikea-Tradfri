@@ -1,4 +1,4 @@
-package thekolo.de.quicktilesforikeatradfri.ui
+package thekolo.de.quicktilesforikeatradfri.ui.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView

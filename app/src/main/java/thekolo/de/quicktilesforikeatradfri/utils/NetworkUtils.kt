@@ -1,7 +1,10 @@
 package thekolo.de.quicktilesforikeatradfri.utils
 
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import java.net.InetAddress
 import java.net.NetworkInterface
 
@@ -23,7 +26,8 @@ object NetworkUtils {
                     }
                 }
             }
-        } catch (ex: Exception) {}
+        } catch (ex: Exception) {
+        }
 
         return null
     }
@@ -48,23 +52,31 @@ object NetworkUtils {
         return null
     }
 
-    fun searchGatewayIp(onProgressChanged: (Int) -> Unit): Deferred<String?> {
-        return async {
-            val deviceIp = getIpAddress() ?: return@async null
-            var foundIp: String? = null
+    fun searchGatewayIp(onSucces: (String) -> Unit, onError: () -> Unit, onDeviceFound: (String) -> Unit, onProgressChanged: (Int) -> Unit) {
+        launch(CommonPool) {
+            //TODO: Uncomment
+            val deviceIp = "192.168.178.44"//getIpAddress()
+            if (deviceIp == null) {
+                onError()
+                return@launch
+            }
+
             var currentCount = 0
 
             scanNetwork(deviceIp) { ip, hostname ->
                 currentCount++
-                onProgressChanged(((currentCount / 256.0) * 100).toInt())
+
+                launch(UI) {
+                    if(ip != hostname)
+                        onDeviceFound("$ip $hostname")
+                    onProgressChanged(((currentCount / 256.0) * 100).toInt())
+                }
 
                 if (hostname != null && hostname.startsWith(GATEWAY_PREFIX)) {
-                    println(foundIp)
-                    foundIp = ip
+                    println(ip)
+                    launch(UI) { onSucces(ip) }
                 }
             }
-
-            return@async foundIp
         }
     }
 }

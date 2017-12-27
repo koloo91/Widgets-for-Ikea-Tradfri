@@ -7,6 +7,7 @@ typealias Action = () -> Job
 
 class QueueService private constructor() {
     private val actions: MutableList<Action> = mutableListOf()
+    private var retryCounter = 0
 
     fun addAction(action: Action) {
         actions.add(action)
@@ -17,17 +18,25 @@ class QueueService private constructor() {
     private fun executeNextAction() {
         if (actions.isEmpty()) return
 
-        runBlocking {
-            println("executeNextAction before")
-            actions.first()().join()
-            println("executeNextAction after")
-            actions.removeAt(0)
+        try {
+            runBlocking {
+                if(retryCounter >= MAX_RETRIES) {
+                    actions.first()().join()
+                }
 
-            executeNextAction()
+                actions.removeAt(0)
+
+                executeNextAction()
+            }
+        } catch (e: Exception) {
+            retryCounter++
+            e.printStackTrace()
         }
     }
 
     companion object {
+        const val MAX_RETRIES = 5
+
         private var instance: QueueService? = null
 
         fun instance(): QueueService {

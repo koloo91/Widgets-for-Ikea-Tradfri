@@ -1,0 +1,42 @@
+<agency.tango.materialintroscreen.parallax.ParallaxRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.GatewaySearchFragment"
+    android:paddingBottom="164dp"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Search for Gateway"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+    <TextView
+        android:id="@+id/description_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please enter your gatways IP address or click on the button to search our gateway"
+        android:layout_below="@+id/title"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/gateway_ip_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/description_textview"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+        <EditText
+            android:id="@+id/gateway_ip_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Gateway IP address"/>
+    </android.support.design.widget.TextInputLayout>
+</agency.tango.materialintroscreen.parallax.ParallaxRelativeLayout>
