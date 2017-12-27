@@ -5,17 +5,20 @@ import android.util.Log
 import com.google.gson.Gson
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.CoroutineExceptionHandler
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.eclipse.californium.core.CoapResponse
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.models.RegisterResult
+import thekolo.de.quicktilesforikeatradfri.services.QueueService
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 
 class TradfriService(context: Context) {
     private val client: TradfriClient
     private val gson = Gson()
+    private val queueService = QueueService.instance()
 
     private val handler = CoroutineExceptionHandler { _, ex ->
         Log.println(Log.ERROR, "TradfriService", Log.getStackTraceString(ex))
@@ -42,39 +45,47 @@ class TradfriService(context: Context) {
             val response = client.register(identity)
 
             if (response == null) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
             if (!response.isSuccess) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
             val result = parseResponse(response, RegisterResult::class.java)
             if (result == null) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
-            launch(UI) { onSuccess(result) }
+            launch(UI + handler) { onSuccess(result) }
         }
     }
 
     fun ping(onSuccess: (String) -> Unit, onError: () -> Unit) {
-        launch(CommonPool + handler) {
+        queueService.addAction({
+            return@addAction _ping(onSuccess, onError)
+        })
+    }
+
+    private fun _ping(onSuccess: (String) -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
+            println("_ping start")
             val response = client.ping()
             if (response == null) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
             if (!response.isSuccess) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
-            launch(UI) { onSuccess(String(response.payload)) }
+            launch(UI + handler) { onSuccess(String(response.payload)) }
+            println("_ping end")
         }
     }
 
@@ -97,30 +108,42 @@ class TradfriService(context: Context) {
     }
 
     fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit) {
-        launch(CommonPool + handler) {
+        queueService.addAction {
+            return@addAction _getDevice(id, onSuccess, onError)
+        }
+    }
+
+    private fun _getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
             val response = client.getDevice(id)
             if (response == null) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
             if (!response.isSuccess) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
             val result = parseResponse(response, Device::class.java)
             if (result == null) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
-            launch(UI) { onSuccess(result) }
+            launch(UI + handler) { onSuccess(result) }
         }
     }
 
     fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit) {
-        launch(CommonPool + handler) {
+        queueService.addAction {
+            return@addAction _getDevices(onSuccess, onError)
+        }
+    }
+
+    private fun _getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
             val deviceIds = getDeviceIds()
 
             val devices = deviceIds.mapNotNull { id ->
@@ -129,45 +152,67 @@ class TradfriService(context: Context) {
                 !device.type.name.contains("remote control")
             }
 
-            launch(UI) { onSuccess(devices) }
+            launch(UI + handler) { onSuccess(devices) }
         }
     }
 
     fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-        val response = client.turnDeviceOn(id)
-        if (response == null) {
-            launch(UI) { onError() }
-            return
+        queueService.addAction {
+            return@addAction _turnDeviceOn(id, onSuccess, onError)
         }
+    }
 
-        if (!response.isSuccess) {
-            launch(UI) { onError() }
-            return
+    private fun _turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
+            val response = client.turnDeviceOn(id)
+            if (response == null) {
+                launch(UI + handler) { onError() }
+                return@launch
+            }
+
+            if (!response.isSuccess) {
+                launch(UI + handler) { onError() }
+                return@launch
+            }
+
+            launch(UI + handler) { onSuccess() }
         }
-
-        launch(UI) { onSuccess() }
     }
 
     fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-        val response = client.turnDeviceOff(id)
-        if (response == null) {
-            launch(UI) { onError() }
-            return
+        queueService.addAction {
+            return@addAction _turnDeviceOff(id, onSuccess, onError)
         }
+    }
 
-        if (!response.isSuccess) {
-            launch(UI) { onError() }
-            return onError()
+    private fun _turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
+            val response = client.turnDeviceOff(id)
+            if (response == null) {
+                launch(UI + handler) { onError() }
+                return@launch
+            }
+
+            if (!response.isSuccess) {
+                launch(UI + handler) { onError() }
+                return@launch
+            }
+
+            launch(UI + handler) { onSuccess() }
         }
-
-        launch(UI) { onSuccess() }
     }
 
     fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-        launch(CommonPool + handler) {
+        queueService.addAction {
+            return@addAction _toggleDevice(deviceId, onSuccess, onError)
+        }
+    }
+
+    private fun _toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
             val device = getDevice(deviceId)
             if (device == null) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
@@ -198,25 +243,31 @@ class TradfriService(context: Context) {
     }
 
     fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit) {
-        launch(CommonPool + handler) {
+        queueService.addAction {
+            return@addAction _getGroup(id, onSuccess, onError)
+        }
+    }
+
+    private fun _getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
             val response = client.getGroup(id)
             if (response == null) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
             if (!response.isSuccess) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
             val result = parseResponse(response, Group::class.java)
             if (result == null) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
-            launch(UI) { onSuccess(result) }
+            launch(UI + handler) { onSuccess(result) }
         }
     }
 
@@ -231,49 +282,77 @@ class TradfriService(context: Context) {
     }
 
     fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit) {
-        launch(CommonPool + handler) {
+        queueService.addAction {
+            return@addAction _getGroups(onSuccess, onError)
+        }
+    }
+
+    private fun _getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
             val groupIds = getGroupIds()
             val groups = groupIds.mapNotNull { getGroup(it) }
 
-            launch(UI) { onSuccess(groups) }
+            launch(UI + handler) { onSuccess(groups) }
         }
     }
 
     fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-        val response = client.turnGroupOn(id)
-        if (response == null) {
-            launch(UI) { onError() }
-            return
+        queueService.addAction {
+            return@addAction _turnGroupOn(id, onSuccess, onError)
         }
+    }
 
-        if (!response.isSuccess) {
-            launch(UI) { onError() }
-            return
+    private fun _turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
+            val response = client.turnGroupOn(id)
+            if (response == null) {
+                launch(UI + handler) { onError() }
+                return@launch
+            }
+
+            if (!response.isSuccess) {
+                launch(UI + handler) { onError() }
+                return@launch
+            }
+
+            launch(UI + handler) { onSuccess() }
         }
-
-        launch(UI) { onSuccess() }
     }
 
     fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-        val response = client.turnGroupOff(id)
-        if (response == null) {
-            launch(UI) { onError() }
-            return
+        queueService.addAction {
+            return@addAction _turnGroupOff(id, onSuccess, onError)
         }
+    }
 
-        if (!response.isSuccess) {
-            launch(UI) { onError() }
-            return onError()
+    private fun _turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
+            val response = client.turnGroupOff(id)
+            if (response == null) {
+                launch(UI + handler) { onError() }
+                return@launch
+            }
+
+            if (!response.isSuccess) {
+                launch(UI + handler) { onError() }
+                return@launch
+            }
+
+            launch(UI + handler) { onSuccess() }
         }
-
-        launch(UI) { onSuccess() }
     }
 
     fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-        launch(CommonPool + handler) {
+        queueService.addAction {
+            return@addAction _toggleGroup(groupId, onSuccess, onError)
+        }
+    }
+
+    private fun _toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
             val device = getGroup(groupId)
             if (device == null) {
-                launch(UI) { onError() }
+                launch(UI + handler) { onError() }
                 return@launch
             }
 
