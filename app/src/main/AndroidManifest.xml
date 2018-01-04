@@ -28,7 +28,7 @@
             android:name=".ui.IntroActivity"
             android:theme="@style/Theme.Intro" />
 
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.DevicesAppWidgetProvider"
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesAppWidgetProvider"
             android:label="Devices Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -39,11 +39,28 @@
                 android:resource="@xml/devices_appwidget_info" />
         </receiver>
 
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.DevicesListViewItemClickedBroadcastReceiver"/>
+        <service
+            android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesListViewItemClickedBroadcastReceiver"/>
+
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsAppWidgetProvider"
+            android:label="Groups Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/devices_appwidget_info" />
+        </receiver>
 
         <service
-            android:name="thekolo.de.quicktilesforikeatradfri.widgets.DevicesiWidgetService"
+            android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsListViewItemClickedBroadcastReceiver"/>
 
         <service
             android:name="thekolo.de.quicktilesforikeatradfri.tileservices.Tile1Service"

@@ -1,4 +1,4 @@
-package thekolo.de.quicktilesforikeatradfri.widgets
+package thekolo.de.quicktilesforikeatradfri.widgets.devices
 
 import android.content.BroadcastReceiver
 import android.content.Context

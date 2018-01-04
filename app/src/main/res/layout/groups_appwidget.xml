@@ -13,14 +13,14 @@
             android:background="@color/colorPrimary"
             android:padding="8dp">
             <TextView
-                android:text="@string/devices"
+                android:text="@string/groups"
                 android:textColor="@android:color/white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </RelativeLayout>
 
         <ListView
-            android:id="@+id/devices_list_view"
+            android:id="@+id/groups_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:drawSelectorOnTop="true"

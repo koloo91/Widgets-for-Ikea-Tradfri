@@ -60,7 +60,7 @@ class DevicesAdapter(context: Context,
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val nameTextView: TextView = view.device_name_text_view
+        val nameTextView: TextView = view.name_text_view
         val stateSwitch: Switch = view.device_state_switch
         val tilesSpinner: Spinner = view.tiles_spinner
     }

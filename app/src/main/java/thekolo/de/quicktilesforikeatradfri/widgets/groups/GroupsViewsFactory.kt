@@ -1,4 +1,4 @@
-package thekolo.de.quicktilesforikeatradfri.widgets
+package thekolo.de.quicktilesforikeatradfri.widgets.groups
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
@@ -10,24 +10,25 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
+import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import java.util.*
 
 
-class DevicesViewsFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
+class GroupsViewsFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val client = TradfriService.instance(context)
-    private var devices: List<Device> = emptyList()
+    private var groups: List<Group> = emptyList()
 
     private val timer = Timer()
     private val timerTask = object : TimerTask() {
         override fun run() {
-            client.getDevices({ devices ->
-                Log.d(LogName, "timerTask devices loaded $devices")
-                this@DevicesViewsFactory.devices = devices
+            client.getGroups({ groups ->
+                Log.d(LogName, "timerTask groups loaded $groups")
+                this@GroupsViewsFactory.groups = groups
 
                 val appWidgetManager = AppWidgetManager.getInstance(context)
-                val componentName = ComponentName(context, DevicesAppWidgetProvider::class.java)
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.devices_list_view)
+                val componentName = ComponentName(context, GroupsAppWidgetProvider::class.java)
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.groups_list_view)
             }, {
 
             })
@@ -59,15 +60,15 @@ class DevicesViewsFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     override fun getViewAt(position: Int): RemoteViews {
-        val device = devices[position]
+        val device = groups[position]
 
         val row = RemoteViews(context.packageName, R.layout.widget_list_view_item)
-        row.setTextViewText(R.id.device_name_text_view, device.name)
+        row.setTextViewText(R.id.name_text_view, device.name)
 
         val rowIntent = Intent()
         val extras = Bundle()
 
-        extras.putInt(DevicesAppWidgetProvider.DEVICE_ID, devices[position].id)
+        extras.putInt(GroupsAppWidgetProvider.GROUP_ID, groups[position].id)
         rowIntent.putExtras(extras)
 
         row.setOnClickFillInIntent(R.id.widget_row_item, rowIntent)
@@ -76,8 +77,8 @@ class DevicesViewsFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     override fun getCount(): Int {
-        Log.d(LogName, "getCount ${devices.size}")
-        return devices.size
+        Log.d(LogName, "getCount ${groups.size}")
+        return groups.size
     }
 
     override fun getViewTypeCount(): Int {
@@ -85,10 +86,10 @@ class DevicesViewsFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     override fun onDestroy() {
-        devices = emptyList()
+        groups = emptyList()
     }
 
     companion object {
-        const val LogName = "DevicesViewsFactory"
+        const val LogName = "GroupsViewsFactory"
     }
 }

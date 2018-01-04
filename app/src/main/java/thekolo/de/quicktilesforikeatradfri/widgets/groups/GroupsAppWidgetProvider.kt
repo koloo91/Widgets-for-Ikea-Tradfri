@@ -1,4 +1,4 @@
-package thekolo.de.quicktilesforikeatradfri.widgets
+package thekolo.de.quicktilesforikeatradfri.widgets.groups
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -11,7 +11,7 @@ import android.widget.RemoteViews
 import thekolo.de.quicktilesforikeatradfri.R
 
 
-class DevicesAppWidgetProvider : AppWidgetProvider() {
+class GroupsAppWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Log.d(LogName, "onUpdate")
@@ -22,18 +22,18 @@ class DevicesAppWidgetProvider : AppWidgetProvider() {
             val appWidgetId = appWidgetIds[i]
 
             // Create an Intent to launch ExampleActivity
-            val intent = Intent(context, DevicesiWidgetService::class.java)
+            val intent = Intent(context, GroupsWidgetService::class.java)
 
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i])
             intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
-            val widget = RemoteViews(context.packageName, R.layout.devices_appwidget)
-            widget.setRemoteAdapter(R.id.devices_list_view, intent)
+            val widget = RemoteViews(context.packageName, R.layout.groups_appwidget)
+            widget.setRemoteAdapter(R.id.groups_list_view, intent)
 
-            val clickIntent = Intent(context, DevicesListViewItemClickedBroadcastReceiver::class.java)
+            val clickIntent = Intent(context, GroupsListViewItemClickedBroadcastReceiver::class.java)
             val clickPI = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-            widget.setPendingIntentTemplate(R.id.devices_list_view, clickPI)
+            widget.setPendingIntentTemplate(R.id.groups_list_view, clickPI)
 
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, widget)
@@ -43,8 +43,8 @@ class DevicesAppWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        const val LogName = "DevicesAppWidgetProvider"
-        const val DEVICE_ID = "de.thekolo.devices.id"
+        const val LogName = "GroupsAppWidgetProvider"
+        const val GROUP_ID = "de.thekolo.groups.id"
     }
 }
 
