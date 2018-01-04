@@ -20,6 +20,5 @@ class ListViewItemClickedBroadcastReceiver : BroadcastReceiver() {
 
     companion object {
         const val LogName = "ListViewItemClickedBroadcastReceiver"
-        const val INTENT_NAME = "thekolo.de.widgetsforikeatradfri.ListItemClicked"
     }
 }

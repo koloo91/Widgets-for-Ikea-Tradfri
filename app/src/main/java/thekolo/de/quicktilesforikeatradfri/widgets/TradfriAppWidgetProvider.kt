@@ -44,7 +44,7 @@ class TradfriAppWidgetProvider : AppWidgetProvider() {
 
     companion object {
         const val LogName = "TradfriAppWidgetProvider"
-        const val DEVICE_ID = "com.commonsware.android.appwidget.lorem.WORD"
+        const val DEVICE_ID = "de.thekolo.devices.id"
     }
 }
 

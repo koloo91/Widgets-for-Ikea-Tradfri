@@ -1,17 +1,16 @@
 package thekolo.de.quicktilesforikeatradfri.widgets
 
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import org.jetbrains.anko._AppWidgetHostView
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
-import android.content.ComponentName
 import java.util.*
 
 
