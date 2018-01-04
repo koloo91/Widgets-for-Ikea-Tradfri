@@ -1,18 +1,43 @@
 package thekolo.de.quicktilesforikeatradfri.widgets
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import org.jetbrains.anko._AppWidgetHostView
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
+import android.content.ComponentName
+import java.util.*
 
 
 class TradfriViewsFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val client = TradfriService.instance(context)
     private var devices: List<Device> = emptyList()
+
+    private val timer = Timer()
+    private val timerTask = object : TimerTask() {
+        override fun run() {
+            client.getDevices({ devices ->
+                Log.d(LogName, "timerTask devices loaded $devices")
+                this@TradfriViewsFactory.devices = devices
+
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val componentName = ComponentName(context, TradfriAppWidgetProvider::class.java)
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.devices_list_view)
+            }, {
+
+            })
+        }
+    }
+
+    init {
+        timer.schedule(timerTask, 0, 30 * 60 * 1000L)
+    }
 
     override fun onCreate() {
 
@@ -27,12 +52,7 @@ class TradfriViewsFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     override fun onDataSetChanged() {
-        println("TradfriViewsFactory onDataSetChanged")
-        client.getDevices({ devices ->
-            this.devices = devices
-        }, {
-
-        })
+        Log.d(LogName, "onDataSetChanged")
     }
 
     override fun hasStableIds(): Boolean {
@@ -40,7 +60,6 @@ class TradfriViewsFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     override fun getViewAt(position: Int): RemoteViews {
-        println("GetViewAt $position")
         val device = devices[position]
 
         val row = RemoteViews(context.packageName, R.layout.device_list_view_item)
@@ -58,6 +77,7 @@ class TradfriViewsFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     override fun getCount(): Int {
+        Log.d(LogName, "getCount ${devices.size}")
         return devices.size
     }
 
@@ -66,6 +86,10 @@ class TradfriViewsFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     override fun onDestroy() {
+        devices = emptyList()
+    }
 
+    companion object {
+        const val LogName = "TradfriViewsFactory"
     }
 }

@@ -6,12 +6,15 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.widget.RemoteViews
 import thekolo.de.quicktilesforikeatradfri.R
 
 
 class TradfriAppWidgetProvider : AppWidgetProvider() {
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        Log.d(LogName, "onUpdate")
         val numberOfWidgets = appWidgetIds.size
 
         // Perform this loop procedure for each App Widget that belongs to this provider
@@ -28,19 +31,19 @@ class TradfriAppWidgetProvider : AppWidgetProvider() {
             widget.setRemoteAdapter(R.id.devices_list_view, intent)
 
             val clickIntent = Intent(context, ListViewItemClickedBroadcastReceiver::class.java)
-            clickIntent.action = ListViewItemClickedBroadcastReceiver.INTENT_NAME
-            clickIntent.setClassName(ListViewItemClickedBroadcastReceiver::class.java.`package`.name, ListViewItemClickedBroadcastReceiver::class.java.canonicalName)
             val clickPI = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
             widget.setPendingIntentTemplate(R.id.devices_list_view, clickPI)
 
-
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, widget)
         }
+
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
 
     companion object {
+        const val LogName = "TradfriAppWidgetProvider"
         const val DEVICE_ID = "com.commonsware.android.appwidget.lorem.WORD"
     }
 }

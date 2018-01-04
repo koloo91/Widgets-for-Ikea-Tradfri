@@ -49,8 +49,9 @@ class MainActivity : AppCompatActivity() {
         bottom_navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         bottom_navigation.selectedItemId = R.id.devices
 
-        val onboardingIntent = Intent(this, IntroActivity::class.java)
-        startActivity(onboardingIntent)
+        // TODO:
+        /*val onboardingIntent = Intent(this, IntroActivity::class.java)
+        startActivity(onboardingIntent)*/
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
