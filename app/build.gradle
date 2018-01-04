@@ -9,8 +9,8 @@ android {
         applicationId "thekolo.de.widgetsforikeatradfri"
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 3
-        versionName "1.1.1"
+        versionCode 5
+        versionName "1.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -52,7 +52,7 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
 
     implementation 'agency.tango.android:material-intro-screen:0.0.5'
-    implementation 'joda-time:joda-time:2.9.9'
+    //implementation 'joda-time:joda-time:2.9.9'
 }
 
 repositories {
