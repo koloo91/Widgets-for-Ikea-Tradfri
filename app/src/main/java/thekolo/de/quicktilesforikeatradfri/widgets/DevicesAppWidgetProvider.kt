@@ -11,7 +11,7 @@ import android.widget.RemoteViews
 import thekolo.de.quicktilesforikeatradfri.R
 
 
-class TradfriAppWidgetProvider : AppWidgetProvider() {
+class DevicesAppWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Log.d(LogName, "onUpdate")
@@ -22,15 +22,15 @@ class TradfriAppWidgetProvider : AppWidgetProvider() {
             val appWidgetId = appWidgetIds[i]
 
             // Create an Intent to launch ExampleActivity
-            val intent = Intent(context, TradfriWidgetService::class.java)
+            val intent = Intent(context, DevicesiWidgetService::class.java)
 
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i])
             intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
-            val widget = RemoteViews(context.packageName, R.layout.tradfri_appwidget)
+            val widget = RemoteViews(context.packageName, R.layout.devices_appwidget)
             widget.setRemoteAdapter(R.id.devices_list_view, intent)
 
-            val clickIntent = Intent(context, ListViewItemClickedBroadcastReceiver::class.java)
+            val clickIntent = Intent(context, DevicesListViewItemClickedBroadcastReceiver::class.java)
             val clickPI = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
             widget.setPendingIntentTemplate(R.id.devices_list_view, clickPI)
@@ -43,7 +43,7 @@ class TradfriAppWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        const val LogName = "TradfriAppWidgetProvider"
+        const val LogName = "DevicesAppWidgetProvider"
         const val DEVICE_ID = "de.thekolo.devices.id"
     }
 }

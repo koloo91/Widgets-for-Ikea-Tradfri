@@ -28,7 +28,7 @@
             android:name=".ui.IntroActivity"
             android:theme="@style/Theme.Intro" />
 
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.TradfriAppWidgetProvider"
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.DevicesAppWidgetProvider"
             android:label="Devices Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -36,13 +36,13 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/tradfri_appwidget_info" />
+                android:resource="@xml/devices_appwidget_info" />
         </receiver>
 
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.ListViewItemClickedBroadcastReceiver"/>
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.DevicesListViewItemClickedBroadcastReceiver"/>
 
         <service
-            android:name="thekolo.de.quicktilesforikeatradfri.widgets.TradfriWidgetService"
+            android:name="thekolo.de.quicktilesforikeatradfri.widgets.DevicesiWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <service

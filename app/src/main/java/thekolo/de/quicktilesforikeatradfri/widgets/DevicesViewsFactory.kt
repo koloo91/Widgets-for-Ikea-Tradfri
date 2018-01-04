@@ -14,7 +14,7 @@ import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import java.util.*
 
 
-class TradfriViewsFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
+class DevicesViewsFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val client = TradfriService.instance(context)
     private var devices: List<Device> = emptyList()
 
@@ -23,10 +23,10 @@ class TradfriViewsFactory(private val context: Context) : RemoteViewsService.Rem
         override fun run() {
             client.getDevices({ devices ->
                 Log.d(LogName, "timerTask devices loaded $devices")
-                this@TradfriViewsFactory.devices = devices
+                this@DevicesViewsFactory.devices = devices
 
                 val appWidgetManager = AppWidgetManager.getInstance(context)
-                val componentName = ComponentName(context, TradfriAppWidgetProvider::class.java)
+                val componentName = ComponentName(context, DevicesAppWidgetProvider::class.java)
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.devices_list_view)
             }, {
 
@@ -61,16 +61,16 @@ class TradfriViewsFactory(private val context: Context) : RemoteViewsService.Rem
     override fun getViewAt(position: Int): RemoteViews {
         val device = devices[position]
 
-        val row = RemoteViews(context.packageName, R.layout.device_list_view_item)
+        val row = RemoteViews(context.packageName, R.layout.widget_list_view_item)
         row.setTextViewText(R.id.device_name_text_view, device.name)
 
         val rowIntent = Intent()
         val extras = Bundle()
 
-        extras.putInt(TradfriAppWidgetProvider.DEVICE_ID, devices[position].id)
+        extras.putInt(DevicesAppWidgetProvider.DEVICE_ID, devices[position].id)
         rowIntent.putExtras(extras)
 
-        row.setOnClickFillInIntent(R.id.device_row_item, rowIntent)
+        row.setOnClickFillInIntent(R.id.widget_row_item, rowIntent)
 
         return row
     }
@@ -89,6 +89,6 @@ class TradfriViewsFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     companion object {
-        const val LogName = "TradfriViewsFactory"
+        const val LogName = "DevicesViewsFactory"
     }
 }
