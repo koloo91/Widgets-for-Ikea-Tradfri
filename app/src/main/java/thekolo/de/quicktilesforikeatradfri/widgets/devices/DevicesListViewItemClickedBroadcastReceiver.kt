@@ -1,15 +1,16 @@
-package thekolo.de.quicktilesforikeatradfri.widgets
+package thekolo.de.quicktilesforikeatradfri.widgets.devices
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 
-class ListViewItemClickedBroadcastReceiver : BroadcastReceiver() {
+class DevicesListViewItemClickedBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
-        val id = intent.getIntExtra(TradfriAppWidgetProvider.DEVICE_ID, -1)
-        println("OnReceive id: $id")
+        val id = intent.getIntExtra(DevicesAppWidgetProvider.DEVICE_ID, -1)
+        Log.d(LogName, "OnReceive id: $id")
         TradfriService.instance(context).toggleDevice(id, {
             println("OnSuccess Toggle")
         }, {
@@ -18,6 +19,6 @@ class ListViewItemClickedBroadcastReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        const val INTENT_NAME = "thekolo.de.widgetsforikeatradfri.ListItemClicked"
+        const val LogName = "DevicesListViewItemClickedBroadcastReceiver"
     }
 }

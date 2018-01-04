@@ -1,9 +1,9 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="80dp"
     android:minHeight="80dp"
-    android:updatePeriodMillis="5000"
+    android:updatePeriodMillis="50000"
     android:previewImage="@mipmap/ic_launcher"
-    android:initialLayout="@layout/tradfri_appwidget"
+    android:initialLayout="@layout/devices_appwidget"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
 </appwidget-provider>

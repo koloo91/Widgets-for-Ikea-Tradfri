@@ -66,27 +66,33 @@ class TradfriClient(ip: String,
     }
 
     fun register(identity: String): CoapResponse? {
+        Log.d(LogName, "POST $baseUrl/15011/9063")
         return registerClient("$baseUrl/15011/9063").post("{\"9090\": \"$identity\"}", MediaTypeRegistry.APPLICATION_JSON)
     }
 
     fun ping(): CoapResponse? {
+        Log.d(LogName, "GET $baseUrl/.well-known/core")
         return client("$baseUrl/.well-known/core").get()
     }
 
     fun getDeviceIds(): CoapResponse? {
+        Log.d(LogName, "GET $baseUrl/15001")
         return client("$baseUrl/15001").get()
     }
 
     fun getDevice(deviceId: Int): CoapResponse? {
+        Log.d(LogName, "GET $baseUrl/15001/$deviceId")
         return client("$baseUrl/15001/$deviceId").get()
     }
 
     fun turnDeviceOn(deviceId: Int): CoapResponse? {
+        Log.d(LogName, "PUT $baseUrl/15001/$deviceId")
         val updateData = DeviceUpdater(listOf(DeviceState(BulbState.On)))
         return client("$baseUrl/15001/$deviceId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
     }
 
     fun turnDeviceOff(deviceId: Int): CoapResponse? {
+        Log.d(LogName, "PUT $baseUrl/15001/$deviceId")
         val updateData = DeviceUpdater(listOf(DeviceState(BulbState.Off)))
         return client("$baseUrl/15001/$deviceId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
     }
@@ -102,11 +108,13 @@ class TradfriClient(ip: String,
     }
 
     fun turnGroupOn(groupId: Int): CoapResponse? {
+        Log.d(LogName, "PUT $baseUrl/15004/$groupId")
         val updateData = GroupUpdater(BulbState.On)
         return client("$baseUrl/15004/$groupId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
     }
 
     fun turnGroupOff(groupId: Int): CoapResponse? {
+        Log.d(LogName, "PUT $baseUrl/15004/$groupId")
         val updateData = GroupUpdater(BulbState.Off)
         return client("$baseUrl/15004/$groupId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
     }

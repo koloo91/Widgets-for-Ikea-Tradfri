@@ -19,24 +19,49 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="thekolo.de.quicktilesforikeatradfri.ui.SettingsActivity"
             android:label="Settings" />
 
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.TradfriAppWidgetProvider">
+        <activity
+            android:name=".ui.IntroActivity"
+            android:theme="@style/Theme.Intro" />
+
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesAppWidgetProvider"
+            android:label="Devices Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/tradfri_appwidget_info" />
+                android:resource="@xml/devices_appwidget_info" />
         </receiver>
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.ListViewItemClickedBroadcastReceiver" />
 
         <service
-            android:name="thekolo.de.quicktilesforikeatradfri.widgets.TradfriWidgetService"
+            android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesListViewItemClickedBroadcastReceiver"/>
+
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsAppWidgetProvider"
+            android:label="Groups Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/devices_appwidget_info" />
+        </receiver>
+
+        <service
+            android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsListViewItemClickedBroadcastReceiver"/>
+
         <service
             android:name="thekolo.de.quicktilesforikeatradfri.tileservices.Tile1Service"
             android:icon="@drawable/lightbulb_outline"
@@ -46,6 +71,7 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
         <service
             android:name="thekolo.de.quicktilesforikeatradfri.tileservices.Tile2Service"
             android:icon="@drawable/lightbulb_outline"
@@ -55,6 +81,7 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
         <service
             android:name="thekolo.de.quicktilesforikeatradfri.tileservices.Tile3Service"
             android:icon="@drawable/lightbulb_outline"
@@ -64,6 +91,7 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
         <service
             android:name="thekolo.de.quicktilesforikeatradfri.tileservices.Tile4Service"
             android:icon="@drawable/lightbulb_outline"
@@ -73,6 +101,7 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
         <service
             android:name="thekolo.de.quicktilesforikeatradfri.tileservices.Tile5Service"
             android:icon="@drawable/lightbulb_outline"
