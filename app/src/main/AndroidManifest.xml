@@ -28,7 +28,8 @@
             android:name=".ui.IntroActivity"
             android:theme="@style/Theme.Intro" />
 
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesAppWidgetProvider"
+        <receiver
+            android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesAppWidgetProvider"
             android:label="Devices Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -43,9 +44,10 @@
             android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesListViewItemClickedBroadcastReceiver"/>
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesListViewItemClickedBroadcastReceiver" />
 
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsAppWidgetProvider"
+        <receiver
+            android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsAppWidgetProvider"
             android:label="Groups Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -60,7 +62,11 @@
             android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsListViewItemClickedBroadcastReceiver"/>
+        <receiver android:name="thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsListViewItemClickedBroadcastReceiver" />
+
+        <service
+            android:name=".widgets.UpdateJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service
             android:name="thekolo.de.quicktilesforikeatradfri.tileservices.Tile1Service"

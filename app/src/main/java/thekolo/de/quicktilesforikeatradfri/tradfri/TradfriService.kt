@@ -157,6 +157,18 @@ class TradfriService(context: Context) {
         }
     }
 
+    fun getDevices(): List<Device> {
+        val deviceIds = getDeviceIds()
+
+        val devices = deviceIds.mapNotNull { id ->
+            getDevice(id)
+        }.filter { device ->
+            !device.type.name.contains("remote control")
+        }
+
+        return devices
+    }
+
 //    fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
 //        queueService.addAction {
 //            return@addAction _turnDeviceOn(id, onSuccess, onError)
@@ -295,6 +307,11 @@ class TradfriService(context: Context) {
 
             launch(UI + handler) { onSuccess(groups) }
         }
+    }
+
+    fun getGroups(): List<Group> {
+        val groupIds = getGroupIds()
+        return groupIds.mapNotNull { getGroup(it) }
     }
 
 //    fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {

@@ -8,35 +8,17 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
-import java.util.*
 
 
 class DevicesViewsFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private val client = TradfriService.instance(context)
     private var devices: List<Device> = emptyList()
-
-    private val timer = Timer()
-    private val timerTask = object : TimerTask() {
-        override fun run() {
-            client.getDevices({ devices ->
-                Log.d(LogName, "timerTask devices loaded $devices")
-                this@DevicesViewsFactory.devices = devices
-
-                val appWidgetManager = AppWidgetManager.getInstance(context)
-                val componentName = ComponentName(context, DevicesAppWidgetProvider::class.java)
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.devices_list_view)
-            }, {
-
-            })
-        }
-    }
-
-    init {
-        timer.schedule(timerTask, 0, 30 * 60 * 1000L)
-    }
 
     override fun onCreate() {
 
@@ -52,6 +34,10 @@ class DevicesViewsFactory(private val context: Context) : RemoteViewsService.Rem
 
     override fun onDataSetChanged() {
         Log.d(LogName, "onDataSetChanged")
+
+        devices = client.getDevices()
+
+        Log.d(LogName, "onDataSetChanged data loaded")
     }
 
     override fun hasStableIds(): Boolean {
@@ -85,7 +71,7 @@ class DevicesViewsFactory(private val context: Context) : RemoteViewsService.Rem
     }
 
     override fun onDestroy() {
-        devices = emptyList()
+
     }
 
     companion object {

@@ -19,26 +19,6 @@ class GroupsViewsFactory(private val context: Context) : RemoteViewsService.Remo
     private val client = TradfriService.instance(context)
     private var groups: List<Group> = emptyList()
 
-    private val timer = Timer()
-    private val timerTask = object : TimerTask() {
-        override fun run() {
-            client.getGroups({ groups ->
-                Log.d(LogName, "timerTask groups loaded $groups")
-                this@GroupsViewsFactory.groups = groups
-
-                val appWidgetManager = AppWidgetManager.getInstance(context)
-                val componentName = ComponentName(context, GroupsAppWidgetProvider::class.java)
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.groups_list_view)
-            }, {
-
-            })
-        }
-    }
-
-    init {
-        timer.schedule(timerTask, 0, 30 * 60 * 1000L)
-    }
-
     override fun onCreate() {
 
     }
@@ -53,6 +33,10 @@ class GroupsViewsFactory(private val context: Context) : RemoteViewsService.Remo
 
     override fun onDataSetChanged() {
         Log.d(LogName, "onDataSetChanged")
+
+        groups = client.getGroups()
+
+        Log.d(LogName, "onDataSetChanged loaded")
     }
 
     override fun hasStableIds(): Boolean {

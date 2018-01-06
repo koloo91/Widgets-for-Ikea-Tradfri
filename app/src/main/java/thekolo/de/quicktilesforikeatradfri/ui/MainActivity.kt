@@ -20,6 +20,7 @@ import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.DevicesFragment
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
+import thekolo.de.quicktilesforikeatradfri.widgets.UpdateJobService
 import java.util.*
 
 
@@ -48,6 +49,8 @@ class MainActivity : AppCompatActivity() {
 
         bottom_navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         bottom_navigation.selectedItemId = R.id.devices
+
+        UpdateJobService.schedule(applicationContext)
 
         // TODO:
         /*val onboardingIntent = Intent(this, IntroActivity::class.java)
