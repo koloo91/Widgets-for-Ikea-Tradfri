@@ -6,24 +6,35 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <RelativeLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:minHeight="48dp"
+            android:gravity="center">
+
             <TextView
-                android:text="@string/groups"
-                android:textColor="@android:color/white"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/groups"
+                android:textColor="@android:color/white" />
+
+            <ImageButton
+                android:id="@+id/refresh_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/ic_refresh_white" />
         </RelativeLayout>
 
         <ListView
             android:id="@+id/groups_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:drawSelectorOnTop="true"
-            android:layout_below="@+id/header"/>
+            android:layout_below="@+id/header"
+            android:drawSelectorOnTop="true" />
     </RelativeLayout>
 </FrameLayout>

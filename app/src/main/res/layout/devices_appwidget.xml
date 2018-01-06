@@ -11,12 +11,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:minHeight="48dp"
+            android:gravity="center">
             <TextView
                 android:text="@string/devices"
                 android:textColor="@android:color/white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/refresh_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_refresh_white"
+                android:layout_alignParentEnd="true"/>
         </RelativeLayout>
 
         <ListView
