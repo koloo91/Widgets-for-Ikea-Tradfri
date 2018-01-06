@@ -9,6 +9,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.RemoteViews
 import thekolo.de.quicktilesforikeatradfri.R
+import android.content.ComponentName
 
 
 class DevicesAppWidgetProvider : AppWidgetProvider() {
@@ -33,6 +34,7 @@ class DevicesAppWidgetProvider : AppWidgetProvider() {
             val clickIntent = Intent(context, DevicesListViewItemClickedBroadcastReceiver::class.java)
             val clickPI = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
+            widget.setOnClickPendingIntent(R.id.refresh_button, getPendingSelfIntent(context, SYNC_CLICKED))
             widget.setPendingIntentTemplate(R.id.devices_list_view, clickPI)
 
             // Tell the AppWidgetManager to perform an update on the current app widget
@@ -42,9 +44,32 @@ class DevicesAppWidgetProvider : AppWidgetProvider() {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
 
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+
+        Log.d(LogName, "onReceive")
+        if (SYNC_CLICKED == intent.action) {
+            Log.d(LogName, "SYNC_CLICKED")
+
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+
+            val devicesComponent = ComponentName(context, DevicesAppWidgetProvider::class.java)
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(devicesComponent), R.id.devices_list_view)
+        }
+    }
+
+    private fun getPendingSelfIntent(context: Context, action: String): PendingIntent {
+        Log.d(LogName, "getPendingSelfIntent")
+        val intent = Intent(context, javaClass)
+        intent.action = action
+        return PendingIntent.getBroadcast(context, 0, intent, 0)
+    }
+
     companion object {
         const val LogName = "DevicesAppWidgetProvider"
         const val DEVICE_ID = "de.thekolo.devices.id"
+
+        private const val SYNC_CLICKED = "automaticWidgetSyncButtonClick"
     }
 }
 

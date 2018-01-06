@@ -42,8 +42,8 @@ class UpdateJobService : JobService() {
 
             val serviceComponent = ComponentName(context, UpdateJobService::class.java)
             val builder = JobInfo.Builder(808, serviceComponent)
-            builder.setMinimumLatency((20 * 1000L))
-            builder.setOverrideDeadline(3ß * 1000L)
+            builder.setMinimumLatency((20 * 60 * 1000L))
+            builder.setOverrideDeadline(30 * 60 * 1000L)
             builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
 
             val jobScheduler = context.getSystemService(JobScheduler::class.java)
