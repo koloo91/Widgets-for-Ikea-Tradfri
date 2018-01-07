@@ -91,15 +91,19 @@ class GroupsFragment : Fragment() {
                     group.on = BulbState.On
                     mainActivity.service.turnGroupOn(group.id, {
                         println("turnGroupOn onSuccess")
+                    }, {
+                        mainActivity.onError()
                         mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
-                    }, mainActivity::onError)
+                    })
                 }
                 false -> {
                     group.on = BulbState.Off
                     mainActivity.service.turnGroupOff(group.id, {
                         println("turnGroupOff onSuccess")
+                    }, {
+                        mainActivity.onError()
                         mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
-                    }, mainActivity::onError)
+                    })
                 }
             }
         }
