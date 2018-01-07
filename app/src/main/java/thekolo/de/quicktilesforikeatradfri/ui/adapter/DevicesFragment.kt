@@ -93,15 +93,19 @@ class DevicesFragment : Fragment() {
                     device.states?.first()?.on = BulbState.On
                     mainActivity.service.turnDeviceOn(device.id, {
                         println("turnDeviceOn onSuccess")
+                    }, {
+                        mainActivity.onError()
                         mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
-                    }, mainActivity::onError)
+                    })
                 }
                 false -> {
                     device.states?.first()?.on = BulbState.Off
                     mainActivity.service.turnDeviceOff(device.id, {
                         println("turnDeviceOff onSuccess")
+                    }, {
+                        mainActivity.onError()
                         mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
-                    }, mainActivity::onError)
+                    })
                 }
             }
         }
@@ -130,12 +134,6 @@ class DevicesFragment : Fragment() {
 
             mainActivity.onError()
         })
-    }
-
-    private fun loadGroups() {
-        mainActivity.service.getGroups({ groups ->
-            println(groups)
-        }, { println("Error getting groups") })
     }
 
     companion object {

@@ -61,8 +61,13 @@ class GroupsAdapter(context: Context,
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nameTextView: TextView = view.name_text_view
+        val typeTextView: TextView = view.device_type_text_view
         val stateSwitch: Switch = view.device_state_switch
         val tilesSpinner: Spinner = view.tiles_spinner
+
+        init {
+            typeTextView.visibility = View.GONE
+        }
     }
 
     private fun isGroupOn(group: Group): Boolean {

@@ -151,7 +151,7 @@ class TradfriService(context: Context) {
                 getDevice(id)
             }.filter { device ->
                 !device.type.name.contains("remote control")
-            }
+            }.sortedBy { it.name }
 
             launch(UI + handler) { onSuccess(devices) }
         }
@@ -160,13 +160,11 @@ class TradfriService(context: Context) {
     fun getDevices(): List<Device> {
         val deviceIds = getDeviceIds()
 
-        val devices = deviceIds.mapNotNull { id ->
+        return deviceIds.mapNotNull { id ->
             getDevice(id)
         }.filter { device ->
             !device.type.name.contains("remote control")
-        }
-
-        return devices
+        }.sortedBy { it.name }
     }
 
 //    fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
@@ -303,7 +301,7 @@ class TradfriService(context: Context) {
     fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val groupIds = getGroupIds()
-            val groups = groupIds.mapNotNull { getGroup(it) }
+            val groups = groupIds.mapNotNull { getGroup(it) }.sortedBy { it.name }
 
             launch(UI + handler) { onSuccess(groups) }
         }
@@ -311,7 +309,7 @@ class TradfriService(context: Context) {
 
     fun getGroups(): List<Group> {
         val groupIds = getGroupIds()
-        return groupIds.mapNotNull { getGroup(it) }
+        return groupIds.mapNotNull { getGroup(it) }.sortedBy { it.name }
     }
 
 //    fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {

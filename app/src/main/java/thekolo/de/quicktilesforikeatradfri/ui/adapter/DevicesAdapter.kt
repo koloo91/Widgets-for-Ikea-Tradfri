@@ -33,6 +33,8 @@ class DevicesAdapter(context: Context,
         val device = devices[position]
 
         holder.nameTextView.text = device.name
+        holder.typeTextView.text = "${device.type.name}"
+
         holder.stateSwitch.isChecked = isDeviceOn(device)
         holder.stateSwitch.setOnCheckedChangeListener { _, isChecked ->
             listener.onStateSwitchCheckedChanged(device, isChecked)
@@ -61,6 +63,7 @@ class DevicesAdapter(context: Context,
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nameTextView: TextView = view.name_text_view
+        val typeTextView: TextView = view.device_type_text_view
         val stateSwitch: Switch = view.device_state_switch
         val tilesSpinner: Spinner = view.tiles_spinner
     }
