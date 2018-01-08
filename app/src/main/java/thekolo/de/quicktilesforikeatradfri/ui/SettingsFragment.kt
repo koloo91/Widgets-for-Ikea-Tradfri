@@ -9,6 +9,7 @@ import android.widget.Toast
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil.DEFAULT_SHARED_PREFERENCES_FILE
+import thekolo.de.quicktilesforikeatradfri.utils.ValidateUtil
 
 
 class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -42,9 +43,8 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
         gatewayPref.summary = gatewayPref.text
         gatewayPref.setOnPreferenceChangeListener { preference, newValue ->
             val ip = newValue as String
-            val regex = Regex(VALID_IP_REGEX)
-            val result = ip.matches(regex) || ip.isEmpty()
 
+            val result = ValidateUtil.isValidIp(ip)
             if(!result) {
                 Toast.makeText(activity, "Please enter a valid IP address like 192.168.178.56", Toast.LENGTH_LONG).show()
             }

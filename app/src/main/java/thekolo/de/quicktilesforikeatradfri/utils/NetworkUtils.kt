@@ -52,7 +52,7 @@ object NetworkUtils {
         return null
     }
 
-    fun searchGatewayIp(onSucces: (String) -> Unit, onError: () -> Unit, onDeviceFound: (String) -> Unit, onProgressChanged: (Int) -> Unit) {
+    fun searchGatewayIp(onSucces: (String) -> Unit, onError: () -> Unit, onDeviceFound: (Pair<String, String>) -> Unit, onProgressChanged: (Int) -> Unit) {
         launch(CommonPool) {
             //TODO: Uncomment
             val deviceIp = "192.168.178.44"//getIpAddress()
@@ -67,8 +67,8 @@ object NetworkUtils {
                 currentCount++
 
                 launch(UI) {
-                    if(ip != hostname)
-                        onDeviceFound("$ip $hostname")
+                    if (ip != hostname)
+                        onDeviceFound(Pair(ip, hostname ?: ""))
                     onProgressChanged(((currentCount / 256.0) * 100).toInt())
                 }
 

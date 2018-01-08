@@ -1,4 +1,4 @@
-package thekolo.de.quicktilesforikeatradfri.ui
+package thekolo.de.quicktilesforikeatradfri.ui.intro
 
 import agency.tango.materialintroscreen.MaterialIntroActivity
 import agency.tango.materialintroscreen.MessageButtonBehaviour
@@ -6,9 +6,12 @@ import agency.tango.materialintroscreen.SlideFragmentBuilder
 import android.os.Bundle
 import android.view.View
 import thekolo.de.quicktilesforikeatradfri.R
+import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 
 
-class IntroActivity: MaterialIntroActivity() {
+class IntroActivity : MaterialIntroActivity() {
+
+    private val gatewaySearchFragment = GatewaySearchFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,18 +24,16 @@ class IntroActivity: MaterialIntroActivity() {
                 .description("Before you can use this app we have to setup some things.")
                 .build())
 
-        addSlide(GatewaySearchFragment(), MessageButtonBehaviour(View.OnClickListener { displayGatewaySearchResultFragmentDialog() }, "Search"))
-
+        addSlide(gatewaySearchFragment, MessageButtonBehaviour(View.OnClickListener { searchForGateway() }, "Search"))
     }
 
-    private fun displayGatewaySearchResultFragmentDialog() {
-        val transaction = fragmentManager.beginTransaction()
-        val prev = fragmentManager.findFragmentByTag("gateway_search_result_dialog")
+    private fun searchForGateway() {
+        gatewaySearchFragment.searchForGateway()
+    }
 
-        if(prev != null)
-            transaction.remove(prev)
+    override fun onFinish() {
+        SettingsUtil.setGatewayIp(applicationContext, gatewaySearchFragment.gatewayIp)
 
-        val dialog = GatewaySearchResultDialogFragment.newInstance()
-        dialog.show(transaction, "gateway_search_result_dialog")
+        super.onFinish()
     }
 }
