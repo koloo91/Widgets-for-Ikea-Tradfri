@@ -54,8 +54,7 @@ object NetworkUtils {
 
     fun searchGatewayIp(onSucces: (String) -> Unit, onError: () -> Unit, onDeviceFound: (Pair<String, String>) -> Unit, onProgressChanged: (Int) -> Unit) {
         launch(CommonPool) {
-            //TODO: Uncomment
-            val deviceIp = "192.168.178.44"//getIpAddress()
+            val deviceIp = getIpAddress()
             if (deviceIp == null) {
                 onError()
                 return@launch

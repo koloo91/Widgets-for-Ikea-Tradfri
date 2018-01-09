@@ -25,10 +25,10 @@ class TradfriClient(ip: String,
     private val baseUrl = "coaps://$ip:5684"
 
     private val gson = Gson()
-    private val coapRegisterEndpoint: CoapEndpoint = getCoapRegisterEndpoint()
-    private val coapEndpoint: CoapEndpoint = getCoapEndpoint()
+    private val coapRegisterEndpoint: CoapEndpoint = getRegisterCoapEndpoint()
+    private val coapEndpoint: CoapEndpoint = getDefaultCoapEndpoint()
 
-    private fun getCoapRegisterEndpoint(): CoapEndpoint {
+    private fun getRegisterCoapEndpoint(): CoapEndpoint {
         val builder = DtlsConnectorConfig.Builder(InetSocketAddress(0))
         builder.setPskStore(StaticPskStore("Client_identity", securityId.toByteArray()))
         builder.setRetransmissionTimeout(50000)
@@ -39,7 +39,7 @@ class TradfriClient(ip: String,
         return CoapEndpoint(dtlsConnector, network)
     }
 
-    private fun getCoapEndpoint(): CoapEndpoint {
+    private fun getDefaultCoapEndpoint(): CoapEndpoint {
         val builder = DtlsConnectorConfig.Builder(InetSocketAddress(0))
         builder.setPskStore(StaticPskStore(identity ?: "", (preSharedKey ?: "").toByteArray()))
         builder.setRetransmissionTimeout(50000)

@@ -2,7 +2,7 @@ package thekolo.de.quicktilesforikeatradfri.ui.intro
 
 
 import agency.tango.materialintroscreen.SlideFragment
-import android.app.FragmentTransaction
+import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -16,7 +16,7 @@ import thekolo.de.quicktilesforikeatradfri.utils.NetworkUtils
 import thekolo.de.quicktilesforikeatradfri.utils.ValidateUtil
 
 
-class GatewaySearchFragment : SlideFragment(), TextWatcher, GatewaySearchResultDialogFragment.OnIpSelectedListener {
+class GatewaySearchFragment : SlideFragment(), TextWatcher, ScanResultDialogFragment.OnIpSelectedListener {
 
     var gatewayIp = ""
 
@@ -74,17 +74,27 @@ class GatewaySearchFragment : SlideFragment(), TextWatcher, GatewaySearchResultD
     }
 
     private fun showDialog(devices: List<Pair<String, String>>) {
-        val fragmentTransaction = fragmentManager!!.beginTransaction()
-        val previousFragment = fragmentManager!!.findFragmentByTag("dialog")
-        if (previousFragment != null) {
-            fragmentTransaction.remove(previousFragment)
-        }
-        fragmentTransaction.addToBackStack(null)
 
-        // Create and show the dialog.
-        val newFragment = GatewaySearchResultDialogFragment.newInstance(devices)
-        newFragment.listener = this
-        newFragment.show(fragmentTransaction, "dialog")
+        val alertDialogBuilder = AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
+
+        alertDialogBuilder.setTitle("Select gateway")
+        alertDialogBuilder.setMessage("Unable to find gateway. Please select one from the list which will be displayed after this message.")
+        alertDialogBuilder.setCancelable(false)
+        alertDialogBuilder.setPositiveButton("OK", { _, _ ->
+            val fragmentTransaction = fragmentManager!!.beginTransaction()
+            val previousFragment = fragmentManager!!.findFragmentByTag("dialog")
+            if (previousFragment != null) {
+                fragmentTransaction.remove(previousFragment)
+            }
+            fragmentTransaction.addToBackStack(null)
+
+            // Create and show the dialog.
+            val newFragment = ScanResultDialogFragment.newInstance(devices)
+            newFragment.listener = this@GatewaySearchFragment
+            newFragment.show(fragmentTransaction, "dialog")
+        })
+        alertDialogBuilder.setNegativeButton("Cancel", {_, _ -> })
+        alertDialogBuilder.create().show()
     }
 
     override fun onIpSelected(ip: String) {

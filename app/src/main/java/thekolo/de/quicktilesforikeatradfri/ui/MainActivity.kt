@@ -53,9 +53,10 @@ class MainActivity : AppCompatActivity() {
 
         UpdateJobService.schedule(applicationContext)
 
-        // TODO:
-        val onboardingIntent = Intent(this, IntroActivity::class.java)
-        startActivity(onboardingIntent)
+        if(!SettingsUtil.getOnboardingCompleted(applicationContext)) {
+            val onboardingIntent = Intent(this, IntroActivity::class.java)
+            startActivity(onboardingIntent)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
