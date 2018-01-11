@@ -18,6 +18,7 @@ import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.DevicesFragment
+import thekolo.de.quicktilesforikeatradfri.ui.intro.IntroActivity
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import thekolo.de.quicktilesforikeatradfri.widgets.UpdateJobService
@@ -52,9 +53,10 @@ class MainActivity : AppCompatActivity() {
 
         UpdateJobService.schedule(applicationContext)
 
-        // TODO:
-        /*val onboardingIntent = Intent(this, IntroActivity::class.java)
-        startActivity(onboardingIntent)*/
+        if(!SettingsUtil.getOnboardingCompleted(applicationContext)) {
+            val onboardingIntent = Intent(this, IntroActivity::class.java)
+            startActivity(onboardingIntent)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

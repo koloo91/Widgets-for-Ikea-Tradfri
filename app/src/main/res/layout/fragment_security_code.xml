@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:text="Search for Gateway"
+        android:text="Scan security code"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
     <TextView
@@ -22,7 +22,7 @@
         android:layout_below="@+id/title"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:text="Please enter your gatways IP address or click on the button to search our gateway"
+        android:text="Please scan your security code at the back of your gateway or enter it manually."
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
     <android.support.design.widget.TextInputLayout
@@ -35,22 +35,12 @@
         android:layout_marginTop="8dp">
 
         <EditText
-            android:id="@+id/gateway_ip_edit_text"
+            android:id="@+id/security_code_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Gateway IP address"
+            android:hint="Security code"
             android:importantForAutofill="noExcludeDescendants" />
     </android.support.design.widget.TextInputLayout>
 
-    <ProgressBar
-        android:id="@+id/search_progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:max="100"
-        android:visibility="gone"
-        android:layout_marginTop="24dp"
-        android:layout_alignParentTop="true"/>
 
 </agency.tango.materialintroscreen.parallax.ParallaxRelativeLayout>

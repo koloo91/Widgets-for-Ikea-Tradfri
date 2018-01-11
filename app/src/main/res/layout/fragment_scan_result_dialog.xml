@@ -2,8 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".ui.GatewaySearchResultDialogFragment"
-    android:minHeight="400dp">
+    tools:context=".ui.intro.ScanResultDialogFragment"
+    android:minHeight="400dp"
+    android:background="@android:color/white">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/gateway_search_results_recycler_view"
