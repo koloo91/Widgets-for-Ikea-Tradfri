@@ -1,16 +1,18 @@
 package thekolo.de.quicktilesforikeatradfri.utils
 
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.Deferred
+import android.util.Log
+import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
 import java.net.InetAddress
 import java.net.NetworkInterface
 
 
 object NetworkUtils {
     private const val GATEWAY_PREFIX = "GW-"
+
+    val handler = CoroutineExceptionHandler { _, ex ->
+        Log.println(Log.ERROR, "MainActivity", Log.getStackTraceString(ex))
+    }
 
     private fun getIpAddress(useIPv4: Boolean = true): String? {
         try {
@@ -32,7 +34,7 @@ object NetworkUtils {
         return null
     }
 
-    private fun scanNetwork(deviceIp: String, onUpdate: (String, String?) -> Unit) {
+    private fun scanNetwork(deviceIp: String, onUpdate: (String, String?) -> Unit, finished: () -> Unit) {
         val baseAddress = deviceIp.split(".").take(3).joinToString(".")
         val addressRange = (0..255)
 
@@ -41,6 +43,8 @@ object NetworkUtils {
             val hostname = getHostname(ip)
             onUpdate(ip, hostname)
         }
+
+        finished()
     }
 
     private fun getHostname(ip: String): String? {
@@ -52,8 +56,8 @@ object NetworkUtils {
         return null
     }
 
-    fun searchGatewayIp(onSucces: (String) -> Unit, onError: () -> Unit, onDeviceFound: (Pair<String, String>) -> Unit, onProgressChanged: (Int) -> Unit) {
-        launch(CommonPool) {
+    fun searchGatewayIp(onSucces: (String) -> Unit, onError: () -> Unit, onDeviceFound: (Pair<String, String>) -> Unit, onProgressChanged: (Int) -> Unit, onFinished: () -> Unit) {
+        launch(CommonPool + handler) {
             val deviceIp = getIpAddress()
             if (deviceIp == null) {
                 onError()
@@ -62,10 +66,10 @@ object NetworkUtils {
 
             var currentCount = 0
 
-            scanNetwork(deviceIp) { ip, hostname ->
+            scanNetwork(deviceIp, { ip, hostname ->
                 currentCount++
 
-                launch(UI) {
+                launch(UI + handler) {
                     if (ip != hostname)
                         onDeviceFound(Pair(ip, hostname ?: ""))
                     onProgressChanged(((currentCount / 256.0) * 100).toInt())
@@ -73,9 +77,13 @@ object NetworkUtils {
 
                 if (hostname != null && hostname.startsWith(GATEWAY_PREFIX)) {
                     println(ip)
-                    launch(UI) { onSucces(ip) }
+                    launch(UI + handler) { onSucces(ip) }
                 }
-            }
+            }, {
+                launch(UI + handler) {
+                    onFinished()
+                }
+            })
         }
     }
 }
