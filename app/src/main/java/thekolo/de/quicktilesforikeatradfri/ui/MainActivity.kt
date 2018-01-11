@@ -17,7 +17,6 @@ import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
-import thekolo.de.quicktilesforikeatradfri.ui.adapter.DevicesFragment
 import thekolo.de.quicktilesforikeatradfri.ui.intro.IntroActivity
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
@@ -94,6 +93,10 @@ class MainActivity : AppCompatActivity() {
                 println("GroupsSelected")
                 displayGroupsFragment()
             }
+            R.id.tiles -> {
+                println("TilesSelected")
+                displayTilesFragment()
+            }
         }
 
         return@OnNavigationItemSelectedListener true
@@ -168,6 +171,16 @@ class MainActivity : AppCompatActivity() {
         if (fragment == null) {
             fragment = GroupsFragment.newInstance()
             fragments["GroupsFragment"] = fragment
+        }
+
+        displayFragment(fragment)
+    }
+
+    private fun displayTilesFragment() {
+        var fragment = fragments["TilesFragment"]
+        if (fragment == null) {
+            fragment = TilesFragment.newInstance()
+            fragments["TilesFragment"] = fragment
         }
 
         displayFragment(fragment)

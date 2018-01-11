@@ -17,6 +17,7 @@ import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
+import thekolo.de.quicktilesforikeatradfri.ui.adapter.GroupsAdapter
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import java.util.*
 

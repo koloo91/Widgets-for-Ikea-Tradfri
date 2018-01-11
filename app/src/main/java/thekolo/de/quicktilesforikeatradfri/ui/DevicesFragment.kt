@@ -1,4 +1,4 @@
-package thekolo.de.quicktilesforikeatradfri.ui.adapter
+package thekolo.de.quicktilesforikeatradfri.ui
 
 
 import android.app.Fragment
@@ -17,7 +17,7 @@ import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
-import thekolo.de.quicktilesforikeatradfri.ui.MainActivity
+import thekolo.de.quicktilesforikeatradfri.ui.adapter.DevicesAdapter
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import java.util.*
 
