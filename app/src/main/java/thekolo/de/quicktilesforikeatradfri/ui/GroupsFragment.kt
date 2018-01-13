@@ -17,6 +17,7 @@ import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
+import thekolo.de.quicktilesforikeatradfri.ui.adapter.GroupsAdapter
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import java.util.*
 
@@ -39,14 +40,10 @@ class GroupsFragment : Fragment() {
         layoutManager = LinearLayoutManager(activity.applicationContext)
         view.groups_recycler_view.layoutManager = layoutManager
 
-
         val dividerItemDecoration = DividerItemDecoration(activity.applicationContext, layoutManager.orientation)
         view.groups_recycler_view.addItemDecoration(dividerItemDecoration)
 
-        val spinnerAdapter = ArrayAdapter.createFromResource(activity.applicationContext, R.array.tiles, android.R.layout.simple_spinner_item)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        adapter = GroupsAdapter(activity.applicationContext, Collections.emptyList(), spinnerAdapter, deviceAdapterListener)
+        adapter = GroupsAdapter(Collections.emptyList(), deviceAdapterListener)
 
         view.swipe_refresh_layout.setOnRefreshListener {
             mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)

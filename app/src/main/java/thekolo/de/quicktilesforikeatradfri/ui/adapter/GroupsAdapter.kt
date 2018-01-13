@@ -1,26 +1,24 @@
-package thekolo.de.quicktilesforikeatradfri.ui
+package thekolo.de.quicktilesforikeatradfri.ui.adapter
 
-import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.Switch
+import android.widget.TextView
+import com.amulyakhare.textdrawable.TextDrawable
+import com.amulyakhare.textdrawable.util.ColorGenerator
 import kotlinx.android.synthetic.main.device_recycler_view_item.view.*
-import kotlinx.coroutines.experimental.async
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.Group
-import thekolo.de.quicktilesforikeatradfri.room.Database
-import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
 
-class GroupsAdapter(context: Context,
-                    var groups: List<Group>,
-                    private val spinnerAdapter: ArrayAdapter<CharSequence>,
+class GroupsAdapter(var groups: List<Group>,
                     private val listener: GroupsAdapterActions) : RecyclerView.Adapter<GroupsAdapter.ViewHolder>() {
 
-    private val deviceDataDao = Database.get(context).deviceDataDao()
+    private val generator = ColorGenerator.MATERIAL
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.device_recycler_view_item, parent, false)
@@ -38,21 +36,9 @@ class GroupsAdapter(context: Context,
             listener.onStateSwitchCheckedChanged(group, isChecked)
         }
 
-        async {
-            val deviceData = deviceDataDao.byId(group.id)
-            holder.tilesSpinner.setSelection(TileUtil.positionFromName(deviceData?.tile ?: TileUtil.NONE.name), false)
-        }
-
-        holder.tilesSpinner.adapter = spinnerAdapter
-        holder.tilesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                println("onNothingSelected")
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                listener.onSpinnerItemSelected(group, position)
-            }
-        }
+        val drawable = TextDrawable.builder()
+                .buildRound(group.name[0].toString(), generator.getColor(group.name))
+        holder.firstLetterImageView.setImageDrawable(drawable)
     }
 
     override fun getItemCount(): Int {
@@ -63,10 +49,10 @@ class GroupsAdapter(context: Context,
         val nameTextView: TextView = view.name_text_view
         val typeTextView: TextView = view.device_type_text_view
         val stateSwitch: Switch = view.device_state_switch
-        val tilesSpinner: Spinner = view.tiles_spinner
+        val firstLetterImageView: ImageView = view.first_letter_image_view
 
         init {
-            typeTextView.visibility = View.GONE
+            typeTextView.visibility = View.INVISIBLE
         }
     }
 

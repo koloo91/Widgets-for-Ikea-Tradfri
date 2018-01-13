@@ -17,7 +17,6 @@ import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
-import thekolo.de.quicktilesforikeatradfri.ui.adapter.DevicesFragment
 import thekolo.de.quicktilesforikeatradfri.ui.intro.IntroActivity
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
@@ -53,10 +52,16 @@ class MainActivity : AppCompatActivity() {
 
         UpdateJobService.schedule(applicationContext)
 
-        if(!SettingsUtil.getOnboardingCompleted(applicationContext)) {
+        if (displayIntroActivity()) {
             val onboardingIntent = Intent(this, IntroActivity::class.java)
             startActivity(onboardingIntent)
         }
+    }
+
+    private fun displayIntroActivity(): Boolean {
+        return !SettingsUtil.getOnboardingCompleted(applicationContext)
+                || (SettingsUtil.getGatewayIp(applicationContext) ?: "").isEmpty()
+                || (SettingsUtil.getSecurityId(applicationContext) ?: "").isEmpty()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -79,8 +84,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        //TODO: if onboarding not completed skip
-
         when (item.itemId) {
             R.id.devices -> {
                 println("DevicesSelected")
@@ -89,6 +92,10 @@ class MainActivity : AppCompatActivity() {
             R.id.groups -> {
                 println("GroupsSelected")
                 displayGroupsFragment()
+            }
+            R.id.tiles -> {
+                println("TilesSelected")
+                displayTilesFragment()
             }
         }
 
@@ -151,7 +158,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayDevicesFragment() {
         var fragment = fragments["DevicesFragment"]
-        if(fragment == null) {
+        if (fragment == null) {
             fragment = DevicesFragment.newInstance()
             fragments["DevicesFragment"] = fragment
         }
@@ -161,12 +168,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayGroupsFragment() {
         var fragment = fragments["GroupsFragment"]
-        if(fragment == null) {
+        if (fragment == null) {
             fragment = GroupsFragment.newInstance()
             fragments["GroupsFragment"] = fragment
         }
 
         displayFragment(fragment)
+    }
+
+    private fun displayTilesFragment() {
+        displayFragment(TilesFragment.newInstance())
     }
 
     private fun displayFragment(fragment: Fragment) {

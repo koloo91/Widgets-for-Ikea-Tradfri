@@ -12,4 +12,10 @@
         android:title="@string/groups"
         android:icon="@drawable/bulb_group"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/tiles"
+        android:title="@string/tiles"
+        android:icon="@drawable/ic_view_quilt"
+        app:showAsAction="ifRoom"/>
 </menu>

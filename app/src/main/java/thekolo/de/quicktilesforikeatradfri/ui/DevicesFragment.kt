@@ -1,4 +1,4 @@
-package thekolo.de.quicktilesforikeatradfri.ui.adapter
+package thekolo.de.quicktilesforikeatradfri.ui
 
 
 import android.app.Fragment
@@ -17,7 +17,7 @@ import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
-import thekolo.de.quicktilesforikeatradfri.ui.MainActivity
+import thekolo.de.quicktilesforikeatradfri.ui.adapter.DevicesAdapter
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import java.util.*
 
@@ -41,14 +41,10 @@ class DevicesFragment : Fragment() {
         layoutManager = LinearLayoutManager(activity.applicationContext)
         view.devices_recycler_view.layoutManager = layoutManager
 
-
         val dividerItemDecoration = DividerItemDecoration(activity.applicationContext, layoutManager.orientation)
         view.devices_recycler_view.addItemDecoration(dividerItemDecoration)
 
-        val spinnerAdapter = ArrayAdapter.createFromResource(activity.applicationContext, R.array.tiles, android.R.layout.simple_spinner_item)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        adapter = DevicesAdapter(activity.applicationContext, Collections.emptyList(), spinnerAdapter, deviceAdapterListener)
+        adapter = DevicesAdapter(Collections.emptyList(), deviceAdapterListener)
 
         view.swipe_refresh_layout.setOnRefreshListener {
             mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)

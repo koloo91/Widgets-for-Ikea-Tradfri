@@ -49,26 +49,29 @@ class GatewaySearchFragment : SlideFragment(), TextWatcher, ScanResultDialogFrag
         val foundDevices = mutableListOf<Pair<String, String>>()
 
         NetworkUtils.searchGatewayIp({ gatewayIp ->
-            onSearchCompleted()
             onIpFound(gatewayIp)
         }, {
             println("Error")
-            onSearchCompleted()
-            showDialog(foundDevices)
         }, { deviceData ->
             println("Found new device: ${deviceData.first} - ${deviceData.second}")
             foundDevices.add(deviceData)
         }, { progress ->
             view!!.search_progress_bar.progress = progress
+        }, {
+            onSearchCompleted()
+            if (gatewayIp.isEmpty())
+                showDialog(foundDevices)
         })
     }
 
     private fun onSearchCompleted() {
+        println("onSearchCompleted")
         activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         view?.search_progress_bar?.visibility = View.GONE
     }
 
     private fun onIpFound(ip: String) {
+        println("onIpFound $ip")
         view?.gateway_ip_edit_text?.setText(ip)
         gatewayIp = ip
     }
@@ -77,23 +80,31 @@ class GatewaySearchFragment : SlideFragment(), TextWatcher, ScanResultDialogFrag
 
         val alertDialogBuilder = AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
 
-        alertDialogBuilder.setTitle("Select gateway")
-        alertDialogBuilder.setMessage("Unable to find gateway. Please select one from the list which will be displayed after this message.")
-        alertDialogBuilder.setCancelable(false)
-        alertDialogBuilder.setPositiveButton("OK", { _, _ ->
-            val fragmentTransaction = fragmentManager!!.beginTransaction()
-            val previousFragment = fragmentManager!!.findFragmentByTag("dialog")
-            if (previousFragment != null) {
-                fragmentTransaction.remove(previousFragment)
-            }
-            fragmentTransaction.addToBackStack(null)
+        if (devices.isNotEmpty()) {
+            alertDialogBuilder.setTitle("Select gateway")
+            alertDialogBuilder.setMessage("Unable to find gateway. Please select one from the list which will be displayed after this message.")
+            alertDialogBuilder.setCancelable(false)
+            alertDialogBuilder.setPositiveButton("OK", { _, _ ->
+                val fragmentTransaction = fragmentManager!!.beginTransaction()
+                val previousFragment = fragmentManager!!.findFragmentByTag("dialog")
+                if (previousFragment != null) {
+                    fragmentTransaction.remove(previousFragment)
+                }
+                fragmentTransaction.addToBackStack(null)
 
-            // Create and show the dialog.
-            val newFragment = ScanResultDialogFragment.newInstance(devices)
-            newFragment.listener = this@GatewaySearchFragment
-            newFragment.show(fragmentTransaction, "dialog")
-        })
-        alertDialogBuilder.setNegativeButton("Cancel", {_, _ -> })
+                // Create and show the dialog.
+                val newFragment = ScanResultDialogFragment.newInstance(devices)
+                newFragment.listener = this@GatewaySearchFragment
+                newFragment.show(fragmentTransaction, "dialog")
+            })
+            alertDialogBuilder.setNegativeButton("Cancel", { _, _ -> })
+        } else {
+            alertDialogBuilder.setTitle("Enter gateway ip")
+            alertDialogBuilder.setMessage("Unable to find gateway.")
+            alertDialogBuilder.setCancelable(false)
+            alertDialogBuilder.setPositiveButton("OK", { _, _ -> })
+        }
+
         alertDialogBuilder.create().show()
     }
 

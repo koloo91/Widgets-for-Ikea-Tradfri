@@ -18,7 +18,6 @@ import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 class TradfriService(context: Context) {
     private val client: TradfriClient
     private val gson = Gson()
-    private val queueService = QueueService.instance()
 
     private val handler = CoroutineExceptionHandler { _, ex ->
         Log.println(Log.ERROR, "TradfriService", Log.getStackTraceString(ex))
@@ -137,7 +136,7 @@ class TradfriService(context: Context) {
         }
     }
 
-//    fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit) {
+//    fun getSpinnerItems(onSuccess: (List<Device>) -> Unit, onError: () -> Unit) {
 //        queueService.addAction {
 //            return@addAction _getDevices(onSuccess, onError)
 //        }
