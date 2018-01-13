@@ -1,7 +1,6 @@
 package thekolo.de.quicktilesforikeatradfri.ui
 
 
-import android.annotation.SuppressLint
 import android.app.Fragment
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
@@ -19,6 +18,10 @@ import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
 
 class TilesFragment : Fragment() {
+
+    private val mainActivity: MainActivity
+        get() = activity as MainActivity
+
     private lateinit var layoutManager: GridLayoutManager
 
     private val service: TradfriService
@@ -49,7 +52,11 @@ class TilesFragment : Fragment() {
         adapter = TilesAdapter(activity, tiles, listOf(SpinnerData(-1, "None", true)))
         recyclerView.adapter = adapter
 
-        loadData()
+        view.swipe_refresh_layout.setOnRefreshListener {
+            mainActivity.startLoadingProcess(this@TilesFragment::loadData)
+        }
+
+        mainActivity.startLoadingProcess(this@TilesFragment::loadData)
 
         return view
     }
@@ -60,18 +67,21 @@ class TilesFragment : Fragment() {
     }
 
     private fun loadData() {
+        view?.swipe_refresh_layout?.isRefreshing = true
+
         service.getDevices({ devices ->
             this.devices = devices
-            updateAdapter()
+
+            service.getGroups({ groups ->
+                this.groups = groups
+                updateAdapter()
+
+                view?.swipe_refresh_layout?.isRefreshing = false
+            }, {
+                view?.swipe_refresh_layout?.isRefreshing = false
+            })
         }, {
-
-        })
-
-        service.getGroups({ groups ->
-            this.groups = groups
-            updateAdapter()
-        }, {
-
+            view?.swipe_refresh_layout?.isRefreshing = false
         })
     }
 

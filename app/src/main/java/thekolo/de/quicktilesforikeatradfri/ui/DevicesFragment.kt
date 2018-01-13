@@ -41,7 +41,6 @@ class DevicesFragment : Fragment() {
         layoutManager = LinearLayoutManager(activity.applicationContext)
         view.devices_recycler_view.layoutManager = layoutManager
 
-
         val dividerItemDecoration = DividerItemDecoration(activity.applicationContext, layoutManager.orientation)
         view.devices_recycler_view.addItemDecoration(dividerItemDecoration)
 
