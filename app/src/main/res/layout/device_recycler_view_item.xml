@@ -2,16 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="48dp">
+    android:minHeight="72dp">
 
-    <Spinner
-        android:id="@+id/tiles_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:id="@+id/first_letter_image_view"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@color/transparent"
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/device_state_switch"
         android:layout_centerVertical="true"
-        android:layout_marginStart="16dp" />
+        android:layout_marginStart="16dp"
+        android:scaleType="fitCenter"/>
 
     <TextView
         android:id="@+id/name_text_view"
@@ -22,7 +24,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_toEndOf="@+id/tiles_spinner"
+        android:layout_toEndOf="@+id/first_letter_image_view"
         android:layout_toStartOf="@+id/device_state_switch"
         android:text="@string/device"
         android:textColor="@color/colorPrimaryText" />
@@ -35,7 +37,7 @@
         android:layout_below="@+id/name_text_view"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
-        android:layout_toEndOf="@+id/tiles_spinner"
+        android:layout_toEndOf="@+id/first_letter_image_view"
         android:text="Type"
         android:textColor="@color/colorSecondaryText" />
 

@@ -25,7 +25,9 @@ class TilesFragment : Fragment() {
     private lateinit var layoutManager: GridLayoutManager
 
     private val service: TradfriService
-        get() = TradfriService.instance(activity)
+        get() {
+            return TradfriService.instance(activity)
+        }
 
     private var devices = emptyList<Device>()
     private var groups = emptyList<Group>()

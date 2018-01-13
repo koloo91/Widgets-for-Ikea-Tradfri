@@ -44,10 +44,7 @@ class DevicesFragment : Fragment() {
         val dividerItemDecoration = DividerItemDecoration(activity.applicationContext, layoutManager.orientation)
         view.devices_recycler_view.addItemDecoration(dividerItemDecoration)
 
-        val spinnerAdapter = ArrayAdapter.createFromResource(activity.applicationContext, R.array.tiles, android.R.layout.simple_spinner_item)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        adapter = DevicesAdapter(activity.applicationContext, Collections.emptyList(), spinnerAdapter, deviceAdapterListener)
+        adapter = DevicesAdapter(Collections.emptyList(), deviceAdapterListener)
 
         view.swipe_refresh_layout.setOnRefreshListener {
             mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)

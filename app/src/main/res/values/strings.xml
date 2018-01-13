@@ -2,15 +2,6 @@
     <string name="app_name">Quicktiles for Ikea TRÅDFRI</string>
     <string name="device_name">Name</string>
 
-    <string-array name="tiles">
-        <item>None</item>
-        <item>Tile 1</item>
-        <item>Tile 2</item>
-        <item>Tile 3</item>
-        <item>Tile 4</item>
-        <item>Tile 5</item>
-    </string-array>
-
     <string name="gateway_example">Gateway IP e.g. 192.168.178.1</string>
     <string name="configure_app">Please click on the settings icon and enter your gateways ip and security id.</string>
     <string name="device">Device</string>

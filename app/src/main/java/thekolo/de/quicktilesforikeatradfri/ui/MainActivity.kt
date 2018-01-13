@@ -177,13 +177,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun displayTilesFragment() {
-        var fragment = fragments["TilesFragment"]
-        if (fragment == null) {
-            fragment = TilesFragment.newInstance()
-            fragments["TilesFragment"] = fragment
-        }
-
-        displayFragment(fragment)
+        displayFragment(TilesFragment.newInstance())
     }
 
     private fun displayFragment(fragment: Fragment) {
