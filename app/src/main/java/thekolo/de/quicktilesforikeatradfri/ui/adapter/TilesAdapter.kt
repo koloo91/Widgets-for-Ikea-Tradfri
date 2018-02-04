@@ -67,14 +67,13 @@ class TilesAdapter(private val context: Context,
         launch(handler) {
             val deviceData = deviceDataDao.findByTile(tile.second)
             deviceData?.let { data ->
-                //launch(UI + handler) {
+                launch(UI + handler) {
                     spinnerItems.find { it.id == data.id }?.let { spinnerData ->
                         val index = spinnerItems.indexOf(spinnerData)
                         holder.spinner.setSelection(index)
                     }
-                //}
+                }
             }
-
         }
     }
 

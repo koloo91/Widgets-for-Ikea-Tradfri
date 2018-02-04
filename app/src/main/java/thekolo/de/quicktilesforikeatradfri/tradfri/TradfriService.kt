@@ -39,8 +39,8 @@ class TradfriService(context: Context) {
         return identity != null && identity.isNotEmpty() && preSharedKey != null && preSharedKey.isNotEmpty()
     }
 
-    fun register(identity: String, onSuccess: (RegisterResult) -> Unit, onError: () -> Unit) {
-        launch(CommonPool + handler) {
+    fun register(identity: String, onSuccess: (RegisterResult) -> Unit, onError: () -> Unit): Job {
+        return launch(CommonPool + handler) {
             val response = client.register(identity)
 
             if (response == null) {
@@ -63,14 +63,8 @@ class TradfriService(context: Context) {
         }
     }
 
-//    fun ping(onSuccess: (String) -> Unit, onError: () -> Unit) {
-//        queueService.addAction({
-//            return@addAction _ping(onSuccess, onError)
-//        })
-//    }
-
     fun ping(onSuccess: (String) -> Unit, onError: () -> Unit): Job {
-        Log.d(LogName, "_ping")
+        Log.d(LogName, "ping")
         return launch(CommonPool + handler) {
             println("_ping start")
             val response = client.ping()
@@ -107,12 +101,6 @@ class TradfriService(context: Context) {
         return parseResponse(response, Device::class.java)
     }
 
-//    fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _getDevice(id, onSuccess, onError)
-//        }
-//    }
-
     fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.getDevice(id)
@@ -136,12 +124,6 @@ class TradfriService(context: Context) {
         }
     }
 
-//    fun getSpinnerItems(onSuccess: (List<Device>) -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _getDevices(onSuccess, onError)
-//        }
-//    }
-
     fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val deviceIds = getDeviceIds()
@@ -149,8 +131,8 @@ class TradfriService(context: Context) {
             val devices = deviceIds.mapNotNull { id ->
                 getDevice(id)
             }.filter { device ->
-                !device.type.name.contains("remote control")
-            }.sortedBy { it.name }
+                        !device.type.name.contains("remote control")
+                    }.sortedBy { it.name }
 
             launch(UI + handler) { onSuccess(devices) }
         }
@@ -162,19 +144,14 @@ class TradfriService(context: Context) {
         return deviceIds.mapNotNull { id ->
             getDevice(id)
         }.filter { device ->
-            !device.type.name.contains("remote control")
-        }.sortedBy { it.name }
+                    !device.type.name.contains("remote control")
+                }.sortedBy { it.name }
     }
-
-//    fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _turnDeviceOn(id, onSuccess, onError)
-//        }
-//    }
 
     fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.turnDeviceOn(id)
+
             if (response == null) {
                 launch(UI + handler) { onError() }
                 return@launch
@@ -188,16 +165,11 @@ class TradfriService(context: Context) {
             launch(UI + handler) { onSuccess() }
         }
     }
-
-//    fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _turnDeviceOff(id, onSuccess, onError)
-//        }
-//    }
 
     fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.turnDeviceOff(id)
+
             if (response == null) {
                 launch(UI + handler) { onError() }
                 return@launch
@@ -212,15 +184,10 @@ class TradfriService(context: Context) {
         }
     }
 
-//    fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _toggleDevice(deviceId, onSuccess, onError)
-//        }
-//    }
-
     fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val device = getDevice(deviceId)
+
             if (device == null) {
                 launch(UI + handler) { onError() }
                 return@launch
@@ -252,15 +219,10 @@ class TradfriService(context: Context) {
         return parseResponse(response, List::class.java) as List<Int>? ?: return emptyList()
     }
 
-//    fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _getGroup(id, onSuccess, onError)
-//        }
-//    }
-
     fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.getGroup(id)
+
             if (response == null) {
                 launch(UI + handler) { onError() }
                 return@launch
@@ -291,12 +253,6 @@ class TradfriService(context: Context) {
         return parseResponse(response, Group::class.java)
     }
 
-//    fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _getGroups(onSuccess, onError)
-//        }
-//    }
-
     fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val groupIds = getGroupIds()
@@ -311,15 +267,10 @@ class TradfriService(context: Context) {
         return groupIds.mapNotNull { getGroup(it) }.sortedBy { it.name }
     }
 
-//    fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _turnGroupOn(id, onSuccess, onError)
-//        }
-//    }
-
     fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.turnGroupOn(id)
+
             if (response == null) {
                 launch(UI + handler) { onError() }
                 return@launch
@@ -333,16 +284,11 @@ class TradfriService(context: Context) {
             launch(UI + handler) { onSuccess() }
         }
     }
-
-//    fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _turnGroupOff(id, onSuccess, onError)
-//        }
-//    }
 
     fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.turnGroupOff(id)
+
             if (response == null) {
                 launch(UI + handler) { onError() }
                 return@launch
@@ -357,15 +303,10 @@ class TradfriService(context: Context) {
         }
     }
 
-//    fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit) {
-//        queueService.addAction {
-//            return@addAction _toggleGroup(groupId, onSuccess, onError)
-//        }
-//    }
-
     fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val device = getGroup(groupId)
+
             if (device == null) {
                 launch(UI + handler) { onError() }
                 return@launch

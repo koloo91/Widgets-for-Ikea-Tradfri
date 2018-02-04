@@ -2,12 +2,15 @@ package thekolo.de.quicktilesforikeatradfri.ui
 
 
 import android.app.Fragment
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_tiles.view.*
+import kotlinx.coroutines.experimental.Job
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.Group
@@ -19,20 +22,26 @@ import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
 class TilesFragment : Fragment() {
 
-    private val mainActivity: MainActivity
-        get() = activity as MainActivity
+    private lateinit var mainActivity: MainActivity
 
     private lateinit var layoutManager: GridLayoutManager
 
-    private val service: TradfriService
-        get() {
-            return TradfriService.instance(activity)
-        }
+    private lateinit var service: TradfriService
 
     private var devices = emptyList<Device>()
     private var groups = emptyList<Group>()
 
     private lateinit var adapter: TilesAdapter
+
+    private var currentJob: Job? = null
+        set(value) {
+            field?.let {
+                if (!it.isCancelled && !it.isCompleted)
+                    field?.cancel()
+            }
+
+            field = value
+        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_tiles, container, false)
@@ -55,10 +64,10 @@ class TilesFragment : Fragment() {
         recyclerView.adapter = adapter
 
         view.swipe_refresh_layout.setOnRefreshListener {
-            mainActivity.startLoadingProcess(this@TilesFragment::loadData)
+            currentJob = mainActivity.startLoadingProcess(this@TilesFragment::loadData)
         }
 
-        mainActivity.startLoadingProcess(this@TilesFragment::loadData)
+        currentJob = mainActivity.startLoadingProcess(this@TilesFragment::loadData)
 
         return view
     }
@@ -68,13 +77,33 @@ class TilesFragment : Fragment() {
         loadData()
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        Log.d("TilesFragment", "onPause")
+        currentJob?.let {
+            if (!it.isCancelled && !it.isCompleted)
+                currentJob?.cancel()
+        }
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+
+        Log.d("TilesFragment", "onAttach")
+
+        mainActivity = context as MainActivity
+        service = TradfriService.instance(activity)
+    }
+
     private fun loadData() {
         view?.swipe_refresh_layout?.isRefreshing = true
 
-        service.getDevices({ devices ->
+        currentJob = service.getDevices({ devices ->
             this.devices = devices
+            updateAdapter()
 
-            service.getGroups({ groups ->
+            currentJob = service.getGroups({ groups ->
                 this.groups = groups
                 updateAdapter()
 
@@ -88,9 +117,12 @@ class TilesFragment : Fragment() {
     }
 
     private fun updateAdapter() {
+        Log.d("TilesFragment", "updateAdapter")
+
         val defaultEntry = listOf(SpinnerData(-1, "None", true)).toMutableList()
         val devicesData = devices.map { SpinnerData(it.id, it.name, true) }.toMutableList()
         val groupsData = groups.map { SpinnerData(it.id, "${it.name} (Group)", false) }.toMutableList()
+
         defaultEntry += devicesData
         defaultEntry += groupsData
 
@@ -102,5 +134,4 @@ class TilesFragment : Fragment() {
             return TilesFragment()
         }
     }
-
 }
