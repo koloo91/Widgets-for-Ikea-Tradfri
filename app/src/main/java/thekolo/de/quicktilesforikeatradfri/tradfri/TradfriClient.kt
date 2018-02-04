@@ -28,6 +28,8 @@ class TradfriClient(ip: String,
     private val coapRegisterEndpoint: CoapEndpoint = getRegisterCoapEndpoint()
     private val coapEndpoint: CoapEndpoint = getDefaultCoapEndpoint()
 
+    private val timeout = 2000L
+
     private fun getRegisterCoapEndpoint(): CoapEndpoint {
         val builder = DtlsConnectorConfig.Builder(InetSocketAddress(0))
         builder.setPskStore(StaticPskStore("Client_identity", securityId.toByteArray()))
@@ -54,14 +56,14 @@ class TradfriClient(ip: String,
     private fun registerClient(url: String): CoapClient {
         val client = CoapClient(url)
         client.endpoint = coapRegisterEndpoint
-        client.timeout = 6000
+        client.timeout = timeout
         return client
     }
 
     private fun client(url: String): CoapClient {
         val client = CoapClient(url)
         client.endpoint = coapEndpoint
-        client.timeout = 6000
+        client.timeout = timeout
         return client
     }
 

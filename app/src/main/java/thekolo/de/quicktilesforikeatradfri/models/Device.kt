@@ -13,6 +13,7 @@ class DeviceState(@SerializedName("5850") var on: Int? = null,
                   @SerializedName("5851") val brightness: Int? = null)
 
 class DeviceType(@SerializedName("1") val name: String,
-                 @SerializedName("3") val version: String)
+                 @SerializedName("3") val version: String,
+                 @SerializedName("9") val battery: Float?)
 
 class DeviceUpdater(@SerializedName("3311") val states: List<DeviceState>)

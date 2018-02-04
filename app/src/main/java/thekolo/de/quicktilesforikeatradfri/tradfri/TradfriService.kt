@@ -39,7 +39,14 @@ class TradfriService(context: Context) {
         return identity != null && identity.isNotEmpty() && preSharedKey != null && preSharedKey.isNotEmpty()
     }
 
-    fun register(identity: String, onSuccess: (RegisterResult) -> Unit, onError: () -> Unit): Job {
+    fun register(identity: String, onSuccess: (RegisterResult) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return register(identity, onSuccess, {
+            if (retryCounter > 0) register(identity, onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun register(identity: String, onSuccess: (RegisterResult) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.register(identity)
 
@@ -63,8 +70,14 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun ping(onSuccess: (String) -> Unit, onError: () -> Unit): Job {
-        Log.d(LogName, "ping")
+    fun ping(onSuccess: (String) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return ping(onSuccess, {
+            if (retryCounter > 0) ping(onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun ping(onSuccess: (String) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             println("_ping start")
             val response = client.ping()
@@ -98,10 +111,18 @@ class TradfriService(context: Context) {
         if (!response.isSuccess)
             return null
 
+        println(String(response.payload))
         return parseResponse(response, Device::class.java)
     }
 
-    fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit): Job {
+    fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return getDevice(id, onSuccess, {
+            if (retryCounter > 0) getDevice(id, onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.getDevice(id)
             if (response == null) {
@@ -124,15 +145,21 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit): Job {
+
+    fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return getDevices(onSuccess, {
+            if (retryCounter > 0) getDevices(onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val deviceIds = getDeviceIds()
 
             val devices = deviceIds.mapNotNull { id ->
                 getDevice(id)
-            }.filter { device ->
-                        !device.type.name.contains("remote control")
-                    }.sortedBy { it.name }
+            }.sortedBy { it.name }
 
             launch(UI + handler) { onSuccess(devices) }
         }
@@ -148,7 +175,14 @@ class TradfriService(context: Context) {
                 }.sortedBy { it.name }
     }
 
-    fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+    fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return turnDeviceOn(id, onSuccess, {
+            if (retryCounter > 0) turnDeviceOn(id, onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.turnDeviceOn(id)
 
@@ -166,7 +200,14 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+    fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return turnDeviceOff(id, onSuccess, {
+            if (retryCounter > 0) turnDeviceOff(id, onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.turnDeviceOff(id)
 
@@ -184,7 +225,14 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+    fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return toggleDevice(deviceId, onSuccess, {
+            if (retryCounter > 0) toggleDevice(deviceId, onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val device = getDevice(deviceId)
 
@@ -219,7 +267,14 @@ class TradfriService(context: Context) {
         return parseResponse(response, List::class.java) as List<Int>? ?: return emptyList()
     }
 
-    fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit): Job {
+    fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return getGroup(id, onSuccess, {
+            if (retryCounter > 0) getGroup(id, onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.getGroup(id)
 
@@ -253,7 +308,14 @@ class TradfriService(context: Context) {
         return parseResponse(response, Group::class.java)
     }
 
-    fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit): Job {
+    fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return getGroups(onSuccess, {
+            if (retryCounter > 0) getGroups(onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val groupIds = getGroupIds()
             val groups = groupIds.mapNotNull { getGroup(it) }.sortedBy { it.name }
@@ -267,7 +329,14 @@ class TradfriService(context: Context) {
         return groupIds.mapNotNull { getGroup(it) }.sortedBy { it.name }
     }
 
-    fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+    fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return turnGroupOn(id, onSuccess, {
+            if (retryCounter > 0) turnGroupOn(id, onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.turnGroupOn(id)
 
@@ -285,7 +354,14 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+    fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return turnGroupOff(id, onSuccess, {
+            if (retryCounter > 0) turnGroupOff(id, onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val response = client.turnGroupOff(id)
 
@@ -303,7 +379,14 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
+    fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
+        return toggleGroup(groupId, onSuccess, {
+            if (retryCounter > 0) toggleGroup(groupId, onSuccess, onError, retryCounter - 1)
+            else onError()
+        })
+    }
+
+    private fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
         return launch(CommonPool + handler) {
             val device = getGroup(groupId)
 
@@ -335,6 +418,7 @@ class TradfriService(context: Context) {
     }
 
     companion object {
+        const val Retries = 3
         const val LogName = "TradfriService"
 
         private var instance: TradfriService? = null

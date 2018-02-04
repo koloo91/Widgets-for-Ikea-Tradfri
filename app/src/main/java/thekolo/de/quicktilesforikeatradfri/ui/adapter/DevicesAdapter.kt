@@ -39,6 +39,16 @@ class DevicesAdapter(var devices: List<Device>,
             listener.onStateSwitchCheckedChanged(device, isChecked)
         }
 
+
+        if (device.type.name.contains("remote control")) {
+            holder.stateSwitch.visibility = View.GONE
+            holder.batteryTextView.visibility = View.VISIBLE
+            holder.batteryTextView.text = "${device.type.battery ?: 100}%"
+        } else {
+            holder.stateSwitch.visibility = View.VISIBLE
+            holder.batteryTextView.visibility = View.GONE
+        }
+
         val drawable = TextDrawable.builder()
                 .buildRound(device.name[0].toString(), generator.getColor(device.name))
 
@@ -54,6 +64,7 @@ class DevicesAdapter(var devices: List<Device>,
         val typeTextView: TextView = view.device_type_text_view
         val stateSwitch: Switch = view.device_state_switch
         val firstLetterImageView: ImageView = view.first_letter_image_view
+        val batteryTextView: TextView = view.battery_text_view
     }
 
     private fun isDeviceOn(device: Device): Boolean {
