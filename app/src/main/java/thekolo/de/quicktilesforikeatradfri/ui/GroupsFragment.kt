@@ -1,35 +1,48 @@
 package thekolo.de.quicktilesforikeatradfri.ui
 
 
-import android.os.Bundle
 import android.app.Fragment
+import android.content.Context
+import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.fragment_groups.view.*
 import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import org.jetbrains.anko.runOnUiThread
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
+import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.GroupsAdapter
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import java.util.*
 
 class GroupsFragment : Fragment() {
 
-    private val mainActivity: MainActivity
-        get() = activity as MainActivity
+    private lateinit var mainActivity: MainActivity
+    private lateinit var service: TradfriService
 
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: GroupsAdapter
 
     private var isLoadingDevices = false
+
+    private var currentJob: Job? = null
+        set(value) {
+            field?.let {
+                if (!it.isCancelled && !it.isCompleted)
+                    field?.cancel()
+            }
+
+            field = value
+        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -46,22 +59,42 @@ class GroupsFragment : Fragment() {
         adapter = GroupsAdapter(Collections.emptyList(), deviceAdapterListener)
 
         view.swipe_refresh_layout.setOnRefreshListener {
-            mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+            currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
         }
 
-        mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+        currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
 
         return view
     }
 
     override fun onResume() {
         super.onResume()
-        mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+
+        currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        Log.d("GroupsFragment", "onPause")
+        currentJob?.let {
+            if (!it.isCancelled && !it.isCompleted)
+                currentJob?.cancel()
+        }
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+
+        Log.d("GroupsFragment", "onAttach")
+
+        mainActivity = context as MainActivity
+        service = TradfriService.instance(activity)
     }
 
     private val deviceAdapterListener = object : GroupsAdapter.GroupsAdapterActions {
         override fun onSpinnerItemSelected(group: Group, position: Int) {
-            launch(CommonPool + mainActivity.handler) {
+            currentJob = launch(CommonPool + mainActivity.handler) {
                 if (position == TileUtil.NONE.index) {
                     mainActivity.deviceDataDao.insert(DeviceData(group.id, group.name, TileUtil.nameForIndex(position), false))
                     return@launch
@@ -70,7 +103,7 @@ class GroupsFragment : Fragment() {
                 if (mainActivity.isOtherDeviceOnTile(group.id, position)) {
                     mainActivity.displayMessage("Only one group per tile is allowed")
 
-                    runOnUiThread {
+                    launch(UI) {
                         adapter.notifyDataSetChanged()
                     }
 
@@ -86,20 +119,20 @@ class GroupsFragment : Fragment() {
             when (isChecked) {
                 true -> {
                     group.on = BulbState.On
-                    mainActivity.service.turnGroupOn(group.id, {
+                    currentJob = service.turnGroupOn(group.id, {
                         println("turnGroupOn onSuccess")
                     }, {
                         mainActivity.onError()
-                        mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+                        currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
                     })
                 }
                 false -> {
                     group.on = BulbState.Off
-                    mainActivity.service.turnGroupOff(group.id, {
+                    currentJob = service.turnGroupOff(group.id, {
                         println("turnGroupOff onSuccess")
                     }, {
                         mainActivity.onError()
-                        mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+                        currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
                     })
                 }
             }
@@ -109,22 +142,22 @@ class GroupsFragment : Fragment() {
     private fun loadGroups() {
         if (isLoadingDevices) return
 
-        view.groups_recycler_view.adapter = adapter
+        view?.groups_recycler_view?.adapter = adapter
 
-        view.swipe_refresh_layout.isRefreshing = true
+        view?.swipe_refresh_layout?.isRefreshing = true
         isLoadingDevices = true
 
-        mainActivity.service.getGroups({ groups ->
+        currentJob = service.getGroups({ groups ->
             adapter.groups = groups
             adapter.notifyDataSetChanged()
 
-            view.swipe_refresh_layout.isRefreshing = false
+            view?.swipe_refresh_layout?.isRefreshing = false
             isLoadingDevices = false
 
             if (groups.isEmpty())
                 mainActivity.displayMessage("No groups found.")
         }, {
-            view.swipe_refresh_layout.isRefreshing = false
+            view?.swipe_refresh_layout?.isRefreshing = false
             isLoadingDevices = false
 
             mainActivity.onError()

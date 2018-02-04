@@ -56,7 +56,7 @@ object NetworkUtils {
         return null
     }
 
-    fun searchGatewayIp(onSucces: (String) -> Unit, onError: () -> Unit, onDeviceFound: (Pair<String, String>) -> Unit, onProgressChanged: (Int) -> Unit, onFinished: () -> Unit) {
+    fun searchGatewayIp(onSuccess: (String) -> Unit, onError: () -> Unit, onDeviceFound: (Pair<String, String>) -> Unit, onProgressChanged: (Int) -> Unit, onFinished: () -> Unit) {
         launch(CommonPool + handler) {
             val deviceIp = getIpAddress()
             if (deviceIp == null) {
@@ -77,7 +77,7 @@ object NetworkUtils {
 
                 if (hostname != null && hostname.startsWith(GATEWAY_PREFIX)) {
                     println(ip)
-                    launch(UI + handler) { onSucces(ip) }
+                    launch(UI + handler) { onSuccess(ip) }
                 }
             }, {
                 launch(UI + handler) {

@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.CoroutineExceptionHandler
+import kotlinx.coroutines.experimental.Job
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     /*private val ip = "192.168.178.56"
     private val securityId = "vBPnZjwbl07N8rex"*/
 
-    val service: TradfriService
+    private val service: TradfriService
         get() = TradfriService(applicationContext)
 
     val deviceDataDao: DeviceDataDao
@@ -102,22 +103,25 @@ class MainActivity : AppCompatActivity() {
         return@OnNavigationItemSelectedListener true
     }
 
-    fun startLoadingProcess(loadingFunction: () -> Unit) {
+    fun startLoadingProcess(loadingFunction: () -> Unit, retryCounter: Int = 3): Job? {
         if (appHasBeenConfigured() && service.isRegistered(applicationContext)) {
-            service.ping({ _ ->
+            return service.ping({ _ ->
                 configuration_hint_text_view.visibility = View.GONE
                 loadingFunction()
             }, {
-                displayMessage(getString(R.string.unable_to_reach_gateway))
+                if (retryCounter > 0) startLoadingProcess(loadingFunction, retryCounter - 1)
+                else displayMessage(getString(R.string.unable_to_reach_gateway))
             })
         } else if (appHasBeenConfigured()) {
-            startRegisterProcess {
+            return startRegisterProcess {
                 configuration_hint_text_view.visibility = View.GONE
                 loadingFunction()
             }
         } else {
             configuration_hint_text_view.visibility = View.VISIBLE
         }
+
+        return null
     }
 
     private fun appHasBeenConfigured(): Boolean {
@@ -127,11 +131,11 @@ class MainActivity : AppCompatActivity() {
         return gatewayIp != null && gatewayIp.isNotEmpty() && securityId != null && securityId.isNotEmpty()
     }
 
-    private fun startRegisterProcess(onFinish: () -> Unit) {
-        if (service.isRegistered(applicationContext)) return
+    private fun startRegisterProcess(onFinish: () -> Unit): Job? {
+        if (service.isRegistered(applicationContext)) return null
 
         val identity = "${UUID.randomUUID()}"
-        service.register(identity, { registerResult ->
+        return service.register(identity, { registerResult ->
             SettingsUtil.setIdentity(applicationContext, identity)
             SettingsUtil.setPreSharedKey(applicationContext, registerResult.preSharedKey)
 
@@ -163,6 +167,7 @@ class MainActivity : AppCompatActivity() {
             fragments["DevicesFragment"] = fragment
         }
 
+        fragment = DevicesFragment.newInstance()
         displayFragment(fragment)
     }
 
@@ -173,11 +178,19 @@ class MainActivity : AppCompatActivity() {
             fragments["GroupsFragment"] = fragment
         }
 
+        fragment = GroupsFragment.newInstance()
         displayFragment(fragment)
     }
 
     private fun displayTilesFragment() {
-        displayFragment(TilesFragment.newInstance())
+        var fragment = fragments["TilesFragment"]
+        if (fragment == null) {
+            fragment = TilesFragment.newInstance()
+            fragments["TilesFragment"] = fragment
+        }
+
+        fragment = TilesFragment.newInstance()
+        displayFragment(fragment)
     }
 
     private fun displayFragment(fragment: Fragment) {
