@@ -32,7 +32,8 @@ class GroupsAdapter(var groups: List<Group>,
 
         holder.nameTextView.text = group.name
         holder.stateSwitch.isChecked = isGroupOn(group)
-        holder.stateSwitch.setOnCheckedChangeListener { _, isChecked ->
+        holder.stateSwitch.setOnCheckedChangeListener { switch, isChecked ->
+            if (!switch.isPressed) return@setOnCheckedChangeListener
             listener.onStateSwitchCheckedChanged(group, isChecked)
         }
 
@@ -67,6 +68,5 @@ class GroupsAdapter(var groups: List<Group>,
 
     interface GroupsAdapterActions {
         fun onStateSwitchCheckedChanged(group: Group, isChecked: Boolean)
-        fun onSpinnerItemSelected(group: Group, position: Int)
     }
 }

@@ -19,14 +19,14 @@ import java.net.InetSocketAddress
 
 class TradfriClient(ip: String,
                     private val securityId: String,
-                    private var identity: String?,
-                    private var preSharedKey: String?) {
+                    var identity: String?,
+                    var preSharedKey: String?) {
 
     private val baseUrl = "coaps://$ip:5684"
 
     private val gson = Gson()
-    private val coapRegisterEndpoint: CoapEndpoint = getRegisterCoapEndpoint()
-    private val coapEndpoint: CoapEndpoint = getDefaultCoapEndpoint()
+    private var coapRegisterEndpoint: CoapEndpoint = getRegisterCoapEndpoint()
+    private var coapEndpoint: CoapEndpoint = getDefaultCoapEndpoint()
 
     private val timeout = 2000L
 
@@ -119,6 +119,11 @@ class TradfriClient(ip: String,
         Log.d(LogName, "PUT $baseUrl/15004/$groupId")
         val updateData = GroupUpdater(BulbState.Off)
         return client("$baseUrl/15004/$groupId").put(gson.toJson(updateData), MediaTypeRegistry.APPLICATION_JSON)
+    }
+
+    fun reload() {
+        coapRegisterEndpoint = getRegisterCoapEndpoint()
+        coapEndpoint = getDefaultCoapEndpoint()
     }
 
     companion object {

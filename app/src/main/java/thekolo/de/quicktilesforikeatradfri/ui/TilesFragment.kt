@@ -10,23 +10,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_tiles.view.*
+import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.Group
+import thekolo.de.quicktilesforikeatradfri.room.Database
+import thekolo.de.quicktilesforikeatradfri.room.DeviceData
+import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.SpinnerData
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.TilesAdapter
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
 
-class TilesFragment : Fragment() {
+class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
+
+    private val handler = CoroutineExceptionHandler { _, ex ->
+        Log.println(Log.ERROR, "MainActivity", Log.getStackTraceString(ex))
+    }
 
     private lateinit var mainActivity: MainActivity
 
     private lateinit var layoutManager: GridLayoutManager
 
     private lateinit var service: TradfriService
+    private lateinit var deviceDataDao: DeviceDataDao
 
     private var devices = emptyList<Device>()
     private var groups = emptyList<Group>()
@@ -35,11 +46,7 @@ class TilesFragment : Fragment() {
 
     private var currentJob: Job? = null
         set(value) {
-            field?.let {
-                if (!it.isCancelled && !it.isCompleted)
-                    field?.cancel()
-            }
-
+            cancelJob(field)
             field = value
         }
 
@@ -60,7 +67,7 @@ class TilesFragment : Fragment() {
                 Pair("Tile 5", TileUtil.nameForIndex(5))
         )
 
-        adapter = TilesAdapter(activity, tiles, listOf(SpinnerData(-1, "None", true)))
+        adapter = TilesAdapter(activity, tiles, listOf(SpinnerData(-1, "None", true)), emptyList(), this)
         recyclerView.adapter = adapter
 
         view.swipe_refresh_layout.setOnRefreshListener {
@@ -68,6 +75,7 @@ class TilesFragment : Fragment() {
         }
 
         currentJob = mainActivity.startLoadingProcess(this@TilesFragment::loadData)
+        loadAndRefreshDeviceData()
 
         return view
     }
@@ -81,9 +89,14 @@ class TilesFragment : Fragment() {
         super.onPause()
 
         Log.d("TilesFragment", "onPause")
-        currentJob?.let {
-            if (!it.isCancelled && !it.isCompleted)
-                currentJob?.cancel()
+        cancelJob(currentJob)
+    }
+
+    private fun cancelJob(job: Job?) {
+        if (job == null) return
+        if (!job.isCancelled && !job.isCompleted) {
+            currentJob?.cancelChildren()
+            currentJob?.cancel()
         }
     }
 
@@ -94,16 +107,16 @@ class TilesFragment : Fragment() {
 
         mainActivity = context as MainActivity
         service = TradfriService.instance(activity)
+        deviceDataDao = Database.get(context).deviceDataDao()
     }
 
     private fun loadData() {
         view?.swipe_refresh_layout?.isRefreshing = true
 
-        currentJob = service.getDevices({ devices ->
+        service.getDevices({ devices ->
             this.devices = devices
-            updateAdapter()
 
-            currentJob = service.getGroups({ groups ->
+            service.getGroups({ groups ->
                 this.groups = groups
                 updateAdapter()
 
@@ -117,7 +130,7 @@ class TilesFragment : Fragment() {
     }
 
     private fun updateAdapter() {
-        Log.d("TilesFragment", "updateAdapter")
+        Log.d("TilesFragment", "updateSpinnerItems")
 
         val defaultEntry = listOf(SpinnerData(-1, "None", true)).toMutableList()
         val devicesData = devices.map { SpinnerData(it.id, it.name, true) }.toMutableList()
@@ -126,7 +139,25 @@ class TilesFragment : Fragment() {
         defaultEntry += devicesData
         defaultEntry += groupsData
 
-        adapter.updateAdapter(defaultEntry)
+        adapter.updateSpinnerItems(defaultEntry)
+    }
+
+    override fun onStateSwitchCheckedChanged(spinnerItem: SpinnerData, tile: String) {
+        launch(handler) {
+            deviceDataDao.deleteByTile(tile)
+            deviceDataDao.insert(DeviceData(spinnerItem.id, spinnerItem.name, tile, spinnerItem.isDevice))
+            loadAndRefreshDeviceData()
+        }
+    }
+
+    private fun loadAndRefreshDeviceData() {
+        launch(handler) {
+            val allStoredData = deviceDataDao.getAll()
+
+            launch(UI + handler) {
+                adapter.updateStoredDeviceData(allStoredData)
+            }
+        }
     }
 
     companion object {
