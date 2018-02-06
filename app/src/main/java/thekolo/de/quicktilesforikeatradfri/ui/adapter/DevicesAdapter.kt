@@ -35,10 +35,10 @@ class DevicesAdapter(var devices: List<Device>,
         holder.typeTextView.text = device.type.name
 
         holder.stateSwitch.isChecked = isDeviceOn(device)
-        holder.stateSwitch.setOnCheckedChangeListener { _, isChecked ->
+        holder.stateSwitch.setOnCheckedChangeListener { switch, isChecked ->
+            if (!switch.isPressed) return@setOnCheckedChangeListener
             listener.onStateSwitchCheckedChanged(device, isChecked)
         }
-
 
         if (device.type.name.contains("remote control")) {
             holder.stateSwitch.visibility = View.GONE
@@ -80,7 +80,5 @@ class DevicesAdapter(var devices: List<Device>,
 
     interface DevicesAdapterActions {
         fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean)
-        fun onSpinnerItemSelected(device: Device, position: Int)
     }
-
 }

@@ -24,7 +24,7 @@ abstract class BaseTileService : TileService() {
     abstract val DISPLAY_NAME: String
 
     private val service: TradfriService
-        get() = TradfriService(applicationContext)
+        get() = TradfriService.instance(applicationContext)
 
     private val deviceDataDao: DeviceDataDao
         get() = Database.get(applicationContext).deviceDataDao()

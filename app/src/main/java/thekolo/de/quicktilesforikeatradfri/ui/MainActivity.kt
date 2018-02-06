@@ -31,14 +31,7 @@ class MainActivity : AppCompatActivity() {
     private val securityId = "vBPnZjwbl07N8rex"*/
 
     private val service: TradfriService
-        get() = TradfriService(applicationContext)
-
-    val deviceDataDao: DeviceDataDao
-        get() = Database.get(applicationContext).deviceDataDao()
-
-    val handler = CoroutineExceptionHandler { _, ex ->
-        Log.println(Log.ERROR, "MainActivity", Log.getStackTraceString(ex))
-    }
+        get() = TradfriService.instance(applicationContext)
 
     private val fragments: MutableMap<String, Fragment> = mutableMapOf()
 
@@ -54,8 +47,8 @@ class MainActivity : AppCompatActivity() {
         UpdateJobService.schedule(applicationContext)
 
         if (displayIntroActivity()) {
-            val onboardingIntent = Intent(this, IntroActivity::class.java)
-            startActivity(onboardingIntent)
+            val introIntent = Intent(this, IntroActivity::class.java)
+            startActivity(introIntent)
         }
     }
 
@@ -98,23 +91,29 @@ class MainActivity : AppCompatActivity() {
                 println("TilesSelected")
                 displayTilesFragment()
             }
+            else -> displayDevicesFragment()
         }
 
         return@OnNavigationItemSelectedListener true
     }
 
     fun startLoadingProcess(loadingFunction: () -> Unit, retryCounter: Int = 3): Job? {
+        if (displayIntroActivity()) return null
+
         if (appHasBeenConfigured() && service.isRegistered(applicationContext)) {
             return service.ping({ _ ->
                 configuration_hint_text_view.visibility = View.GONE
                 loadingFunction()
             }, {
-                if (retryCounter > 0) startLoadingProcess(loadingFunction, retryCounter - 1)
-                else displayMessage(getString(R.string.unable_to_reach_gateway))
+                if (retryCounter > 0) {
+                    Log.d("MainActivity", "Ping failed.. retrying $retryCounter")
+                    startLoadingProcess(loadingFunction, retryCounter - 1)
+                } else displayMessage(getString(R.string.unable_to_reach_gateway))
             })
         } else if (appHasBeenConfigured()) {
             return startRegisterProcess {
                 configuration_hint_text_view.visibility = View.GONE
+                service.refreshClient(applicationContext)
                 loadingFunction()
             }
         } else {
@@ -134,6 +133,8 @@ class MainActivity : AppCompatActivity() {
     private fun startRegisterProcess(onFinish: () -> Unit): Job? {
         if (service.isRegistered(applicationContext)) return null
 
+        service.refreshClient(applicationContext)
+
         val identity = "${UUID.randomUUID()}"
         return service.register(identity, { registerResult ->
             SettingsUtil.setIdentity(applicationContext, identity)
@@ -141,11 +142,6 @@ class MainActivity : AppCompatActivity() {
 
             onFinish()
         }, { onError("Unable to register app at gateway! Please try it later again") })
-    }
-
-    fun isOtherDeviceOnTile(groupId: Int, position: Int): Boolean {
-        val deviceOnTile = deviceDataDao.findByTile(TileUtil.nameForIndex(position))
-        return deviceOnTile != null && groupId != deviceOnTile.id
     }
 
     fun displayMessage(message: String) {
@@ -199,3 +195,4 @@ class MainActivity : AppCompatActivity() {
                 .commit()
     }
 }
+

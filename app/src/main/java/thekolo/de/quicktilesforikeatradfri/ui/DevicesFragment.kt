@@ -39,11 +39,7 @@ class DevicesFragment : Fragment() {
 
     private var currentJob: Job? = null
         set(value) {
-            field?.let {
-                if (!it.isCancelled && !it.isCompleted)
-                    field?.cancel()
-            }
-
+            cancelJob(field)
             field = value
         }
 
@@ -65,6 +61,7 @@ class DevicesFragment : Fragment() {
             currentJob = mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
         }
 
+        view.swipe_refresh_layout.isRefreshing = true
         currentJob = mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
 
         return view
@@ -80,9 +77,14 @@ class DevicesFragment : Fragment() {
         super.onPause()
 
         Log.d("DevicesFragment", "onPause")
-        currentJob?.let {
-            if (!it.isCancelled && !it.isCompleted)
-                currentJob?.cancel()
+        cancelJob(currentJob)
+    }
+
+    private fun cancelJob(job: Job?) {
+        if (job == null) return
+        if (!job.isCancelled && !job.isCompleted) {
+            currentJob?.cancelChildren()
+            currentJob?.cancel()
         }
     }
 
@@ -95,27 +97,6 @@ class DevicesFragment : Fragment() {
     }
 
     private val deviceAdapterListener = object : DevicesAdapter.DevicesAdapterActions {
-        override fun onSpinnerItemSelected(device: Device, position: Int) {
-            currentJob = launch(CommonPool + mainActivity.handler) {
-                if (position == TileUtil.NONE.index) {
-                    mainActivity.deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position), true))
-                    return@launch
-                }
-
-                if (mainActivity.isOtherDeviceOnTile(device.id, position)) {
-                    mainActivity.displayMessage("Only one device per tile is allowed")
-
-                    launch(UI) {
-                        adapter.notifyDataSetChanged()
-                    }
-
-                    return@launch
-                }
-
-                mainActivity.deviceDataDao.insert(DeviceData(device.id, device.name, TileUtil.nameForIndex(position), true))
-            }
-        }
-
         override fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean) {
             when (isChecked) {
                 true -> {
@@ -148,7 +129,7 @@ class DevicesFragment : Fragment() {
         view?.swipe_refresh_layout?.isRefreshing = true
         isLoadingDevices = true
 
-        currentJob = service.getDevices({ devices ->
+        service.getDevices({ devices ->
             adapter.devices = devices
             adapter.notifyDataSetChanged()
 

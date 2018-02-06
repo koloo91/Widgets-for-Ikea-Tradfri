@@ -36,11 +36,7 @@ class GroupsFragment : Fragment() {
 
     private var currentJob: Job? = null
         set(value) {
-            field?.let {
-                if (!it.isCancelled && !it.isCompleted)
-                    field?.cancel()
-            }
-
+            cancelJob(field)
             field = value
         }
 
@@ -77,9 +73,14 @@ class GroupsFragment : Fragment() {
         super.onPause()
 
         Log.d("GroupsFragment", "onPause")
-        currentJob?.let {
-            if (!it.isCancelled && !it.isCompleted)
-                currentJob?.cancel()
+        cancelJob(currentJob)
+    }
+
+    private fun cancelJob(job: Job?) {
+        if (job == null) return
+        if (!job.isCancelled && !job.isCompleted) {
+            currentJob?.cancelChildren()
+            currentJob?.cancel()
         }
     }
 
@@ -93,29 +94,7 @@ class GroupsFragment : Fragment() {
     }
 
     private val deviceAdapterListener = object : GroupsAdapter.GroupsAdapterActions {
-        override fun onSpinnerItemSelected(group: Group, position: Int) {
-            currentJob = launch(CommonPool + mainActivity.handler) {
-                if (position == TileUtil.NONE.index) {
-                    mainActivity.deviceDataDao.insert(DeviceData(group.id, group.name, TileUtil.nameForIndex(position), false))
-                    return@launch
-                }
-
-                if (mainActivity.isOtherDeviceOnTile(group.id, position)) {
-                    mainActivity.displayMessage("Only one group per tile is allowed")
-
-                    launch(UI) {
-                        adapter.notifyDataSetChanged()
-                    }
-
-                    return@launch
-                }
-
-                mainActivity.deviceDataDao.insert(DeviceData(group.id, group.name, TileUtil.nameForIndex(position), false))
-            }
-        }
-
         override fun onStateSwitchCheckedChanged(group: Group, isChecked: Boolean) {
-
             when (isChecked) {
                 true -> {
                     group.on = BulbState.On
@@ -147,7 +126,7 @@ class GroupsFragment : Fragment() {
         view?.swipe_refresh_layout?.isRefreshing = true
         isLoadingDevices = true
 
-        currentJob = service.getGroups({ groups ->
+        service.getGroups({ groups ->
             adapter.groups = groups
             adapter.notifyDataSetChanged()
 

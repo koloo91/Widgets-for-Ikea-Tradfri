@@ -14,21 +14,19 @@ import kotlinx.android.synthetic.main.tiles_recycler_view_item.view.*
 import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
+import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
 import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
 class TilesAdapter(private val context: Context,
-                   private var tiles: List<Pair<String, String>>,
-                   private var spinnerItems: List<SpinnerData>) : RecyclerView.Adapter<TilesAdapter.ViewHolder>() {
+                   private val tiles: List<Pair<String, String>>,
+                   private var spinnerItems: List<SpinnerData>,
+                   private var storedDeviceData: List<DeviceData>,
+                   private val listener: TilesAdapterActions) : RecyclerView.Adapter<TilesAdapter.ViewHolder>() {
 
-    private val deviceDataDao = Database.get(context).deviceDataDao()
     private var onItemSelectedCalledCount = 0
-
-    val handler = CoroutineExceptionHandler { _, ex ->
-        Log.println(Log.ERROR, "MainActivity", Log.getStackTraceString(ex))
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.tiles_recycler_view_item, parent, false)
@@ -51,11 +49,9 @@ class TilesAdapter(private val context: Context,
                 onItemSelectedCalledCount++
                 if (onItemSelectedCalledCount <= 5) return
 
-                launch(handler) {
-                    println("onItemSelected save data ${tile.first}")
-                    val spinnerItem = spinnerItems[position]
-                    deviceDataDao.insert(DeviceData(spinnerItem.id, spinnerItem.name, tile.second, spinnerItem.isDevice))
-                }
+                val spinnerItem = spinnerItems[position]
+
+                listener.onStateSwitchCheckedChanged(spinnerItem, tile.second)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -64,15 +60,10 @@ class TilesAdapter(private val context: Context,
 
         }
 
-        launch(handler) {
-            val deviceData = deviceDataDao.findByTile(tile.second)
-            deviceData?.let { data ->
-                launch(UI + handler) {
-                    spinnerItems.find { it.id == data.id }?.let { spinnerData ->
-                        val index = spinnerItems.indexOf(spinnerData)
-                        holder.spinner.setSelection(index)
-                    }
-                }
+        storedDeviceData.find { it.tile == tile.second }?.let { data ->
+            spinnerItems.find { it.id == data.id }?.let { spinnerData ->
+                val index = spinnerItems.indexOf(spinnerData)
+                holder.spinner.setSelection(index)
             }
         }
     }
@@ -81,14 +72,25 @@ class TilesAdapter(private val context: Context,
         return tiles.size
     }
 
-    fun updateAdapter(newItems: List<SpinnerData>) {
+    fun updateSpinnerItems(newItems: List<SpinnerData>) {
+        onItemSelectedCalledCount = 0
         spinnerItems = newItems
+        notifyDataSetChanged()
+    }
+
+    fun updateStoredDeviceData(newItems: List<DeviceData>) {
+        onItemSelectedCalledCount = 0
+        storedDeviceData = newItems
         notifyDataSetChanged()
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nameTextView: TextView = view.tile_name_text_view
         val spinner: Spinner = view.selected_device_spinner
+    }
+
+    interface TilesAdapterActions {
+        fun onStateSwitchCheckedChanged(spinnerItem: SpinnerData, tile: String)
     }
 
 }

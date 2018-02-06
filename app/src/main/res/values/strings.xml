@@ -7,8 +7,6 @@
     <string name="device">Device</string>
     <string name="unable_to_reach_gateway">Unable to reach gateway. Please try it again</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="devices">Devices</string>
     <string name="groups">Groups</string>
     <string name="tiles">Tiles</string>

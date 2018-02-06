@@ -12,11 +12,10 @@ import org.eclipse.californium.core.CoapResponse
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.models.RegisterResult
-import thekolo.de.quicktilesforikeatradfri.services.QueueService
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 
 class TradfriService(context: Context) {
-    private val client: TradfriClient
+    private lateinit var client: TradfriClient
     private val gson = Gson()
 
     private val handler = CoroutineExceptionHandler { _, ex ->
@@ -24,6 +23,10 @@ class TradfriService(context: Context) {
     }
 
     init {
+        refreshClient(context)
+    }
+
+    fun refreshClient(context: Context) {
         val gatewayIp = SettingsUtil.getGatewayIp(context) ?: ""
         val securityId = SettingsUtil.getSecurityId(context) ?: ""
         val identity = SettingsUtil.getIdentity(context)
@@ -66,7 +69,13 @@ class TradfriService(context: Context) {
                 return@launch
             }
 
-            launch(UI + handler) { onSuccess(result) }
+            launch(UI + handler) {
+                client.identity = identity
+                client.preSharedKey = result.preSharedKey
+                client.reload()
+
+                onSuccess(result)
+            }
         }
     }
 
@@ -111,7 +120,6 @@ class TradfriService(context: Context) {
         if (!response.isSuccess)
             return null
 
-        println(String(response.payload))
         return parseResponse(response, Device::class.java)
     }
 
