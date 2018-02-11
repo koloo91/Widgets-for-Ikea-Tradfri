@@ -9,9 +9,7 @@ import android.util.Log
 import android.widget.Toast
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
-import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
-import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao

@@ -3,7 +3,6 @@ package thekolo.de.quicktilesforikeatradfri.ui
 import android.app.Fragment
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
@@ -15,8 +14,6 @@ import android.view.View
 import kotlinx.android.synthetic.main.action_bar_switch.view.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.Job
-import org.sufficientlysecure.donations.DonationsFragment
-import thekolo.de.quicktilesforikeatradfri.BuildConfig
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.intro.IntroActivity
