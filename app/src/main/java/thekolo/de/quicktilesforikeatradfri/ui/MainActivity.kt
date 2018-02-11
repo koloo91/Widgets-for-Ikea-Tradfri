@@ -11,16 +11,13 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import kotlinx.android.synthetic.main.action_bar_switch.view.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.Job
 import thekolo.de.quicktilesforikeatradfri.R
-import thekolo.de.quicktilesforikeatradfri.room.Database
-import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.intro.IntroActivity
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
-import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import thekolo.de.quicktilesforikeatradfri.widgets.UpdateJobService
 import java.util.*
 
@@ -35,11 +32,14 @@ class MainActivity : AppCompatActivity() {
 
     private val fragments: MutableMap<String, Fragment> = mutableMapOf()
 
+    private var currentFragment: Fragment? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         bottom_navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         bottom_navigation.selectedItemId = R.id.devices
@@ -61,6 +61,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_main, menu)
+
+        val item = menu?.findItem(R.id.action_toggle_all)
+        item?.setActionView(R.layout.action_bar_switch)
+
+        val switch = item?.actionView?.toggle_all_switch
+        switch?.setOnCheckedChangeListener(this::toggleAll)
+
         return true
     }
 
@@ -152,8 +159,25 @@ class MainActivity : AppCompatActivity() {
         onError("An unexpected error occurred!")
     }
 
-    fun onError(message: String) {
+    private fun onError(message: String) {
         displayMessage(message)
+    }
+
+    private fun toggleAll(view: View, checked: Boolean) {
+        if(checked) service.toggleAllOn(this::onToggleAllFinished)
+        else service.toggleAllOff(this::onToggleAllFinished)
+    }
+
+    private fun onToggleAllFinished() {
+        if(currentFragment == null) return
+        refreshCurrentFragment(currentFragment!!)
+    }
+
+    private fun refreshCurrentFragment(fragment: Fragment) {
+        when(fragment) {
+            is DevicesFragment -> fragment.loadDevices()
+            is GroupsFragment -> fragment.loadGroups()
+        }
     }
 
     private fun displayDevicesFragment() {
@@ -163,7 +187,6 @@ class MainActivity : AppCompatActivity() {
             fragments["DevicesFragment"] = fragment
         }
 
-        fragment = DevicesFragment.newInstance()
         displayFragment(fragment)
     }
 
@@ -174,7 +197,6 @@ class MainActivity : AppCompatActivity() {
             fragments["GroupsFragment"] = fragment
         }
 
-        fragment = GroupsFragment.newInstance()
         displayFragment(fragment)
     }
 
@@ -185,11 +207,12 @@ class MainActivity : AppCompatActivity() {
             fragments["TilesFragment"] = fragment
         }
 
-        fragment = TilesFragment.newInstance()
         displayFragment(fragment)
     }
 
     private fun displayFragment(fragment: Fragment) {
+        currentFragment = fragment
+
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit()

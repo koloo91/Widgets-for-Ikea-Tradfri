@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -121,7 +122,7 @@ class DevicesFragment : Fragment() {
         }
     }
 
-    private fun loadDevices() {
+    fun loadDevices() {
         if (isLoadingDevices) return
 
         view?.devices_recycler_view?.adapter = adapter

@@ -118,7 +118,7 @@ class GroupsFragment : Fragment() {
         }
     }
 
-    private fun loadGroups() {
+    fun loadGroups() {
         if (isLoadingDevices) return
 
         view?.groups_recycler_view?.adapter = adapter
