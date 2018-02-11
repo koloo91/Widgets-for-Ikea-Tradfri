@@ -1,6 +1,6 @@
 package thekolo.de.quicktilesforikeatradfri.models
 
 object BulbState {
-    val Off = 0
-    val On = 1
+    const val Off = 0
+    const val On = 1
 }

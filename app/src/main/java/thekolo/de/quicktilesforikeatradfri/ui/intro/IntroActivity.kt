@@ -3,7 +3,6 @@ package thekolo.de.quicktilesforikeatradfri.ui.intro
 import agency.tango.materialintroscreen.MaterialIntroActivity
 import agency.tango.materialintroscreen.MessageButtonBehaviour
 import agency.tango.materialintroscreen.SlideFragmentBuilder
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import thekolo.de.quicktilesforikeatradfri.R

@@ -6,25 +6,17 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.fragment_devices.view.*
-import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import org.jetbrains.anko.runOnUiThread
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
-import thekolo.de.quicktilesforikeatradfri.room.DeviceData
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.DevicesAdapter
-import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import java.util.*
 
 

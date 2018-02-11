@@ -11,17 +11,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_groups.view.*
-import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.Group
-import thekolo.de.quicktilesforikeatradfri.room.DeviceData
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.GroupsAdapter
-import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 import java.util.*
 
 class GroupsFragment : Fragment() {

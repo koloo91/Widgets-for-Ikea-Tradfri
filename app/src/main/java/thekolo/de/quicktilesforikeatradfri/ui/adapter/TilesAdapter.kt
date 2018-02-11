@@ -2,7 +2,6 @@ package thekolo.de.quicktilesforikeatradfri.ui.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +10,8 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
 import kotlinx.android.synthetic.main.tiles_recycler_view_item.view.*
-import kotlinx.coroutines.experimental.CoroutineExceptionHandler
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
-import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
-import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
 class TilesAdapter(private val context: Context,
                    private val tiles: List<Pair<String, String>>,
@@ -39,9 +32,9 @@ class TilesAdapter(private val context: Context,
         val tile = tiles[position]
 
         holder.nameTextView.text = tile.first
-
         holder.spinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, spinnerItems.map { it.name })
         holder.spinner.setSelection(0, false)
+
         holder.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 println("onItemSelected ${tile.first} $position : $id")

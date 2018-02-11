@@ -40,7 +40,7 @@ class DonationsActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val GOOGLE_PUBKEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiCym60cI3MrIUpXiIcTudnFTOwc8c53CadvIQQkDAXeExysKiRF1rUvp567k7bAJKEuN6E1EuE4BW5fyKi2ydo0NrVGxgXj2tW4hh9Z1VWMh6nIeUJtJGxFI0/9n50QGEzUjOSQvaN/3T+7vGH0HBA0mOZ37QO0RZa08srK+VTWvzFNLilgM3/VeSEGfsc3zHJgm+HU+SiBSxl4M1HbgX0+T/qdBJvFYHWCXVC8GWKdaq/RI3k7l9+2h1Htq1vrGmRQKOzW7xo0urNCxCktfPlByWYMMKya1wX7FSuzQmvwR7fbxCvwcDhleTwFhvzRBKnXn+MQExse37P+XHuzGvwIDAQAB"
+        private const val GOOGLE_PUBKEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiCym60cI3MrIUpXiIcTudnFTOwc8c53CadvIQQkDAXeExysKiRF1rUvp567k7bAJKEuN6E1EuE4BW5fyKi2ydo0NrVGxgXj2tW4hh9Z1VWMh6nIeUJtJGxFI0/9n50QGEzUjOSQvaN/3T+7vGH0HBA0mOZ37QO0RZa08srK+VTWvzFNLilgM3/VeSEGfsc3zHJgm+HU+SiBSxl4M1HbgX0+T/qdBJvFYHWCXVC8GWKdaq/RI3k7l9+2h1Htq1vrGmRQKOzW7xo0urNCxCktfPlByWYMMKya1wX7FSuzQmvwR7fbxCvwcDhleTwFhvzRBKnXn+MQExse37P+XHuzGvwIDAQAB"
         private val GOOGLE_CATALOG = arrayOf("ntpsync.donation.1", "ntpsync.donation.2", "ntpsync.donation.3", "ntpsync.donation.5", "ntpsync.donation.8", "ntpsync.donation.13")
     }
 }
