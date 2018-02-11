@@ -105,6 +105,34 @@ class TradfriService(context: Context) {
         }
     }
 
+    fun toggleAllOn(onFinish: () -> Unit): Job {
+        return launch(CommonPool + handler) {
+            val ids = getDeviceIds()
+
+            val allJobs = ids.map { turnDeviceOn(it, {}, {}) }
+
+            allJobs.forEach { it.join() }
+
+            launch(UI + handler) {
+                onFinish()
+            }
+        }
+    }
+
+    fun toggleAllOff(onFinish: () -> Unit): Job {
+        return launch(CommonPool + handler) {
+            val ids = getDeviceIds()
+
+            val allJobs = ids.map { turnDeviceOff(it, {}, {}) }
+
+            allJobs.forEach { it.join() }
+
+            launch(UI + handler) {
+                onFinish()
+            }
+        }
+    }
+
     private fun getDeviceIds(): List<Int> {
         val response = client.getDeviceIds() ?: return emptyList()
 
