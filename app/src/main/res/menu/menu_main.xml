@@ -8,6 +8,12 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_donate"
+        android:icon="@drawable/ic_donate"
+        android:title="Donate"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings"
         android:title="Settings"

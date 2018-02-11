@@ -3,6 +3,7 @@ package thekolo.de.quicktilesforikeatradfri.ui
 import android.app.Fragment
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
@@ -14,11 +15,14 @@ import android.view.View
 import kotlinx.android.synthetic.main.action_bar_switch.view.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.Job
+import org.sufficientlysecure.donations.DonationsFragment
+import thekolo.de.quicktilesforikeatradfri.BuildConfig
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.intro.IntroActivity
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 import thekolo.de.quicktilesforikeatradfri.widgets.UpdateJobService
+import thekolo.de.widgetsforikeatradfri.DonationsActivity
 import java.util.*
 
 
@@ -52,12 +56,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun displayIntroActivity(): Boolean {
-        return !SettingsUtil.getOnboardingCompleted(applicationContext)
-                || (SettingsUtil.getGatewayIp(applicationContext) ?: "").isEmpty()
-                || (SettingsUtil.getSecurityId(applicationContext) ?: "").isEmpty()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_main, menu)
@@ -78,6 +76,10 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
+            }
+            R.id.action_donate -> {
+                val donationsActivity = Intent(this, DonationsActivity::class.java)
+                startActivity(donationsActivity)
             }
         }
 
@@ -130,6 +132,12 @@ class MainActivity : AppCompatActivity() {
         return null
     }
 
+    private fun displayIntroActivity(): Boolean {
+        return !SettingsUtil.getOnboardingCompleted(applicationContext)
+                || (SettingsUtil.getGatewayIp(applicationContext) ?: "").isEmpty()
+                || (SettingsUtil.getSecurityId(applicationContext) ?: "").isEmpty()
+    }
+
     private fun appHasBeenConfigured(): Boolean {
         val gatewayIp = SettingsUtil.getGatewayIp(this)
         val securityId = SettingsUtil.getSecurityId(this)
@@ -164,17 +172,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toggleAll(view: View, checked: Boolean) {
-        if(checked) service.toggleAllOn(this::onToggleAllFinished)
+        if (checked) service.toggleAllOn(this::onToggleAllFinished)
         else service.toggleAllOff(this::onToggleAllFinished)
     }
 
     private fun onToggleAllFinished() {
-        if(currentFragment == null) return
+        if (currentFragment == null) return
         refreshCurrentFragment(currentFragment!!)
     }
 
     private fun refreshCurrentFragment(fragment: Fragment) {
-        when(fragment) {
+        when (fragment) {
             is DevicesFragment -> fragment.loadDevices()
             is GroupsFragment -> fragment.loadGroups()
         }
@@ -209,6 +217,8 @@ class MainActivity : AppCompatActivity() {
 
         displayFragment(fragment)
     }
+
+
 
     private fun displayFragment(fragment: Fragment) {
         currentFragment = fragment
