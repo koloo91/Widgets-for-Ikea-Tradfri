@@ -8,32 +8,36 @@ import android.content.Intent
 import android.util.Log
 import android.widget.RemoteViews
 import thekolo.de.quicktilesforikeatradfri.R
+import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 
 
 class SingleDeviceAppWidgetProvider : AppWidgetProvider() {
     internal var context: Context? = null
 
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray?) {
-        super.onUpdate(context, appWidgetManager, appWidgetIds)
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, widgetIds: IntArray?) {
+        super.onUpdate(context, appWidgetManager, widgetIds)
 
-        if (appWidgetIds == null)
+        if (widgetIds == null)
             return
 
-        for (appWidgetId in appWidgetIds) {
+        for (widgetId in widgetIds) {
             Log.d(LogName, "OnUpdate")
 
             val remoteViews = RemoteViews(context.packageName, R.layout.single_device_appwidget)
-            remoteViews.setTextViewText(R.id.button_ok, "$appWidgetId")
+
+            val data = SettingsUtil.getWidgetData(context, widgetId) ?: ""
+            val splitData = data.split(";")
+
+            if(splitData.size >= 2)
+                remoteViews.setTextViewText(R.id.button_ok, splitData[1])
 
             val clickIntent = Intent(context, SingleDeviceItemClickedBroadcastReceiver::class.java)
+            clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
 
-            clickIntent.action = "ToggleDevice"
-            clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-
-            val pendingIntent = PendingIntent.getBroadcast(context, appWidgetId, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent = PendingIntent.getBroadcast(context, widgetId, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             remoteViews.setOnClickPendingIntent(R.id.button_ok, pendingIntent)
 
-            appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+            appWidgetManager.updateAppWidget(widgetId, remoteViews)
         }
     }
 
