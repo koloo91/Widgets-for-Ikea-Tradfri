@@ -62,7 +62,6 @@ dependencies {
     implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 
     implementation 'org.sufficientlysecure:donations:2.5'
-
 }
 
 repositories {

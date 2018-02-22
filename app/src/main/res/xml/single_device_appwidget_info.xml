@@ -1,0 +1,10 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="40dp"
+    android:minHeight="40dp"
+    android:configure="thekolo.de.quicktilesforikeatradfri.ui.widgets.SingleDeviceWidgetConfigurationActivity"
+    android:updatePeriodMillis="50000"
+    android:previewImage="@mipmap/ic_launcher"
+    android:initialLayout="@layout/single_device_appwidget"
+    android:resizeMode="none"
+    android:widgetCategory="home_screen">
+</appwidget-provider>
