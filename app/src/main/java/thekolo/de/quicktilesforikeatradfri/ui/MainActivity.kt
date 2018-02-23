@@ -103,11 +103,11 @@ class MainActivity : AppCompatActivity() {
         return@OnNavigationItemSelectedListener true
     }
 
-    fun startLoadingProcess(loadingFunction: () -> Unit, retryCounter: Int = 3): Job? {
-        if (displayIntroActivity()) return null
+    fun startLoadingProcess(loadingFunction: () -> Unit, retryCounter: Int = 3) {
+        if (displayIntroActivity()) return
 
         if (appHasBeenConfigured() && service.isRegistered(applicationContext)) {
-            return service.ping({ _ ->
+            service.ping({ _ ->
                 configuration_hint_text_view.visibility = View.GONE
                 loadingFunction()
             }, {
@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                 } else displayMessage(getString(R.string.unable_to_reach_gateway))
             })
         } else if (appHasBeenConfigured()) {
-            return startRegisterProcess {
+            startRegisterProcess {
                 configuration_hint_text_view.visibility = View.GONE
                 service.refreshClient(applicationContext)
                 loadingFunction()
@@ -125,8 +125,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             configuration_hint_text_view.visibility = View.VISIBLE
         }
-
-        return null
     }
 
     private fun displayIntroActivity(): Boolean {
@@ -214,7 +212,6 @@ class MainActivity : AppCompatActivity() {
 
         displayFragment(fragment)
     }
-
 
 
     private fun displayFragment(fragment: Fragment) {

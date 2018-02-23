@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_tiles.view.*
 import kotlinx.coroutines.experimental.CoroutineExceptionHandler
-import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import thekolo.de.quicktilesforikeatradfri.Device
@@ -20,6 +19,7 @@ import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
+import thekolo.de.quicktilesforikeatradfri.services.QueueService
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.SpinnerData
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.TilesAdapter
@@ -44,12 +44,6 @@ class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
 
     private lateinit var adapter: TilesAdapter
 
-    private var currentJob: Job? = null
-        set(value) {
-            cancelJob(field)
-            field = value
-        }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_tiles, container, false)
 
@@ -71,10 +65,10 @@ class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
         recyclerView.adapter = adapter
 
         view.swipe_refresh_layout.setOnRefreshListener {
-            currentJob = mainActivity.startLoadingProcess(this@TilesFragment::loadData)
+            mainActivity.startLoadingProcess(this@TilesFragment::loadData)
         }
 
-        currentJob = mainActivity.startLoadingProcess(this@TilesFragment::loadData)
+        mainActivity.startLoadingProcess(this@TilesFragment::loadData)
         loadAndRefreshDeviceData()
 
         return view
@@ -89,15 +83,7 @@ class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
         super.onPause()
 
         Log.d("TilesFragment", "onPause")
-        cancelJob(currentJob)
-    }
-
-    private fun cancelJob(job: Job?) {
-        if (job == null) return
-        if (!job.isCancelled && !job.isCompleted) {
-            currentJob?.cancelChildren()
-            currentJob?.cancel()
-        }
+        QueueService.instance().clearQueue()
     }
 
     override fun onAttach(context: Context?) {
