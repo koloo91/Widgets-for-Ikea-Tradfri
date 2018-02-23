@@ -1,7 +1,7 @@
 package thekolo.de.quicktilesforikeatradfri.utils
 
 import android.content.Context
-import com.google.gson.Gson
+import thekolo.de.quicktilesforikeatradfri.Device
 
 object SettingsUtil {
     const val DEFAULT_SHARED_PREFERENCES_FILE = "thekolo.de.widgetsforikeatradfri.settings"
@@ -9,9 +9,8 @@ object SettingsUtil {
     const val SECURITY_ID_KEY = "security_id"
     const val IDENTITY_KEY = "identity"
     const val PRESHARED_KEY_KEY = "preshared_key"
-    const val ON_BOARDING_COMPLETED_KEY = "on_boarding_completed"
-
-    private val gson = Gson()
+    private const val ON_BOARDING_COMPLETED_KEY = "on_boarding_completed"
+    private const val WIDGET_DATA_KEY = "widget_data"
 
     fun getGatewayIp(context: Context): String? {
         return context.getSharedPreferences(DEFAULT_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE).getString(GATEWAY_IP_KEY, null)
@@ -60,6 +59,16 @@ object SettingsUtil {
     fun setOnboardingCompleted(context: Context, completed: Boolean) {
         val prefsEdit = context.getSharedPreferences(DEFAULT_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE).edit()
         prefsEdit.putBoolean(ON_BOARDING_COMPLETED_KEY, completed)
+        prefsEdit.apply()
+    }
+
+    fun getWidgetData(context: Context, widgetId: Int): String? {
+        return context.getSharedPreferences(DEFAULT_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE).getString("$widgetId", null)
+    }
+
+    fun setWidgetData(context: Context, widgetId: Int, device: Device) {
+        val prefsEdit = context.getSharedPreferences(DEFAULT_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE).edit()
+        prefsEdit.putString("$widgetId", "${device.id};${device.name};true")
         prefsEdit.apply()
     }
 }
