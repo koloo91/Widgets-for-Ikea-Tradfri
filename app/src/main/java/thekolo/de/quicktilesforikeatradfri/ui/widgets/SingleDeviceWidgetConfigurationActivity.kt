@@ -72,8 +72,10 @@ class SingleDeviceWidgetConfigurationActivity : AppCompatActivity(), SingleDevic
         clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
 
         val pendingIntent = PendingIntent.getBroadcast(applicationContext, widgetId, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        remoteViews.setTextViewText(R.id.button_ok, device.name)
-        remoteViews.setOnClickPendingIntent(R.id.button_ok, pendingIntent)
+        remoteViews.setTextViewText(R.id.device_name_text_view, device.name)
+        remoteViews.setOnClickPendingIntent(R.id.root_view, pendingIntent)
+        remoteViews.setOnClickPendingIntent(R.id.toggle_device_image_button, pendingIntent)
+        remoteViews.setOnClickPendingIntent(R.id.device_name_text_view, pendingIntent)
 
         appWidgetManager.updateAppWidget(widgetId, remoteViews)
 

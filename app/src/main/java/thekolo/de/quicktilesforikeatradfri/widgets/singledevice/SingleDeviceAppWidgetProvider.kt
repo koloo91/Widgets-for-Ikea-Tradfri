@@ -29,13 +29,15 @@ class SingleDeviceAppWidgetProvider : AppWidgetProvider() {
             val splitData = data.split(";")
 
             if(splitData.size >= 2)
-                remoteViews.setTextViewText(R.id.button_ok, splitData[1])
+                remoteViews.setTextViewText(R.id.device_name_text_view, splitData[1])
 
             val clickIntent = Intent(context, SingleDeviceItemClickedBroadcastReceiver::class.java)
             clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
 
             val pendingIntent = PendingIntent.getBroadcast(context, widgetId, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-            remoteViews.setOnClickPendingIntent(R.id.button_ok, pendingIntent)
+            remoteViews.setOnClickPendingIntent(R.id.root_view, pendingIntent)
+            remoteViews.setOnClickPendingIntent(R.id.toggle_device_image_button, pendingIntent)
+            remoteViews.setOnClickPendingIntent(R.id.device_name_text_view, pendingIntent)
 
             appWidgetManager.updateAppWidget(widgetId, remoteViews)
         }
