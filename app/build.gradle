@@ -9,8 +9,8 @@ android {
         applicationId "thekolo.de.widgetsforikeatradfri"
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 15
-        versionName "1.4.5"
+        versionCode 16
+        versionName "1.4.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
