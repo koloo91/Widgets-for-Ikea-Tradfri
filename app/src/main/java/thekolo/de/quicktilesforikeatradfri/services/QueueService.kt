@@ -1,13 +1,24 @@
 package thekolo.de.quicktilesforikeatradfri.services
 
+import android.util.Log
+import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.launch
 
 typealias Action = () -> Job
 
 class QueueService private constructor() {
+    private val handler = CoroutineExceptionHandler { _, ex ->
+        isExecutingAction = false
+        Log.println(Log.ERROR, "QueueService", Log.getStackTraceString(ex))
+
+        executeNextAction()
+    }
+
     private val actions: MutableList<Action> = mutableListOf()
-    private var retryCounter = 0
+
+    private var isExecutingAction = false
+    private var currentJob: Job? = null
 
     fun addAction(action: Action) {
         actions.add(action)
@@ -15,28 +26,26 @@ class QueueService private constructor() {
         executeNextAction()
     }
 
+    fun clearQueue() {
+        currentJob?.cancel()
+        actions.clear()
+        isExecutingAction = false
+    }
+
     private fun executeNextAction() {
-        if (actions.isEmpty()) return
+        if (actions.isEmpty() || isExecutingAction) return
 
-        try {
-            runBlocking {
-                if(retryCounter >= MAX_RETRIES) {
-                    actions.first()().join()
-                }
+        currentJob = launch(handler) {
+            isExecutingAction = true
+            actions.first()().join()
 
-                actions.removeAt(0)
-
-                executeNextAction()
-            }
-        } catch (e: Exception) {
-            retryCounter++
-            e.printStackTrace()
+            actions.removeAt(0)
+            isExecutingAction = false
+            executeNextAction()
         }
     }
 
     companion object {
-        const val MAX_RETRIES = 5
-
         private var instance: QueueService? = null
 
         fun instance(): QueueService {

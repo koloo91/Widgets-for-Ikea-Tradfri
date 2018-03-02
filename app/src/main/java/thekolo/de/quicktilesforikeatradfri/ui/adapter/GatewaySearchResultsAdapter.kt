@@ -9,9 +9,7 @@ import kotlinx.android.synthetic.main.gateway_search_results_recycler_view_item.
 import thekolo.de.quicktilesforikeatradfri.R
 
 class GatewaySearchResultsAdapter(private val listener: ItemClickedListener, private val ips: List<String>, private val hostnames: List<String>) : RecyclerView.Adapter<GatewaySearchResultsAdapter.ViewHolder>() {
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        if (holder == null) return
-
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val hostname = hostnames[position]
         val ip = ips[position]
         holder.hostnameTextView.text = hostname
@@ -23,8 +21,8 @@ class GatewaySearchResultsAdapter(private val listener: ItemClickedListener, pri
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.gateway_search_results_recycler_view_item, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.gateway_search_results_recycler_view_item, parent, false)
 
         return GatewaySearchResultsAdapter.ViewHolder(view)
     }

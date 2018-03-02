@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,12 +14,18 @@ import android.view.WindowManager
 import kotlinx.android.synthetic.main.fragment_gateway_search.view.*
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.utils.NetworkUtils
+import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 import thekolo.de.quicktilesforikeatradfri.utils.ValidateUtil
 
 
 class GatewaySearchFragment : SlideFragment(), TextWatcher, ScanResultDialogFragment.OnIpSelectedListener {
 
     var gatewayIp = ""
+        set(value) {
+            Log.d("GatewaySearchFragment", "Setting gateway ip $value")
+            SettingsUtil.setGatewayIp(activity!!.applicationContext, value)
+            field = value
+        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_gateway_search, container, false)

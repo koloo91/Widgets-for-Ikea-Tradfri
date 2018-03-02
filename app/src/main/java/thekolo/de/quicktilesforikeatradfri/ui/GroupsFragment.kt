@@ -15,6 +15,7 @@ import kotlinx.coroutines.experimental.Job
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.Group
+import thekolo.de.quicktilesforikeatradfri.services.QueueService
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.GroupsAdapter
 import java.util.*
@@ -28,12 +29,6 @@ class GroupsFragment : Fragment() {
     private lateinit var adapter: GroupsAdapter
 
     private var isLoadingDevices = false
-
-    private var currentJob: Job? = null
-        set(value) {
-            cancelJob(field)
-            field = value
-        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -50,10 +45,10 @@ class GroupsFragment : Fragment() {
         adapter = GroupsAdapter(Collections.emptyList(), deviceAdapterListener)
 
         view.swipe_refresh_layout.setOnRefreshListener {
-            currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+            mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
         }
 
-        currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+        mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
 
         return view
     }
@@ -61,22 +56,14 @@ class GroupsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+        mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
     }
 
     override fun onPause() {
         super.onPause()
 
         Log.d("GroupsFragment", "onPause")
-        cancelJob(currentJob)
-    }
-
-    private fun cancelJob(job: Job?) {
-        if (job == null) return
-        if (!job.isCancelled && !job.isCompleted) {
-            currentJob?.cancelChildren()
-            currentJob?.cancel()
-        }
+        QueueService.instance().clearQueue()
     }
 
     override fun onAttach(context: Context?) {
@@ -93,20 +80,20 @@ class GroupsFragment : Fragment() {
             when (isChecked) {
                 true -> {
                     group.on = BulbState.On
-                    currentJob = service.turnGroupOn(group.id, {
+                    service.turnGroupOn(group.id, {
                         println("turnGroupOn onSuccess")
                     }, {
                         mainActivity.onError()
-                        currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+                        mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
                     })
                 }
                 false -> {
                     group.on = BulbState.Off
-                    currentJob = service.turnGroupOff(group.id, {
+                    service.turnGroupOff(group.id, {
                         println("turnGroupOff onSuccess")
                     }, {
                         mainActivity.onError()
-                        currentJob = mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
+                        mainActivity.startLoadingProcess(this@GroupsFragment::loadGroups)
                     })
                 }
             }

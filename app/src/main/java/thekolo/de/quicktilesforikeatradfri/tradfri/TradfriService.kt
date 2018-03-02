@@ -3,20 +3,20 @@ package thekolo.de.quicktilesforikeatradfri.tradfri
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.CoroutineExceptionHandler
-import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.eclipse.californium.core.CoapResponse
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.models.RegisterResult
+import thekolo.de.quicktilesforikeatradfri.services.QueueService
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 
 class TradfriService(context: Context) {
-    private lateinit var client: TradfriClient
     private val gson = Gson()
+    private val queueService = QueueService.instance()
+
+    private lateinit var client: TradfriClient
 
     private val handler = CoroutineExceptionHandler { _, ex ->
         Log.println(Log.ERROR, "TradfriService", Log.getStackTraceString(ex))
@@ -31,6 +31,8 @@ class TradfriService(context: Context) {
         val securityId = SettingsUtil.getSecurityId(context) ?: ""
         val identity = SettingsUtil.getIdentity(context)
         val preSharedKey = SettingsUtil.getPreSharedKey(context)
+
+        Log.d(LogName, "Refreshing with values: '$gatewayIp', '$securityId', '$identity', '$preSharedKey'")
 
         client = TradfriClient(gatewayIp, securityId, identity, preSharedKey)
     }
@@ -79,11 +81,13 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun ping(onSuccess: (String) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return ping(onSuccess, {
-            if (retryCounter > 0) ping(onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun ping(onSuccess: (String) -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            ping(onSuccess, {
+                if (retryCounter > 0) ping(onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun ping(onSuccess: (String) -> Unit, onError: () -> Unit): Job {
@@ -105,30 +109,34 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun toggleAllOn(onFinish: () -> Unit): Job {
-        return launch(CommonPool + handler) {
-            val ids = getDeviceIds()
+    fun toggleAllOn(onFinish: () -> Unit) {
+        queueService.addAction {
+            launch(CommonPool + handler) {
+                val ids = getDeviceIds()
 
-            val allJobs = ids.map { turnDeviceOn(it, {}, {}) }
+                val allJobs = ids.map { turnDeviceOn(it, {}, {}) }
 
-            allJobs.forEach { it.join() }
+                allJobs.forEach { it.join() }
 
-            launch(UI + handler) {
-                onFinish()
+                launch(UI + handler) {
+                    onFinish()
+                }
             }
         }
     }
 
-    fun toggleAllOff(onFinish: () -> Unit): Job {
-        return launch(CommonPool + handler) {
-            val ids = getDeviceIds()
+    fun toggleAllOff(onFinish: () -> Unit) {
+        queueService.addAction {
+            launch(CommonPool + handler) {
+                val ids = getDeviceIds()
 
-            val allJobs = ids.map { turnDeviceOff(it, {}, {}) }
+                val allJobs = ids.map { turnDeviceOff(it, {}, {}) }
 
-            allJobs.forEach { it.join() }
+                allJobs.forEach { it.join() }
 
-            launch(UI + handler) {
-                onFinish()
+                launch(UI + handler) {
+                    onFinish()
+                }
             }
         }
     }
@@ -151,11 +159,13 @@ class TradfriService(context: Context) {
         return parseResponse(response, Device::class.java)
     }
 
-    fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return getDevice(id, onSuccess, {
-            if (retryCounter > 0) getDevice(id, onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            getDevice(id, onSuccess, {
+                if (retryCounter > 0) getDevice(id, onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit): Job {
@@ -182,11 +192,13 @@ class TradfriService(context: Context) {
     }
 
 
-    fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return getDevices(onSuccess, {
-            if (retryCounter > 0) getDevices(onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            getDevices(onSuccess, {
+                if (retryCounter > 0) getDevices(onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit): Job {
@@ -211,11 +223,13 @@ class TradfriService(context: Context) {
                 }.sortedBy { it.name }
     }
 
-    fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return turnDeviceOn(id, onSuccess, {
-            if (retryCounter > 0) turnDeviceOn(id, onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            turnDeviceOn(id, onSuccess, {
+                if (retryCounter > 0) turnDeviceOn(id, onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
@@ -236,11 +250,13 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return turnDeviceOff(id, onSuccess, {
-            if (retryCounter > 0) turnDeviceOff(id, onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            turnDeviceOff(id, onSuccess, {
+                if (retryCounter > 0) turnDeviceOff(id, onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
@@ -261,11 +277,13 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return toggleDevice(deviceId, onSuccess, {
-            if (retryCounter > 0) toggleDevice(deviceId, onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            toggleDevice(deviceId, onSuccess, {
+                if (retryCounter > 0) toggleDevice(deviceId, onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
@@ -303,11 +321,13 @@ class TradfriService(context: Context) {
         return parseResponse(response, List::class.java) as List<Int>? ?: return emptyList()
     }
 
-    fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return getGroup(id, onSuccess, {
-            if (retryCounter > 0) getGroup(id, onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            getGroup(id, onSuccess, {
+                if (retryCounter > 0) getGroup(id, onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit): Job {
@@ -344,11 +364,13 @@ class TradfriService(context: Context) {
         return parseResponse(response, Group::class.java)
     }
 
-    fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return getGroups(onSuccess, {
-            if (retryCounter > 0) getGroups(onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            getGroups(onSuccess, {
+                if (retryCounter > 0) getGroups(onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit): Job {
@@ -365,11 +387,13 @@ class TradfriService(context: Context) {
         return groupIds.mapNotNull { getGroup(it) }.sortedBy { it.name }
     }
 
-    fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return turnGroupOn(id, onSuccess, {
-            if (retryCounter > 0) turnGroupOn(id, onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            turnGroupOn(id, onSuccess, {
+                if (retryCounter > 0) turnGroupOn(id, onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
@@ -390,11 +414,13 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return turnGroupOff(id, onSuccess, {
-            if (retryCounter > 0) turnGroupOff(id, onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            turnGroupOff(id, onSuccess, {
+                if (retryCounter > 0) turnGroupOff(id, onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
@@ -415,11 +441,13 @@ class TradfriService(context: Context) {
         }
     }
 
-    fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries): Job {
-        return toggleGroup(groupId, onSuccess, {
-            if (retryCounter > 0) toggleGroup(groupId, onSuccess, onError, retryCounter - 1)
-            else onError()
-        })
+    fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
+        queueService.addAction {
+            toggleGroup(groupId, onSuccess, {
+                if (retryCounter > 0) toggleGroup(groupId, onSuccess, onError, retryCounter - 1)
+                else onError()
+            })
+        }
     }
 
     private fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {

@@ -15,6 +15,7 @@ import kotlinx.coroutines.experimental.Job
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
+import thekolo.de.quicktilesforikeatradfri.services.QueueService
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.DevicesAdapter
 import java.util.*
@@ -29,12 +30,6 @@ class DevicesFragment : Fragment() {
     private lateinit var adapter: DevicesAdapter
 
     private var isLoadingDevices = false
-
-    private var currentJob: Job? = null
-        set(value) {
-            cancelJob(field)
-            field = value
-        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -51,11 +46,11 @@ class DevicesFragment : Fragment() {
         adapter = DevicesAdapter(Collections.emptyList(), deviceAdapterListener)
 
         view.swipe_refresh_layout.setOnRefreshListener {
-            currentJob = mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
+            mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
         }
 
         view.swipe_refresh_layout.isRefreshing = true
-        currentJob = mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
+        mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
 
         return view
     }
@@ -63,22 +58,14 @@ class DevicesFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        currentJob = mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
+        mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
     }
 
     override fun onPause() {
         super.onPause()
 
         Log.d("DevicesFragment", "onPause")
-        cancelJob(currentJob)
-    }
-
-    private fun cancelJob(job: Job?) {
-        if (job == null) return
-        if (!job.isCancelled && !job.isCompleted) {
-            currentJob?.cancelChildren()
-            currentJob?.cancel()
-        }
+        QueueService.instance().clearQueue()
     }
 
     override fun onAttach(context: Context?) {
@@ -94,20 +81,20 @@ class DevicesFragment : Fragment() {
             when (isChecked) {
                 true -> {
                     device.states?.first()?.on = BulbState.On
-                    currentJob = service.turnDeviceOn(device.id, {
+                    service.turnDeviceOn(device.id, {
                         println("turnDeviceOn onSuccess")
                     }, {
                         mainActivity.onError()
-                        currentJob = mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
+                        mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
                     })
                 }
                 false -> {
                     device.states?.first()?.on = BulbState.Off
-                    currentJob = service.turnDeviceOff(device.id, {
+                    service.turnDeviceOff(device.id, {
                         println("turnDeviceOff onSuccess")
                     }, {
                         mainActivity.onError()
-                        currentJob = mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
+                        mainActivity.startLoadingProcess(this@DevicesFragment::loadDevices)
                     })
                 }
             }

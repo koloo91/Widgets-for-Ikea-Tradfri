@@ -1,0 +1,25 @@
+<agency.tango.materialintroscreen.parallax.ParallaxRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:paddingBottom="164dp"
+    tools:context=".ui.intro.GatewaySearchFragment">
+
+    <TextView
+        android:id="@+id/description_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="Test your connection to validate your data"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
+
+</agency.tango.materialintroscreen.parallax.ParallaxRelativeLayout>

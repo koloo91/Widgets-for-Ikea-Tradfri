@@ -21,14 +21,13 @@ class TilesAdapter(private val context: Context,
 
     private var onItemSelectedCalledCount = 0
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.tiles_recycler_view_item, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.tiles_recycler_view_item, parent, false)
 
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        if (holder == null) return
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val tile = tiles[position]
 
         holder.nameTextView.text = tile.first
