@@ -88,6 +88,6 @@ class QrCodeScanDialogFragment : DialogFragment() {
     }
 
     interface OnCodeScannedListener {
-        fun onCodeScanned(code: String)
+        fun onCodeScanned(scanResult: String)
     }
 }

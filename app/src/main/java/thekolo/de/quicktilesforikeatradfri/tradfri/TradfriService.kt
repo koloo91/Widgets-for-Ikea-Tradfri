@@ -32,6 +32,8 @@ class TradfriService(context: Context) {
         val identity = SettingsUtil.getIdentity(context)
         val preSharedKey = SettingsUtil.getPreSharedKey(context)
 
+        Log.d(LogName, "Refreshing with values: '$gatewayIp', '$securityId', '$identity', '$preSharedKey'")
+
         client = TradfriClient(gatewayIp, securityId, identity, preSharedKey)
     }
 
