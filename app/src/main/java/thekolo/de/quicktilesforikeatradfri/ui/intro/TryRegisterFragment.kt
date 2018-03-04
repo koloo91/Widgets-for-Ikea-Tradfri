@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_try_register.view.*
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
@@ -18,6 +17,7 @@ import java.util.*
 class TryRegisterFragment : SlideFragment() {
 
     private var canMoveFurther = false
+    private var currentErrorMessage = "Test your connection before proceeding"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_try_register, container, false)
@@ -38,7 +38,7 @@ class TryRegisterFragment : SlideFragment() {
     }
 
     override fun cantMoveFurtherErrorMessage(): String {
-        return "Your data does not seem to be correct"
+        return currentErrorMessage
     }
 
     fun tryRegister() {
@@ -57,6 +57,7 @@ class TryRegisterFragment : SlideFragment() {
         }, {
             view?.progress_bar?.visibility = View.INVISIBLE
             (activity as MaterialIntroActivity).showMessage("Connection was not successful. Please check your data again")
+            currentErrorMessage = "Your data does not seem to be correct"
         })
     }
 }
