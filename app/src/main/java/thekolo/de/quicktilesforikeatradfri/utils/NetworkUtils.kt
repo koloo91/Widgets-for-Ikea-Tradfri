@@ -1,8 +1,10 @@
 package thekolo.de.quicktilesforikeatradfri.utils
 
 import android.util.Log
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import java.net.InetAddress
 import java.net.NetworkInterface
 
