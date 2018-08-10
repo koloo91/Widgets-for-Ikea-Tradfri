@@ -1,13 +1,12 @@
 package thekolo.de.quicktilesforikeatradfri.ui.adapter
 
+import android.app.AlertDialog
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
+import android.widget.RelativeLayout
 import android.widget.TextView
 import kotlinx.android.synthetic.main.tiles_recycler_view_item.view.*
 import thekolo.de.quicktilesforikeatradfri.R
@@ -19,8 +18,6 @@ class TilesAdapter(private val context: Context,
                    private var storedDeviceData: List<DeviceData>,
                    private val listener: TilesAdapterActions) : RecyclerView.Adapter<TilesAdapter.ViewHolder>() {
 
-    private var onItemSelectedCalledCount = 0
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.tiles_recycler_view_item, parent, false)
 
@@ -31,31 +28,20 @@ class TilesAdapter(private val context: Context,
         val tile = tiles[position]
 
         holder.nameTextView.text = tile.first
-        holder.spinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, spinnerItems.map { it.name })
-        holder.spinner.setSelection(0, false)
+        holder.selectedDeviceTextView.text = "None"
 
-        holder.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                println("onItemSelected ${tile.first} $position : $id")
-
-                onItemSelectedCalledCount++
-                if (onItemSelectedCalledCount <= 5) return
-
-                val spinnerItem = spinnerItems[position]
-
-                listener.onStateSwitchCheckedChanged(spinnerItem, tile.second)
+        holder.rootLayout.setOnClickListener {
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle("Select a device or group")
+            builder.setItems(spinnerItems.map { it.name }.toTypedArray()) { dialog, which ->
+                listener.onStateSwitchCheckedChanged(spinnerItems[which], tile.second)
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                println("onNothingSelected")
-            }
-
+            builder.create().show()
         }
 
         storedDeviceData.find { it.tile == tile.second }?.let { data ->
             spinnerItems.find { it.id == data.id }?.let { spinnerData ->
-                val index = spinnerItems.indexOf(spinnerData)
-                holder.spinner.setSelection(index)
+                holder.selectedDeviceTextView.text = spinnerData.name
             }
         }
     }
@@ -65,20 +51,19 @@ class TilesAdapter(private val context: Context,
     }
 
     fun updateSpinnerItems(newItems: List<SpinnerData>) {
-        onItemSelectedCalledCount = 0
         spinnerItems = newItems
         notifyDataSetChanged()
     }
 
     fun updateStoredDeviceData(newItems: List<DeviceData>) {
-        onItemSelectedCalledCount = 0
         storedDeviceData = newItems
         notifyDataSetChanged()
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val rootLayout: RelativeLayout = view.root_layout
         val nameTextView: TextView = view.tile_name_text_view
-        val spinner: Spinner = view.selected_device_spinner
+        val selectedDeviceTextView: TextView = view.selected_device_text_view
     }
 
     interface TilesAdapterActions {
