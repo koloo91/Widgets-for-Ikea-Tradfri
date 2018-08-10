@@ -1,19 +1,12 @@
 package thekolo.de.quicktilesforikeatradfri.services
 
 import android.util.Log
-import kotlinx.coroutines.experimental.CoroutineExceptionHandler
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
 
 typealias Action = () -> Job
 
 class QueueService private constructor() {
-    private val handler = CoroutineExceptionHandler { _, ex ->
-        isExecutingAction = false
-        Log.println(Log.ERROR, "QueueService", Log.getStackTraceString(ex))
-
-        executeNextAction()
-    }
 
     private val actions: MutableList<Action> = mutableListOf()
 
@@ -35,13 +28,18 @@ class QueueService private constructor() {
     private fun executeNextAction() {
         if (actions.isEmpty() || isExecutingAction) return
 
-        currentJob = launch(handler) {
-            isExecutingAction = true
-            actions.first()().join()
+        currentJob = launch() {
+            try {
+                isExecutingAction = true
+                actions.first()().join()
 
-            actions.removeAt(0)
-            isExecutingAction = false
-            executeNextAction()
+                actions.removeAt(0)
+            } catch (e: Exception) {
+                Log.e("QueueService", e.message)
+            } finally {
+                isExecutingAction = false
+                executeNextAction()
+            }
         }
     }
 
