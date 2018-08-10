@@ -28,10 +28,6 @@ import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
 class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
 
-    private val handler = CoroutineExceptionHandler { _, ex ->
-        Log.println(Log.ERROR, "MainActivity", Log.getStackTraceString(ex))
-    }
-
     private lateinit var mainActivity: MainActivity
 
     private lateinit var layoutManager: GridLayoutManager
@@ -129,18 +125,21 @@ class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
     }
 
     override fun onStateSwitchCheckedChanged(spinnerItem: SpinnerData, tile: String) {
-        launch(handler) {
+        launch {
             deviceDataDao.deleteByTile(tile)
-            deviceDataDao.insert(DeviceData(spinnerItem.id, spinnerItem.name, tile, spinnerItem.isDevice))
+
+            if (spinnerItem.id > 0)
+                deviceDataDao.insert(DeviceData(spinnerItem.id, spinnerItem.name, tile, spinnerItem.isDevice))
+
             loadAndRefreshDeviceData()
         }
     }
 
     private fun loadAndRefreshDeviceData() {
-        launch(handler) {
+        launch {
             val allStoredData = deviceDataDao.getAll()
 
-            launch(UI + handler) {
+            launch(UI) {
                 adapter.updateStoredDeviceData(allStoredData)
             }
         }
