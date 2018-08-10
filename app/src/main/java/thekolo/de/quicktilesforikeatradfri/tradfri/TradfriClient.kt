@@ -77,6 +77,11 @@ class TradfriClient(ip: String,
         return client("$baseUrl/.well-known/core").get()
     }
 
+    fun getGatewayInfo(): String? {
+        Log.d(LogName, "GET $baseUrl/15011/15012")
+        return String(client("$baseUrl/15011/15012").get().payload)
+    }
+
     fun getDeviceIds(): CoapResponse? {
         Log.d(LogName, "GET $baseUrl/15001")
         return client("$baseUrl/15001").get()
