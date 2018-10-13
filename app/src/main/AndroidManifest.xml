@@ -31,9 +31,7 @@
             android:name=".ui.SettingsActivity"
             android:label="Settings" />
 
-        <activity
-            android:name=".ui.intro.IntroActivity"
-            android:theme="@style/Theme.Intro" />
+        <activity android:name=".ui.intro.IntroActivity" />
 
         <activity
             android:name="thekolo.de.widgetsforikeatradfri.DonationsActivity"

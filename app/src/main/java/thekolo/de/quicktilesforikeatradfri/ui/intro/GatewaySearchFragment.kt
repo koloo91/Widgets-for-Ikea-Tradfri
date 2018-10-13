@@ -91,7 +91,7 @@ class GatewaySearchFragment : SlideFragment(), TextWatcher, ScanResultDialogFrag
             alertDialogBuilder.setTitle("Select gateway")
             alertDialogBuilder.setMessage("Unable to find gateway. Please select one from the list which will be displayed after this message.")
             alertDialogBuilder.setCancelable(false)
-            alertDialogBuilder.setPositiveButton("OK", { _, _ ->
+            alertDialogBuilder.setPositiveButton("OK") { _, _ ->
                 val fragmentTransaction = fragmentManager!!.beginTransaction()
                 val previousFragment = fragmentManager!!.findFragmentByTag("dialog")
                 if (previousFragment != null) {
@@ -103,7 +103,7 @@ class GatewaySearchFragment : SlideFragment(), TextWatcher, ScanResultDialogFrag
                 val newFragment = ScanResultDialogFragment.newInstance(devices)
                 newFragment.listener = this@GatewaySearchFragment
                 newFragment.show(fragmentTransaction, "dialog")
-            })
+            }
             alertDialogBuilder.setNegativeButton("Cancel", { _, _ -> })
         } else {
             alertDialogBuilder.setTitle("Enter gateway ip")
