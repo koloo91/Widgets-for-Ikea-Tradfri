@@ -6,33 +6,36 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <RelativeLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            android:padding="8dp"
+            android:gravity="center"
             android:minHeight="48dp"
-            android:gravity="center">
+            android:padding="8dp">
+
             <TextView
-                android:text="@string/devices"
-                android:textColor="@android:color/white"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/devices"
+                android:textColor="@android:color/white" />
 
             <ImageButton
                 android:id="@+id/refresh_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_refresh_white"
-                android:layout_alignParentEnd="true"/>
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/ic_refresh_white" />
         </RelativeLayout>
 
         <ListView
             android:id="@+id/devices_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:drawSelectorOnTop="true"
-            android:layout_below="@+id/header"/>
+            android:layout_below="@+id/header"
+            android:background="@android:color/white"
+            android:drawSelectorOnTop="true" />
     </RelativeLayout>
 </FrameLayout>
