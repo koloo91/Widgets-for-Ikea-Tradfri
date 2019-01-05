@@ -7,8 +7,7 @@ import android.service.quicksettings.TileService
 import android.support.annotation.RequiresApi
 import android.util.Log
 import android.widget.Toast
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.*
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
@@ -34,10 +33,10 @@ abstract class BaseTileService : TileService() {
     override fun onStartListening() {
         println("onStartListeningTile")
 
-        launch(CommonPool + handler) {
+        GlobalScope.launch(handler) {
             val deviceData = deviceDataFromDatabase().await() ?: return@launch
 
-            launch(UI + handler) {
+            launch(Dispatchers.Main + handler) {
                 val tile = qsTile
                 tile.label = deviceData.name
                 tile.updateTile()
@@ -52,14 +51,14 @@ abstract class BaseTileService : TileService() {
     }
 
     private fun deviceDataFromDatabase(): Deferred<DeviceData?> {
-        return async { deviceDataDao.findByTile(TILE_NAME) }
+        return GlobalScope.async { deviceDataDao.findByTile(TILE_NAME) }
     }
 
     private fun handleClick() {
-        launch(CommonPool + handler) {
+        GlobalScope.launch(handler) {
             val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return@launch
 
-            service.ping({ _ ->
+            service.ping({
                 if (deviceData.isDevice) handleDevice(deviceData)
                 else handleGroup(deviceData)
             }, {

@@ -13,7 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.action_bar_switch.view.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.Job
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.intro.IntroActivity

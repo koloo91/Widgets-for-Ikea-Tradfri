@@ -10,9 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_tiles.view.*
-import kotlinx.coroutines.experimental.CoroutineExceptionHandler
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.Group
@@ -125,7 +126,7 @@ class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
     }
 
     override fun onStateSwitchCheckedChanged(spinnerItem: SpinnerData, tile: String) {
-        launch {
+        GlobalScope.launch {
             deviceDataDao.deleteByTile(tile)
 
             if (spinnerItem.id > 0)
@@ -136,10 +137,10 @@ class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
     }
 
     private fun loadAndRefreshDeviceData() {
-        launch {
+        GlobalScope.launch {
             val allStoredData = deviceDataDao.getAll()
 
-            launch(UI) {
+            launch(Dispatchers.Main) {
                 adapter.updateStoredDeviceData(allStoredData)
             }
         }

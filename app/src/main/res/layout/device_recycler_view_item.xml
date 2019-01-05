@@ -13,7 +13,7 @@
         android:layout_alignTop="@+id/device_state_switch"
         android:layout_centerVertical="true"
         android:layout_marginStart="16dp"
-        android:background="@color/transparent"
+        android:background="@android:color/transparent"
         android:scaleType="fitCenter" />
 
     <TextView
