@@ -1,8 +1,9 @@
 package thekolo.de.quicktilesforikeatradfri.services
 
 import android.util.Log
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 typealias Action = () -> Job
 
@@ -28,7 +29,7 @@ class QueueService private constructor() {
     private fun executeNextAction() {
         if (actions.isEmpty() || isExecutingAction) return
 
-        currentJob = launch() {
+        currentJob = GlobalScope.launch {
             try {
                 isExecutingAction = true
                 actions.first()().join()
