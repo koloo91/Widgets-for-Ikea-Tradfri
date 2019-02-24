@@ -114,7 +114,7 @@ class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
     private fun updateAdapter() {
         Log.d("TilesFragment", "updateSpinnerItems")
 
-        val defaultEntry = listOf(SpinnerData(-1, "None", true)).toMutableList()
+        val defaultEntry = listOf(SpinnerData(TileUtil.NONE_ID, "None", true), SpinnerData(TileUtil.ALL_ID, "All", true)).toMutableList()
         val devicesData = devices.map { SpinnerData(it.id, it.name, true) }.toMutableList()
         val groupsData = groups.map { SpinnerData(it.id, "${it.name} (Group)", false) }.toMutableList()
 
