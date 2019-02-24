@@ -4,11 +4,6 @@ import agency.tango.materialintroscreen.MaterialIntroActivity
 import agency.tango.materialintroscreen.MessageButtonBehaviour
 import agency.tango.materialintroscreen.SlideFragmentBuilder
 import android.os.Bundle
-import android.support.v4.view.ViewPager
-import android.util.Log
-import android.view.KeyEvent
-import android.view.View
-import org.jetbrains.anko.support.v4.viewPager
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
 
@@ -31,9 +26,9 @@ class IntroActivity : MaterialIntroActivity() {
 
         enableLastSlideAlphaExitTransition(true)
 
-        addSlide(gatewaySearchFragment, MessageButtonBehaviour(View.OnClickListener { searchForGateway() }, "Search"))
-        addSlide(securityCodeFragment, MessageButtonBehaviour(View.OnClickListener { scanSecurityCode() }, "Scan"))
-        addSlide(tryRegisterFragment, MessageButtonBehaviour(View.OnClickListener { tryRegister() }, "Test connection"))
+        addSlide(gatewaySearchFragment, MessageButtonBehaviour({ searchForGateway() }, "Search"))
+        addSlide(securityCodeFragment, MessageButtonBehaviour({ scanSecurityCode() }, "Scan"))
+        addSlide(tryRegisterFragment, MessageButtonBehaviour({ tryRegister() }, "Test connection"))
     }
 
     private fun searchForGateway() {
