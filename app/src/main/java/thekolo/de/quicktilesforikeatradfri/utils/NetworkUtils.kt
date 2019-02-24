@@ -1,10 +1,10 @@
 package thekolo.de.quicktilesforikeatradfri.utils
 
 import android.util.Log
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.CoroutineExceptionHandler
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.net.NetworkInterface
 
@@ -59,7 +59,7 @@ object NetworkUtils {
     }
 
     fun searchGatewayIp(onSuccess: (String) -> Unit, onError: () -> Unit, onDeviceFound: (Pair<String, String>) -> Unit, onProgressChanged: (Int) -> Unit, onFinished: () -> Unit) {
-        launch(CommonPool + handler) {
+        CoroutineScope(Dispatchers.Default + handler).launch {
             val deviceIp = getIpAddress()
             if (deviceIp == null) {
                 onError()
@@ -71,7 +71,7 @@ object NetworkUtils {
             scanNetwork(deviceIp, { ip, hostname ->
                 currentCount++
 
-                launch(UI + handler) {
+                CoroutineScope(Dispatchers.Main + handler).launch {
                     if (ip != hostname)
                         onDeviceFound(Pair(ip, hostname ?: ""))
                     onProgressChanged(((currentCount / 256.0) * 100).toInt())
@@ -79,10 +79,10 @@ object NetworkUtils {
 
                 if (hostname != null && hostname.startsWith(GATEWAY_PREFIX)) {
                     println(ip)
-                    launch(UI + handler) { onSuccess(ip) }
+                    CoroutineScope(Dispatchers.Main + handler).launch { onSuccess(ip) }
                 }
             }, {
-                launch(UI + handler) {
+                CoroutineScope(Dispatchers.Main + handler).launch {
                     onFinished()
                 }
             })
