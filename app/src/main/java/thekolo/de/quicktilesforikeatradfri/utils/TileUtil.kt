@@ -10,6 +10,10 @@ object TileUtil {
     val TILE_4 = Tile("tile_4", 4)
     val TILE_5 = Tile("tile_5", 5)
 
+
+    const val NONE_ID = -1
+    const val ALL_ID = 1
+
     fun nameForIndex(index: Int): String {
         return when (index) {
             NONE.index -> NONE.name

@@ -5,6 +5,7 @@ import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.Group
 
 object DeviceUtil {
+
     fun isDeviceOn(device: Device?): Boolean {
         if (device == null) return false
         if (device.states == null) return false

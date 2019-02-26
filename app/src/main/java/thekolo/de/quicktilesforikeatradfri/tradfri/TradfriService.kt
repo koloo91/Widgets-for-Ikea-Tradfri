@@ -51,7 +51,7 @@ class TradfriService(context: Context) {
     }
 
     private fun register(identity: String, onSuccess: (RegisterResult) -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val response = client.register(identity)
 
             if (response == null) {
@@ -90,7 +90,7 @@ class TradfriService(context: Context) {
     }
 
     private fun ping(onSuccess: (String) -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             println("_ping start")
             val response = client.ping()
             if (response == null) {
@@ -110,7 +110,7 @@ class TradfriService(context: Context) {
 
     fun toggleAllOn(onFinish: () -> Unit) {
         queueService.addAction {
-            GlobalScope.launch(handler) {
+            CoroutineScope(Dispatchers.Default + handler).launch {
                 val ids = getDeviceIds()
 
                 val allJobs = ids.map { turnDeviceOn(it, {}, {}) }
@@ -126,7 +126,7 @@ class TradfriService(context: Context) {
 
     fun toggleAllOff(onFinish: () -> Unit) {
         queueService.addAction {
-            GlobalScope.launch(handler) {
+            CoroutineScope(Dispatchers.Default + handler).launch {
                 val ids = getDeviceIds()
 
                 val allJobs = ids.map { turnDeviceOff(it, {}, {}) }
@@ -168,7 +168,7 @@ class TradfriService(context: Context) {
     }
 
     private fun getDevice(id: Int, onSuccess: (Device) -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val response = client.getDevice(id)
             if (response == null) {
                 launch(Dispatchers.Main + handler) { onError() }
@@ -201,7 +201,7 @@ class TradfriService(context: Context) {
     }
 
     private fun getDevices(onSuccess: (List<Device>) -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val deviceIds = getDeviceIds()
 
             val devices = deviceIds.mapNotNull { id ->
@@ -218,8 +218,8 @@ class TradfriService(context: Context) {
         return deviceIds.mapNotNull { id ->
             getDevice(id)
         }.filter { device ->
-            !device.type.name.contains("remote control")
-        }.sortedBy { it.name }
+                    !device.type.name.contains("remote control")
+                }.sortedBy { it.name }
     }
 
     fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
@@ -232,7 +232,7 @@ class TradfriService(context: Context) {
     }
 
     private fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val response = client.turnDeviceOn(id)
 
             if (response == null) {
@@ -259,7 +259,7 @@ class TradfriService(context: Context) {
     }
 
     private fun turnDeviceOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val response = client.turnDeviceOff(id)
 
             if (response == null) {
@@ -286,7 +286,7 @@ class TradfriService(context: Context) {
     }
 
     private fun toggleDevice(deviceId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val device = getDevice(deviceId)
 
             if (device == null) {
@@ -330,7 +330,7 @@ class TradfriService(context: Context) {
     }
 
     private fun getGroup(id: Int, onSuccess: (Group) -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val response = client.getGroup(id)
 
             if (response == null) {
@@ -373,7 +373,7 @@ class TradfriService(context: Context) {
     }
 
     private fun getGroups(onSuccess: (List<Group>) -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val groupIds = getGroupIds()
             val groups = groupIds.mapNotNull { getGroup(it) }.sortedBy { it.name }
 
@@ -396,7 +396,7 @@ class TradfriService(context: Context) {
     }
 
     private fun turnGroupOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val response = client.turnGroupOn(id)
 
             if (response == null) {
@@ -423,7 +423,7 @@ class TradfriService(context: Context) {
     }
 
     private fun turnGroupOff(id: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val response = client.turnGroupOff(id)
 
             if (response == null) {
@@ -450,7 +450,7 @@ class TradfriService(context: Context) {
     }
 
     private fun toggleGroup(groupId: Int, onSuccess: () -> Unit, onError: () -> Unit): Job {
-        return GlobalScope.launch(handler) {
+        return CoroutineScope(Dispatchers.Default + handler).launch {
             val device = getGroup(groupId)
 
             if (device == null) {

@@ -1,7 +1,8 @@
 package thekolo.de.quicktilesforikeatradfri.services
 
 import android.util.Log
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -29,7 +30,7 @@ class QueueService private constructor() {
     private fun executeNextAction() {
         if (actions.isEmpty() || isExecutingAction) return
 
-        currentJob = GlobalScope.launch {
+        currentJob = CoroutineScope(Dispatchers.Default).launch {
             try {
                 isExecutingAction = true
                 actions.first()().join()

@@ -14,9 +14,12 @@ import thekolo.de.quicktilesforikeatradfri.room.DeviceData
 import thekolo.de.quicktilesforikeatradfri.room.DeviceDataDao
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.utils.DeviceUtil
+import thekolo.de.quicktilesforikeatradfri.utils.TileUtil
 
 @RequiresApi(Build.VERSION_CODES.N)
 abstract class BaseTileService : TileService() {
+    private val TAG = this::class.java.simpleName
+
     abstract val TILE_NAME: String
     abstract val DISPLAY_NAME: String
 
@@ -33,10 +36,10 @@ abstract class BaseTileService : TileService() {
     override fun onStartListening() {
         println("onStartListeningTile")
 
-        GlobalScope.launch(handler) {
+        CoroutineScope(Dispatchers.Default + handler).launch {
             val deviceData = deviceDataFromDatabase().await() ?: return@launch
 
-            launch(Dispatchers.Main + handler) {
+            CoroutineScope(Dispatchers.Main + handler).launch {
                 val tile = qsTile
                 tile.label = deviceData.name
                 tile.updateTile()
@@ -51,14 +54,16 @@ abstract class BaseTileService : TileService() {
     }
 
     private fun deviceDataFromDatabase(): Deferred<DeviceData?> {
-        return GlobalScope.async { deviceDataDao.findByTile(TILE_NAME) }
+        return CoroutineScope(Dispatchers.Default + handler).async {
+            return@async deviceDataDao.findByTile(TILE_NAME)
+        }
     }
 
     private fun handleClick() {
-        GlobalScope.launch(handler) {
+        CoroutineScope(Dispatchers.Default + handler).launch {
             val deviceData = runBlocking { deviceDataFromDatabase().await() } ?: return@launch
 
-            service.ping({
+            service.ping({ _ ->
                 if (deviceData.isDevice) handleDevice(deviceData)
                 else handleGroup(deviceData)
             }, {
@@ -68,11 +73,24 @@ abstract class BaseTileService : TileService() {
     }
 
     private fun handleDevice(deviceData: DeviceData) {
-        service.toggleDevice(deviceData.id, {
-            service.getDevice(deviceData.id, { device ->
-                updateTile(device.name, DeviceUtil.isDeviceOn(device))
+        if (deviceData.id == TileUtil.ALL_ID) {
+            // Turn lamps of
+            if (qsTile.icon.resId == R.drawable.lightbulb_outline) {
+                service.toggleAllOn {
+                    updateTile(deviceData.name, true)
+                }
+            } else {
+                service.toggleAllOff {
+                    updateTile(deviceData.name, false)
+                }
+            }
+        } else {
+            service.toggleDevice(deviceData.id, {
+                service.getDevice(deviceData.id, { device ->
+                    updateTile(device.name, DeviceUtil.isDeviceOn(device))
+                }, { onError() })
             }, { onError() })
-        }, { onError() })
+        }
     }
 
     private fun handleGroup(deviceData: DeviceData) {
