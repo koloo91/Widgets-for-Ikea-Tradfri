@@ -35,7 +35,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/header"
-            android:background="@android:color/white"
             android:drawSelectorOnTop="true" />
     </RelativeLayout>
 </FrameLayout>

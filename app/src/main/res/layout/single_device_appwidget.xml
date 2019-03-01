@@ -9,14 +9,16 @@
         android:id="@+id/toggle_device_image_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/transparent"
         android:src="@mipmap/ic_launcher" />
 
     <TextView
         android:id="@+id/device_name_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Single Widget"
         android:layout_below="@+id/toggle_device_image_button"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:textAlignment="center"
         android:textColor="@android:color/white" />
 </RelativeLayout>
