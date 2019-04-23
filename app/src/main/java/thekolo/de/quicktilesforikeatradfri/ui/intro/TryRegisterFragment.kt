@@ -44,7 +44,7 @@ class TryRegisterFragment : SlideFragment() {
     fun tryRegister() {
         view?.progress_bar?.visibility = View.VISIBLE
 
-        val identity = "${UUID.randomUUID()}"
+        val identity = "${UUID.randomUUID()}".replace("-", "").toLowerCase()
 
         TradfriService.instance(activity!!.applicationContext).refreshClient(activity!!.applicationContext)
         TradfriService.instance(activity!!.applicationContext).register(identity, { registerResult ->
