@@ -45,11 +45,17 @@ class MainActivity : AppCompatActivity() {
         bottom_navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         bottom_navigation.selectedItemId = R.id.devices
 
+        // For widgets
         UpdateJobService.schedule(applicationContext)
 
         if (displayIntroActivity()) {
             val introIntent = Intent(this, IntroActivity::class.java)
             startActivity(introIntent)
+        }
+
+        if ((SettingsUtil.getIdentity(this) ?: "").contains("-")) {
+            SettingsUtil.setIdentity(this, "")
+            SettingsUtil.setPreSharedKey(this, "")
         }
     }
 
@@ -145,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
         service.refreshClient(applicationContext)
 
-        val identity = "${UUID.randomUUID()}"
+        val identity = "${UUID.randomUUID()}".replace("-", "").toLowerCase()
         return service.register(identity, { registerResult ->
             SettingsUtil.setIdentity(applicationContext, identity)
             SettingsUtil.setPreSharedKey(applicationContext, registerResult.preSharedKey)
