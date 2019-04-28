@@ -27,6 +27,7 @@ android {
         exclude 'epl-v10.html'
         exclude 'edl-v10.html'
         exclude 'notice.html'
+        exclude 'META-INF/atomicfu.kotlin_module'
     }
 }
 
