@@ -51,9 +51,7 @@ class MainActivity : AppCompatActivity() {
         if (displayIntroActivity()) {
             val introIntent = Intent(this, IntroActivity::class.java)
             startActivity(introIntent)
-        }
-
-        if ((SettingsUtil.getIdentity(this) ?: "").contains("-")) {
+        } else if ((SettingsUtil.getIdentity(this) ?: "").contains("-")) {
             SettingsUtil.setIdentity(this, "")
             SettingsUtil.setPreSharedKey(this, "")
         }
