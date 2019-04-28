@@ -10,8 +10,8 @@ android {
         applicationId "thekolo.de.widgetsforikeatradfri"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 26
-        versionName "1.6.2"
+        versionCode 27
+        versionName "1.6.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -52,8 +52,8 @@ dependencies {
     kapt 'android.arch.persistence.room:compiler:1.1.1'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.0"
 
     implementation 'agency.tango.android:material-intro-screen:0.0.5'
     implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
