@@ -1,7 +1,7 @@
 package thekolo.de.quicktilesforikeatradfri.utils
 
 import android.content.Context
-import thekolo.de.quicktilesforikeatradfri.Device
+import thekolo.de.quicktilesforikeatradfri.models.Device
 
 object SettingsUtil {
     const val DEFAULT_SHARED_PREFERENCES_FILE = "thekolo.de.widgetsforikeatradfri.settings"

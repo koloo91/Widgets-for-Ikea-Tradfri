@@ -12,8 +12,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.widget.RemoteViews
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_single_widget_configuration.*
-import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
+import thekolo.de.quicktilesforikeatradfri.models.Device
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.SingleDeviceWidgetSelectionAdapter
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil
@@ -69,7 +69,7 @@ class SingleDeviceWidgetConfigurationActivity : AppCompatActivity(), SingleDevic
         val remoteViews = RemoteViews(packageName, R.layout.single_device_appwidget)
 
         val clickIntent = Intent(applicationContext, SingleDeviceItemClickedBroadcastReceiver::class.java)
-        clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        clickIntent.putExtra(EXTRA_APPWIDGET_ID, widgetId)
 
         val pendingIntent = PendingIntent.getBroadcast(applicationContext, widgetId, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         remoteViews.setTextViewText(R.id.device_name_text_view, device.name)
@@ -80,7 +80,7 @@ class SingleDeviceWidgetConfigurationActivity : AppCompatActivity(), SingleDevic
         appWidgetManager.updateAppWidget(widgetId, remoteViews)
 
         val resultValue = Intent()
-        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        resultValue.putExtra(EXTRA_APPWIDGET_ID, widgetId)
         setResult(RESULT_OK, resultValue)
         finish()
     }

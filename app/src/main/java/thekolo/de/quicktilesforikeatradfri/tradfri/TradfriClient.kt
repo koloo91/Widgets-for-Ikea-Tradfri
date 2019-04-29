@@ -10,9 +10,9 @@ import org.eclipse.californium.core.network.config.NetworkConfig
 import org.eclipse.californium.scandium.DTLSConnector
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.pskstore.StaticPskStore
-import thekolo.de.quicktilesforikeatradfri.DeviceState
-import thekolo.de.quicktilesforikeatradfri.DeviceUpdater
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
+import thekolo.de.quicktilesforikeatradfri.models.DeviceState
+import thekolo.de.quicktilesforikeatradfri.models.DeviceUpdater
 import thekolo.de.quicktilesforikeatradfri.models.GroupUpdater
 import java.net.InetSocketAddress
 

@@ -5,7 +5,7 @@ import android.util.Log
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import org.eclipse.californium.core.CoapResponse
-import thekolo.de.quicktilesforikeatradfri.Device
+import thekolo.de.quicktilesforikeatradfri.models.Device
 import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.models.RegisterResult
 import thekolo.de.quicktilesforikeatradfri.services.QueueService
@@ -218,7 +218,7 @@ class TradfriService(context: Context) {
         return deviceIds.mapNotNull { id ->
             getDevice(id)
         }.filter { device ->
-                    !device.type.name.contains("remote control")
+            !(device.type?.name?.contains("remote control") ?: false)
                 }.sortedBy { it.name }
     }
 
