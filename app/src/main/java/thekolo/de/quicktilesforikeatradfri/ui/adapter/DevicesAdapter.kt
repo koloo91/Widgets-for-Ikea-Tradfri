@@ -10,9 +10,9 @@ import android.widget.TextView
 import com.amulyakhare.textdrawable.TextDrawable
 import com.amulyakhare.textdrawable.util.ColorGenerator
 import kotlinx.android.synthetic.main.device_recycler_view_item.view.*
-import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.BulbState
+import thekolo.de.quicktilesforikeatradfri.models.Device
 
 
 class DevicesAdapter(var devices: List<Device>,
@@ -30,7 +30,7 @@ class DevicesAdapter(var devices: List<Device>,
         val device = devices[position]
 
         holder.nameTextView.text = device.name
-        holder.typeTextView.text = device.type.name
+        holder.typeTextView.text = device.type?.name ?: "Unknown"
 
         holder.stateSwitch.isChecked = isDeviceOn(device)
         holder.stateSwitch.setOnCheckedChangeListener { switch, isChecked ->
@@ -38,7 +38,7 @@ class DevicesAdapter(var devices: List<Device>,
             listener.onStateSwitchCheckedChanged(device, isChecked)
         }
 
-        if (device.type.name.contains("remote control")) {
+        if (device.type?.name?.contains("remote control") == true) {
             holder.stateSwitch.visibility = View.GONE
             holder.batteryTextView.visibility = View.VISIBLE
             holder.batteryTextView.text = "${device.type.battery ?: 100}%"

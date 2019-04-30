@@ -10,8 +10,8 @@ import android.widget.TextView
 import com.amulyakhare.textdrawable.TextDrawable
 import com.amulyakhare.textdrawable.util.ColorGenerator
 import kotlinx.android.synthetic.main.device_recycler_view_item.view.*
-import thekolo.de.quicktilesforikeatradfri.Device
 import thekolo.de.quicktilesforikeatradfri.R
+import thekolo.de.quicktilesforikeatradfri.models.Device
 
 
 class SingleDeviceWidgetSelectionAdapter(var devices: List<Device>,
@@ -33,7 +33,7 @@ class SingleDeviceWidgetSelectionAdapter(var devices: List<Device>,
         }
 
         holder.nameTextView.text = device.name
-        holder.typeTextView.text = device.type.name
+        holder.typeTextView.text = device.type?.name ?: "Unknown"
 
         val drawable = TextDrawable.builder()
                 .buildRound(device.name[0].toString(), generator.getColor(device.name))
