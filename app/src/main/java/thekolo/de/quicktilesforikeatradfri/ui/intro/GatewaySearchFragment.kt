@@ -22,7 +22,7 @@ class GatewaySearchFragment : SlideFragment(), TextWatcher, ScanResultDialogFrag
 
     var gatewayIp = ""
         set(value) {
-            Log.d("GatewaySearchFragment", "Setting gateway ip $value")
+            Log.i("GatewaySearchFragment", "Setting gateway ip $value")
             SettingsUtil.setGatewayIp(activity!!.applicationContext, value)
             field = value
         }

@@ -12,8 +12,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.widget.RemoteViews
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_single_widget_configuration.*
-import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.Device
+import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 import thekolo.de.quicktilesforikeatradfri.ui.adapter.SingleDeviceWidgetSelectionAdapter
 import thekolo.de.quicktilesforikeatradfri.utils.SettingsUtil

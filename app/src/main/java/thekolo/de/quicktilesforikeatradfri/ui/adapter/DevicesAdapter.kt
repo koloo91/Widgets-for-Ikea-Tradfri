@@ -1,7 +1,6 @@
 package thekolo.de.quicktilesforikeatradfri.ui.adapter
 
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +18,7 @@ import thekolo.de.quicktilesforikeatradfri.models.Device
 class DevicesAdapter(var devices: List<Device>,
                      private val listener: DevicesAdapterActions) : RecyclerView.Adapter<DevicesAdapter.ViewHolder>() {
 
-    var generator = ColorGenerator.MATERIAL
+    private var generator = ColorGenerator.MATERIAL
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.device_recycler_view_item, parent, false)
@@ -28,43 +27,29 @@ class DevicesAdapter(var devices: List<Device>,
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        try {
-            val device = devices[position]
+        val device = devices[position]
 
-            holder.nameTextView.text = device.name
+        holder.nameTextView.text = device.name
+        holder.typeTextView.text = device.type?.name ?: "Unknown"
 
-            if (device.type?.name != null) {
-                holder.typeTextView.text = device.type.name
-                val drawable = TextDrawable.builder()
-                        .buildRound(device.name[0].toString(), generator.getColor(device.name))
+        val drawable = TextDrawable.builder()
+                .buildRound(device.name[0].toString(), generator.getColor(device.name))
 
-                holder.firstLetterImageView.setImageDrawable(drawable)
-            } else {
-                holder.typeTextView.text = "Unknown"
+        holder.firstLetterImageView.setImageDrawable(drawable)
 
-                val drawable = TextDrawable.builder()
-                        .buildRound("U", generator.getColor(device.name))
+        holder.stateSwitch.isChecked = isDeviceOn(device)
+        holder.stateSwitch.setOnCheckedChangeListener { switch, isChecked ->
+            if (!switch.isPressed) return@setOnCheckedChangeListener
+            listener.onStateSwitchCheckedChanged(device, isChecked)
+        }
 
-                holder.firstLetterImageView.setImageDrawable(drawable)
-            }
-
-            holder.stateSwitch.isChecked = isDeviceOn(device)
-            holder.stateSwitch.setOnCheckedChangeListener { switch, isChecked ->
-                if (!switch.isPressed) return@setOnCheckedChangeListener
-                listener.onStateSwitchCheckedChanged(device, isChecked)
-            }
-
-            if (device.type?.name?.contains("remote control") == true) {
-                holder.stateSwitch.visibility = View.GONE
-                holder.batteryTextView.visibility = View.VISIBLE
-                holder.batteryTextView.text = "${device.type.battery ?: 100}%"
-            } else {
-                holder.stateSwitch.visibility = View.VISIBLE
-                holder.batteryTextView.visibility = View.GONE
-            }
-
-        } catch (e: Exception) {
-            Log.e(TAG, e.message)
+        if (device.type?.name?.contains("remote control") == true) {
+            holder.stateSwitch.visibility = View.GONE
+            holder.batteryTextView.visibility = View.VISIBLE
+            holder.batteryTextView.text = "${device.type.battery ?: 100}%"
+        } else {
+            holder.stateSwitch.visibility = View.VISIBLE
+            holder.batteryTextView.visibility = View.GONE
         }
     }
 

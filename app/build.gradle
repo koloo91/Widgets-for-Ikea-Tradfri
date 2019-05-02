@@ -10,19 +10,17 @@ android {
         applicationId "thekolo.de.widgetsforikeatradfri"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 30
-        versionName "1.6.5"
+        versionCode 31
+        versionName "1.6.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
-
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     packagingOptions {
         exclude 'epl-v10.html'
         exclude 'edl-v10.html'

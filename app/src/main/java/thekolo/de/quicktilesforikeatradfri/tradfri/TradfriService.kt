@@ -31,7 +31,7 @@ class TradfriService(context: Context) {
         val identity = SettingsUtil.getIdentity(context)
         val preSharedKey = SettingsUtil.getPreSharedKey(context)
 
-        Log.d(LogName, "Refreshing with values: '$gatewayIp', '$securityId', '$identity', '$preSharedKey'")
+        Log.i(TAG, "Refreshing with values: '$gatewayIp', '$securityId', '$identity', '$preSharedKey'")
 
         client = TradfriClient(gatewayIp, securityId, identity, preSharedKey)
     }
@@ -308,15 +308,15 @@ class TradfriService(context: Context) {
     }
 
     private fun getGroupIds(): List<Int> {
-        Log.d(LogName, "getGroupIds")
+        Log.i(TAG, "getGroupIds")
         val response = client.getGroupIds() ?: return emptyList()
 
         if (!response.isSuccess) {
-            Log.d(LogName, "getGroupIds was not successful")
+            Log.i(TAG, "getGroupIds was not successful")
             return emptyList()
         }
 
-        Log.d(LogName, "getGroupIds was successful -> found ${String(response.payload)}")
+        Log.i(TAG, "getGroupIds was successful -> found ${String(response.payload)}")
         return parseResponse(response, List::class.java) as List<Int>? ?: return emptyList()
     }
 
@@ -359,7 +359,7 @@ class TradfriService(context: Context) {
         if (!response.isSuccess)
             return null
 
-        Log.d(LogName, "getGroup was successful -> found ${String(response.payload)}")
+        Log.i(TAG, "getGroup was successful -> found ${String(response.payload)}")
         return parseResponse(response, Group::class.java)
     }
 
@@ -472,17 +472,18 @@ class TradfriService(context: Context) {
 
     private fun <T> parseResponse(response: CoapResponse, type: Class<T>): T? {
         return try {
+            Log.i(TAG, String(response.payload))
             val payload = String(response.payload)
             gson.fromJson<T>(payload, type)
         } catch (e: Exception) {
-            println(e.message)
+            Log.e(TAG, e.message)
             null
         }
     }
 
     companion object {
         const val Retries = 3
-        const val LogName = "TradfriService"
+        private val TAG = this::class.java.simpleName
 
         private var instance: TradfriService? = null
 
