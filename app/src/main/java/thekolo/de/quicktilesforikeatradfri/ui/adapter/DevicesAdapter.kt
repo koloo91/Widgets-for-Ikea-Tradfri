@@ -33,8 +33,20 @@ class DevicesAdapter(var devices: List<Device>,
 
             holder.nameTextView.text = device.name
 
-            holder.typeTextView.text = device.type?.name ?: "Unknown"
+            if (device.type?.name != null) {
+                holder.typeTextView.text = device.type.name
+                val drawable = TextDrawable.builder()
+                        .buildRound(device.name[0].toString(), generator.getColor(device.name))
 
+                holder.firstLetterImageView.setImageDrawable(drawable)
+            } else {
+                holder.typeTextView.text = "Unknown"
+
+                val drawable = TextDrawable.builder()
+                        .buildRound("U", generator.getColor(device.name))
+
+                holder.firstLetterImageView.setImageDrawable(drawable)
+            }
 
             holder.stateSwitch.isChecked = isDeviceOn(device)
             holder.stateSwitch.setOnCheckedChangeListener { switch, isChecked ->
@@ -51,10 +63,6 @@ class DevicesAdapter(var devices: List<Device>,
                 holder.batteryTextView.visibility = View.GONE
             }
 
-            val drawable = TextDrawable.builder()
-                    .buildRound(device.name[0].toString(), generator.getColor(device.name))
-
-            holder.firstLetterImageView.setImageDrawable(drawable)
         } catch (e: Exception) {
             Log.e(TAG, e.message)
         }
