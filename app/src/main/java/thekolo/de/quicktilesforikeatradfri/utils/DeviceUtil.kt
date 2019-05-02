@@ -1,7 +1,7 @@
 package thekolo.de.quicktilesforikeatradfri.utils
 
-import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.Device
+import thekolo.de.quicktilesforikeatradfri.models.BulbState
 import thekolo.de.quicktilesforikeatradfri.models.Group
 
 object DeviceUtil {

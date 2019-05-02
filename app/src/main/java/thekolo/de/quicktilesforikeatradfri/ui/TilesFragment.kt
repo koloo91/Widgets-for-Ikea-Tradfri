@@ -5,7 +5,6 @@ import android.app.Fragment
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +12,8 @@ import kotlinx.android.synthetic.main.fragment_tiles.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.Device
+import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.Group
 import thekolo.de.quicktilesforikeatradfri.room.Database
 import thekolo.de.quicktilesforikeatradfri.room.DeviceData
@@ -78,14 +77,11 @@ class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
     override fun onPause() {
         super.onPause()
 
-        Log.d("TilesFragment", "onPause")
         QueueService.instance().clearQueue()
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-
-        Log.d("TilesFragment", "onAttach")
 
         mainActivity = context as MainActivity
         service = TradfriService.instance(activity)
@@ -112,8 +108,6 @@ class TilesFragment : Fragment(), TilesAdapter.TilesAdapterActions {
     }
 
     private fun updateAdapter() {
-        Log.d("TilesFragment", "updateSpinnerItems")
-
         val defaultEntry = listOf(SpinnerData(TileUtil.NONE_ID, "None", true), SpinnerData(TileUtil.ALL_ID, "All", true)).toMutableList()
         val devicesData = devices.map { SpinnerData(it.id, it.name, true) }.toMutableList()
         val groupsData = groups.map { SpinnerData(it.id, "${it.name} (Group)", false) }.toMutableList()

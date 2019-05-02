@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.Device
+import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.tradfri.TradfriService
 
 

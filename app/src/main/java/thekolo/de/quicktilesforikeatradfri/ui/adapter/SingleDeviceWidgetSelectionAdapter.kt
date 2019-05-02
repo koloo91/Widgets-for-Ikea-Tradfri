@@ -10,8 +10,8 @@ import android.widget.TextView
 import com.amulyakhare.textdrawable.TextDrawable
 import com.amulyakhare.textdrawable.util.ColorGenerator
 import kotlinx.android.synthetic.main.device_recycler_view_item.view.*
-import thekolo.de.quicktilesforikeatradfri.R
 import thekolo.de.quicktilesforikeatradfri.models.Device
+import thekolo.de.quicktilesforikeatradfri.R
 
 
 class SingleDeviceWidgetSelectionAdapter(var devices: List<Device>,

@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
                 loadingFunction()
             }, {
                 if (retryCounter > 0) {
-                    Log.d("MainActivity", "Ping failed.. retrying $retryCounter")
+                    Log.i("MainActivity", "Ping failed.. retrying $retryCounter")
                     startLoadingProcess(loadingFunction, retryCounter - 1)
                 } else displayMessage(getString(R.string.unable_to_reach_gateway))
             })

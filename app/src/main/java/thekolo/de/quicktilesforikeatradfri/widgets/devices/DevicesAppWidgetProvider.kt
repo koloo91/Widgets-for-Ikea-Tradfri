@@ -15,7 +15,7 @@ import android.content.ComponentName
 class DevicesAppWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        Log.d(LogName, "onUpdate")
+        Log.i(LogName, "onUpdate")
         val numberOfWidgets = appWidgetIds.size
 
         // Perform this loop procedure for each App Widget that belongs to this provider
@@ -47,9 +47,9 @@ class DevicesAppWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        Log.d(LogName, "onReceive")
+        Log.i(LogName, "onReceive")
         if (SYNC_CLICKED == intent.action) {
-            Log.d(LogName, "SYNC_CLICKED")
+            Log.i(LogName, "SYNC_CLICKED")
 
             val appWidgetManager = AppWidgetManager.getInstance(context)
 
@@ -59,7 +59,7 @@ class DevicesAppWidgetProvider : AppWidgetProvider() {
     }
 
     private fun getPendingSelfIntent(context: Context, action: String): PendingIntent {
-        Log.d(LogName, "getPendingSelfIntent")
+        Log.i(LogName, "getPendingSelfIntent")
         val intent = Intent(context, javaClass)
         intent.action = action
         return PendingIntent.getBroadcast(context, 0, intent, 0)

@@ -15,7 +15,7 @@ import thekolo.de.quicktilesforikeatradfri.widgets.groups.GroupsAppWidgetProvide
 
 class UpdateJobService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
-        Log.d(LogName, "onStartJob")
+        Log.i(LogName, "onStartJob")
 
         val appWidgetManager = AppWidgetManager.getInstance(applicationContext)
 
@@ -38,7 +38,7 @@ class UpdateJobService : JobService() {
         const val LogName = "UpdateJobService"
 
         fun schedule(context: Context) {
-            Log.d(LogName, "schedule")
+            Log.i(LogName, "schedule")
 
             val serviceComponent = ComponentName(context, UpdateJobService::class.java)
             val builder = JobInfo.Builder(808, serviceComponent)

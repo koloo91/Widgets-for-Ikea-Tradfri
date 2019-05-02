@@ -28,11 +28,11 @@ class GroupsViewsFactory(private val context: Context) : RemoteViewsService.Remo
     }
 
     override fun onDataSetChanged() {
-        Log.d(LogName, "onDataSetChanged")
+        Log.i(LogName, "onDataSetChanged")
 
         groups = client.getGroups()
 
-        Log.d(LogName, "onDataSetChanged loaded")
+        Log.i(LogName, "onDataSetChanged loaded")
     }
 
     override fun hasStableIds(): Boolean {
@@ -57,7 +57,7 @@ class GroupsViewsFactory(private val context: Context) : RemoteViewsService.Remo
     }
 
     override fun getCount(): Int {
-        Log.d(LogName, "getCount ${groups.size}")
+        Log.i(LogName, "getCount ${groups.size}")
         return groups.size
     }
 

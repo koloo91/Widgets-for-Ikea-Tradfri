@@ -61,14 +61,14 @@ class GroupsFragment : Fragment() {
     override fun onPause() {
         super.onPause()
 
-        Log.d("GroupsFragment", "onPause")
+        Log.i("GroupsFragment", "onPause")
         QueueService.instance().clearQueue()
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
 
-        Log.d("GroupsFragment", "onAttach")
+        Log.i("GroupsFragment", "onAttach")
 
         mainActivity = context as MainActivity
         service = TradfriService.instance(activity)

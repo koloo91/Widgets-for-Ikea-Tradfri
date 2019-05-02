@@ -16,7 +16,6 @@ import thekolo.de.quicktilesforikeatradfri.widgets.devices.DevicesAppWidgetProvi
 class GroupsAppWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        Log.d(LogName, "onUpdate")
         val numberOfWidgets = appWidgetIds.size
 
         // Perform this loop procedure for each App Widget that belongs to this provider
@@ -48,9 +47,9 @@ class GroupsAppWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        Log.d(DevicesAppWidgetProvider.LogName, "onReceive")
+        Log.i(DevicesAppWidgetProvider.LogName, "onReceive")
         if (SYNC_CLICKED == intent.action) {
-            Log.d(DevicesAppWidgetProvider.LogName, "SYNC_CLICKED")
+            Log.i(DevicesAppWidgetProvider.LogName, "SYNC_CLICKED")
 
             val appWidgetManager = AppWidgetManager.getInstance(context)
 
@@ -60,7 +59,7 @@ class GroupsAppWidgetProvider : AppWidgetProvider() {
     }
 
     private fun getPendingSelfIntent(context: Context, action: String): PendingIntent {
-        Log.d(DevicesAppWidgetProvider.LogName, "getPendingSelfIntent")
+        Log.i(DevicesAppWidgetProvider.LogName, "getPendingSelfIntent")
         val intent = Intent(context, javaClass)
         intent.action = action
         return PendingIntent.getBroadcast(context, 0, intent, 0)

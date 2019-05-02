@@ -21,7 +21,7 @@ class SecurityCodeFragment : SlideFragment(), QrCodeScanDialogFragment.OnCodeSca
 
     var securityCode = ""
         set(value) {
-            Log.d("SecurityCodeFragment", "Setting security code $value")
+            Log.i("SecurityCodeFragment", "Setting security code $value")
             SettingsUtil.setSecurityId(activity!!.applicationContext, value)
             field = value
         }
