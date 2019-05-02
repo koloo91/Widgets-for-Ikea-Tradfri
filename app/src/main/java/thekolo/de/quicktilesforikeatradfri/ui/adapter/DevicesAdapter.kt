@@ -1,6 +1,7 @@
 package thekolo.de.quicktilesforikeatradfri.ui.adapter
 
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,30 +28,44 @@ class DevicesAdapter(var devices: List<Device>,
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val device = devices[position]
+        try {
+            val device = devices[position]
 
-        holder.nameTextView.text = device.name
-        holder.typeTextView.text = device.type?.name ?: "Unknown"
+            holder.nameTextView.text = device.name
 
-        holder.stateSwitch.isChecked = isDeviceOn(device)
-        holder.stateSwitch.setOnCheckedChangeListener { switch, isChecked ->
-            if (!switch.isPressed) return@setOnCheckedChangeListener
-            listener.onStateSwitchCheckedChanged(device, isChecked)
+            if (device.type?.name != null) {
+                holder.typeTextView.text = device.type.name
+                val drawable = TextDrawable.builder()
+                        .buildRound(device.name[0].toString(), generator.getColor(device.name))
+
+                holder.firstLetterImageView.setImageDrawable(drawable)
+            } else {
+                holder.typeTextView.text = "Unknown"
+
+                val drawable = TextDrawable.builder()
+                        .buildRound("U", generator.getColor(device.name))
+
+                holder.firstLetterImageView.setImageDrawable(drawable)
+            }
+
+            holder.stateSwitch.isChecked = isDeviceOn(device)
+            holder.stateSwitch.setOnCheckedChangeListener { switch, isChecked ->
+                if (!switch.isPressed) return@setOnCheckedChangeListener
+                listener.onStateSwitchCheckedChanged(device, isChecked)
+            }
+
+            if (device.type?.name?.contains("remote control") == true) {
+                holder.stateSwitch.visibility = View.GONE
+                holder.batteryTextView.visibility = View.VISIBLE
+                holder.batteryTextView.text = "${device.type.battery ?: 100}%"
+            } else {
+                holder.stateSwitch.visibility = View.VISIBLE
+                holder.batteryTextView.visibility = View.GONE
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, e.message)
         }
-
-        if (device.type?.name?.contains("remote control") == true) {
-            holder.stateSwitch.visibility = View.GONE
-            holder.batteryTextView.visibility = View.VISIBLE
-            holder.batteryTextView.text = "${device.type.battery ?: 100}%"
-        } else {
-            holder.stateSwitch.visibility = View.VISIBLE
-            holder.batteryTextView.visibility = View.GONE
-        }
-
-        val drawable = TextDrawable.builder()
-                .buildRound(device.name[0].toString(), generator.getColor(device.name))
-
-        holder.firstLetterImageView.setImageDrawable(drawable)
     }
 
     override fun getItemCount(): Int {
@@ -78,5 +93,9 @@ class DevicesAdapter(var devices: List<Device>,
 
     interface DevicesAdapterActions {
         fun onStateSwitchCheckedChanged(device: Device, isChecked: Boolean)
+    }
+
+    companion object {
+        private val TAG = this::class.java.simpleName
     }
 }
