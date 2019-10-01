@@ -18,7 +18,7 @@ class TradfriService(context: Context) {
     private lateinit var client: TradfriClient
 
     private val handler = CoroutineExceptionHandler { _, ex ->
-        Log.println(Log.ERROR, "TradfriService", Log.getStackTraceString(ex))
+        Log.e(TAG, Log.getStackTraceString(ex))
     }
 
     init {
@@ -91,7 +91,7 @@ class TradfriService(context: Context) {
 
     private fun ping(onSuccess: (String) -> Unit, onError: () -> Unit): Job {
         return CoroutineScope(Dispatchers.Default + handler).launch {
-            println("_ping start")
+            Log.i(TAG, "ping start")
             val response = client.ping()
             if (response == null) {
                 launch(Dispatchers.Main + handler) { onError() }
@@ -104,7 +104,7 @@ class TradfriService(context: Context) {
             }
 
             launch(Dispatchers.Main + handler) { onSuccess(String(response.payload)) }
-            println("_ping end")
+            Log.i(TAG, "ping end")
         }
     }
 
@@ -204,10 +204,9 @@ class TradfriService(context: Context) {
         return CoroutineScope(Dispatchers.Default + handler).launch {
             val deviceIds = getDeviceIds()
 
-            val devices = deviceIds.mapNotNull { id ->
-                getDevice(id)
-            }.sortedBy { it.name }
-
+            val devices = deviceIds.mapNotNull { getDevice(it) }
+                    .filter { !(it.type?.name?.contains("remote control") ?: false) }
+                    .sortedBy { it.name }
             launch(Dispatchers.Main + handler) { onSuccess(devices) }
         }
     }
@@ -219,7 +218,7 @@ class TradfriService(context: Context) {
             getDevice(id)
         }.filter { device ->
             !(device.type?.name?.contains("remote control") ?: false)
-                }.sortedBy { it.name }
+        }.sortedBy { it.name }
     }
 
     fun turnDeviceOn(id: Int, onSuccess: () -> Unit, onError: () -> Unit, retryCounter: Int = Retries) {
@@ -483,7 +482,7 @@ class TradfriService(context: Context) {
 
     companion object {
         const val Retries = 3
-        private val TAG = this::class.java.simpleName
+        private val TAG = TradfriService::class.java.simpleName
 
         private var instance: TradfriService? = null
 
